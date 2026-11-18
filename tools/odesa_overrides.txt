@@ -1,86 +1,92 @@
-settings|Настройки, таки
-settings_title|Настройки лаунчера, шоб ви знали
-search_apps|Шо шукаємо?
-drawer_search_hint|Шо шукаєм?
-cancel|Ша, не треба
-save|Таки зберегти
+settings|Настройки, шоб вы были здоровы
+settings_title|Настройки лаунчера, не стесняйтесь
+search_apps|Шо ищем?
+drawer_search_hint|Шо ищем?
+cancel|Ша, не надо
+save|Таки сохранить
 remove|Забрать
-uninstall|Знести
-back|Назад, до Привозу
+uninstall|Снести
+back|Назад, на Привоз
 ok|Ну добре
-next|Йдемо далі
-not_now|Не зараз, я занятий
-continue_label|Ну давай
-folder|Папка
-no_room_on_page|Тут уже тісно, як на Привозі
-no_room_anywhere|Нема де яблуку впасти, ніде
-page_removed|Сторінку таки нема
-badges|Цяцьки-сповіщення
-drawer_groups|Як розкласти шухляду
-smart_folders|Розумні папки (не всі такі розумні, як вам здається)
-category_games|Ігри
-category_social|Балачки
-category_finance|Гроші
-hidden_apps|Шо ховається від людей
-widget_provider_missing|Цей віджет пішов у Одесу гуляти й не повернувся
-widget_bind_failed|Віджет не захотів. Таке буває
-shortcut_failed|Ярлик не пішов. Нічого не поробиш
-unable_to_launch|Не запускається %1$s, хоч ти тресни
-wallpaper_set|Поставить шпалери
-wallpaper_load_failed|Шо за картинка? Не вантажиться
-export_backup|Забрать копію
-import_backup|Привезти копію
-backup_exported|Копію забрано, можна спати спокійно
-backup_import_failed|Копія не приїхала: %1$s
-backup_export_failed|Копія не поїхала: %1$s
-reset_done|Лаунчер як новий, наче вчора народився
-reset_failed|Не вийшло скинути: %1$s
+next|Идём дальше
+not_now|Не сейчас, я занят
+continue_label|Ну давайте
+no_room_on_page|Тут уже тесно, как на Привозе
+no_room_anywhere|Яблоку негде упасть, нигде
+page_removed|Страницы таки нет
+badges|Цацки-уведомления
+drawer_groups|Как разложить меню
+smart_folders|Умные папки (не все такие умные, как вам кажется)
+category_games|Игры
+category_social|Болтовня
+category_finance|Деньги
+hidden_apps|Шо прячется от людей
+widget_provider_missing|Этот виджет ушёл гулять по Одессе и не вернулся
+widget_bind_failed|Виджет не захотел. Бывает
+shortcut_failed|Ярлык не пошёл. Ничего не поделаешь
+unable_to_launch|Не запускается %1$s, хоть ты тресни
+wallpaper_set|Поставить обои
+wallpaper_load_failed|Шо за картинка? Не грузится
+export_backup|Забрать копию
+import_backup|Привезти копию
+backup_exported|Копию забрали, можно спать спокойно
+backup_import_failed|Копия не приехала: %1$s
+backup_export_failed|Копия не поехала: %1$s
+reset_done|Лаунчер как новый, будто вчера родился
+reset_failed|Не вышло сбросить: %1$s
 undo|Ой, назад
 item_removed|Забрали
-no_icons_in_pack|Нема тут іконок, порожньо, як у кишені
-search_no_matches|На цьому телефоні такого нема, шукайте на Привозі
-settings_search_no_matches|Нема таких налаштувань: «%1$s». Ви шо, придумали?
-search_recent_header|Шо шукали останнім часом
-copied_to_clipboard|Скопіював. Користуйтесь на здоров’я
-onboarding_welcome_to|Ну шо, ласкаво просимо до
-onboarding_tagline|Головний екран, налаштуй хоч до ранку
-onboarding_design_home|Зробити красиво
-onboarding_restore_backup|Привезти стару копію
-onboarding_skip_setup|Та ну його, пропустити
-onboarding_skip_hint|Не хочете налаштовувати? Тиснете «Та ну його, пропустити» і йдете по своїх справах
-onboarding_look_title|Звідки починаємо?
-onboarding_shuffle|Зробити так, шоб ні в кого такого не було
-onboarding_color_title|Який колір по-вашому красивий?
-onboarding_density_title|Скільки влізе на сторінку?
-onboarding_density_roomy|Просторо, як на Дерибасівській
-onboarding_density_balanced|Як годиться
-onboarding_density_packed|Тісно, як у трамваї
-onboarding_names_title|Як будемо називать приложухи?
-onboarding_done_title|Ось ваш екран. Таки красота.
-onboarding_done_later|Все можна поміняти потім, в настройках, у «Швидкому старті».
-onboarding_set_home|Зробить це моїм екраном
+no_icons_in_pack|Тут нет значков, пусто, как в кармане
+search_no_matches|На этом телефоне такого нет, ищите на Привозе
+settings_search_no_matches|Нет таких настроек: «%1$s». Вы шо, придумали?
+search_recent_header|Шо искали недавно
+copied_to_clipboard|Скопировал. Пользуйтесь на здоровье
+onboarding_welcome_to|Ну шо, добро пожаловать в
+onboarding_tagline|Главный экран, настраивайте хоть до утра
+onboarding_design_home|Сделать красиво
+onboarding_restore_backup|Привезти старую копию
+onboarding_skip_setup|Да ну его, пропустить
+onboarding_skip_hint|Не хотите настраивать? Жмёте «Да ну его, пропустить» и идёте по своим делам
+onboarding_look_title|Откуда начинаем?
+onboarding_shuffle|Сделать так, шоб ни у кого такого не было
+onboarding_color_title|Какой цвет вам красивый?
+onboarding_density_title|Сколько влезет на страницу?
+onboarding_density_roomy|Просторно, как на Дерибасовской
+onboarding_density_balanced|Как положено
+onboarding_density_packed|Тесно, как в трамвае
+onboarding_names_title|Как будем называть приложения?
+onboarding_done_title|Вот ваш экран. Таки красота.
+onboarding_done_later|Всё можно поменять потом, в настройках, в «Быстром старте».
+onboarding_set_home|Сделать это моим экраном
 onboarding_done_rerun|Таки готово
-today|Сьогодні
-tomorrow|Завтра, якшо дасть Бог
-feed_empty_title|Ваша стрічка
-feed_empty_text|Складіть сюди віджети, приложухи й ярлики, шо потрібні кожного дня, і не гайте час.
-feed_disabled_hint|Спершу увімкніть стрічку в настройках
-card_removed|Картку забрали
-card_untitled|Картка
-crash_log|Журнал, де все падало
-crash_log_none|Ще нічого не падало, тьху-тьху-тьху
-crash_log_clear|Стерти
-crash_log_share_button|Показати
-about|Про лаунчер, коротко
+today|Сегодня
+tomorrow|Завтра, если Бог даст
+feed_empty_title|Ваша лента
+feed_empty_text|Положите сюда виджеты, приложения и ярлыки, шо нужны каждый день, и не теряйте время.
+feed_disabled_hint|Сначала включите ленту в настройках
+card_removed|Карточку забрали
+crash_log|Журнал, где всё падало
+crash_log_none|Ещё ничего не падало, тьфу-тьфу-тьфу
+crash_log_clear|Стереть
+crash_log_share_button|Показать
+about|О лаунчере, коротко
 about_whats_new|Шо нового
-about_whats_new_none|Нічого нового, все як було
-about_report_issue|Нажалітись
-about_report_issue_summary|Відкриє скаргу на GitHub, пишіть, не соромтесь
-about_license_name|AGPL-3.0
-restart_supernova|Перезапустити, шоб ви були здорові
-restart_launcher_q|Перезапустити Supernova?
-restart_launcher_message|Настройки й головний екран закриються й відкриються знову. Нічого не пропаде, слово одесита.
-reset_to_default|Скинути все до початку
-language|Мова
-language_system|Як на телефоні
-language_summary|Мова інтерфейсу лаунчера
+about_whats_new_none|Ничего нового, всё как было
+about_report_issue|Пожаловаться
+about_report_issue_summary|Откроет жалобу на GitHub, пишите, не стесняйтесь
+restart_supernova|Перезапустить, шоб вы были здоровы
+restart_launcher_q|Перезапустить Supernova?
+restart_launcher_message|Настройки и главный экран закроются и откроются снова. Ничего не пропадёт, слово одессита.
+reset_to_default|Сбросить всё к началу
+language|Язык
+language_system|Как на телефоне
+language_summary|Язык интерфейса лаунчера
+ok|Ну добре
+set_default_launcher|Сделайте меня главным, не пожалеете
+add_page|Добавить страничку
+remove_page|Убрать эту страничку
+widget_picker_empty|Виджетов нет, ой вей
+page_removed|Страницу убрали
+app_info|Шо за приложение
+action_lock_screen|Закрыть экран на замок
+accessibility_description|Позволяет Supernova закрыть экран жестом. Не обязательно; шо у вас на экране, она не читает.

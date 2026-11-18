@@ -1,1014 +1,1014 @@
-settings|Настройки, таки
-set_default_launcher|Зробити лаунчером за замовчуванням
-add_page|Докинуть сторінку
-remove_page|Знести цю сторінку
-page_removed|Сторінку таки нема
-set_default_page|Зробити сторінкою за замовчуванням
-move_page_left|Перемістити сторінку ліворуч
-move_page_right|Перемістити сторінку праворуч
-settings_title|Настройки лаунчера, шоб ви знали
-search_apps|Шо шукаємо?
-drawer_search_hint|Шо шукаєм?
-add_to_home|Докинуть на головний екран
-app_info|Про приложуху
-uninstall|Знести
+settings|Настройки, шоб вы были здоровы
+set_default_launcher|Сделайте меня главным, не пожалеете
+add_page|Добавить страничку
+remove_page|Убрать эту страничку
+page_removed|Страницу убрали
+set_default_page|Сделать страницей по умолчанию
+move_page_left|Переместить страницу влево
+move_page_right|Переместить страницу вправо
+settings_title|Настройки лаунчера, не стесняйтесь
+search_apps|Шо ищем?
+drawer_search_hint|Шо ищем?
+add_to_home|Добавить на главный экран
+app_info|Шо за приложение
+uninstall|Снести
 remove|Забрать
-save|Таки зберегти
-cancel|Ша, не треба
+save|Таки сохранить
+cancel|Ша, не надо
 folder|Папка
-folder_name|Назва папки
-remove_from_folder|На головний екран
-widget|Віджет
-widget_resize|Змінити розмір
-large_icon|Велика іконка
-normal_icon|Звичайна іконка
-padding|Відступ
-bring_to_front|На передній план
-send_to_back|На задній план
-pin_shortcut_title|Докинуть «%1$s» на головний екран?
-pin_widget_title|Докинуть віджет «%1$s» на головний екран?
-widget_picker_empty|Нема доступних віджетів
-home_action_wallpaper|Обої
-wallpaper_apps|Приложухи зі шпалерами
-wallpaper_from_files|Зображення з файлів
-wallpaper_set|Поставить шпалери
-wallpaper_crop_description|Зображення шпалер. Перетягніть, щоб пересунути, зведіть пальці, щоб змінити масштаб.
-wallpaper_target_home|Головний екран
-wallpaper_target_lock|Екран блокування
-wallpaper_target_both|Головний екран і екран блокування
-wallpaper_load_failed|Шо за картинка? Не вантажиться
-wallpaper_set_failed|Не склалося встановити обої
+folder_name|Название папки
+remove_from_folder|На главный экран
+widget|Виджет
+widget_resize|Изменить размер
+large_icon|Большой значок
+normal_icon|Обычный значок
+padding|Отступ
+bring_to_front|На передний план
+send_to_back|На задний план
+pin_shortcut_title|Добавить «%1$s» на главный экран?
+pin_widget_title|Добавить виджет «%1$s» на главный экран?
+widget_picker_empty|Виджетов нет, ой вей
+home_action_wallpaper|Обои
+wallpaper_apps|Приложения с обоями
+wallpaper_from_files|Изображение из файлов
+wallpaper_set|Поставить обои
+wallpaper_crop_description|Изображение обоев. Перетащите, чтобы сдвинуть, сведите пальцы, чтобы изменить масштаб.
+wallpaper_target_home|Главный экран
+wallpaper_target_lock|Экран блокировки
+wallpaper_target_both|Главный экран и экран блокировки
+wallpaper_load_failed|Шо за картинка? Не грузится
+wallpaper_set_failed|Не получилось установить обои
 home_action_settings|Настройки
-widget_count|%1$d віджет|%1$d віджети|%1$d віджетів|%1$d віджета
-no_room_on_page|Тут уже тісно, як на Привозі
-no_room_anywhere|Нема де яблуку впасти, ніде
-widget_not_in_dock|Віджети не можна ставити в док-панель
-added_to_page|Додано на сторінку %1$d
+widget_count|%1$d виджет|%1$d виджета|%1$d виджетов|%1$d виджета
+no_room_on_page|Тут уже тесно, как на Привозе
+no_room_anywhere|Яблоку негде упасть, нигде
+widget_not_in_dock|Виджеты нельзя помещать в док-панель
+added_to_page|Добавлено на страницу %1$d
 widget_span|%1$d × %2$d
-widget_add_interrupted|Настройки віджета перервано, спробуйте ще раз
-widget_settings|Настройки віджета
-widget_bind_failed|Віджет не захотів. Таке буває
-widget_configure_failed|Не склалося відкрити настройки віджета
-widget_provider_missing|Цей віджет пішов у Одесу гуляти й не повернувся
-widget_finish_setup|%1$s\nНатисніть, щоб завершити настройки
-export_backup|Забрать копію
-import_backup|Привезти копію
-import_backup_subtitle|Копія Supernova або файл копії з іншого лаунчера
-backup_exported|Копію забрано, можна спати спокійно
-backup_imported_count|Відновлено %1$d елемент|Відновлено %1$d елементи|Відновлено %1$d елементів|Відновлено %1$d елемента
-backup_dropped_apps|, пропущено %1$d відсутній приложуху|, пропущено %1$d відсутні приложухи|, пропущено %1$d відсутніх приложух|, пропущено %1$d відсутнього приложухи
-backup_widgets_rebind|, %1$d віджет, можливо, треба налаштувати знову|, %1$d віджети, можливо, треба налаштувати знову|, %1$d віджетів, можливо, треба налаштувати знову|, %1$d віджета, можливо, треба налаштувати знову
-backup_left_out|, пропущено %1$d елемент, для якого в Supernova немає місця|, пропущено %1$d елементи, для яких у Supernova немає місця|, пропущено %1$d елементів, для яких у Supernova немає місця|, пропущено %1$d елемента, для якого в Supernova немає місця
-backup_export_failed|Копія не поїхала: %1$s
-backup_import_failed|Копія не приїхала: %1$s
-shortcut_failed|Ярлик не пішов. Нічого не поробиш
-unable_to_launch|Не запускається %1$s, хоч ти тресни
-grid_rows|Рядки
-grid_cols|Стовпці
-dock_count|Місця в док-панелі
-show_labels|Показувать підписи іконок
-wallpaper_scroll|Прокручувати обої разом зі сторінками
-subgrid|Позиціювання за піделементами сітки (півклітинки)
-badges|Цяцьки-сповіщення
-badges_need_access_summary|Натисніть, щоб дозволити, і значки зʼявляться
-popup_needs_access_summary|Натисніть, щоб дозволити, і меню покаже сповіщення
-notification_access_title|Дозволити доступ до сповіщень
-notification_access_badges|Значки рахуються за вашими сповіщеннями, тож Supernova потрібен доступ до них. Вони читаються лише на цьому телефоні.
-notification_access_popup|Меню довгого натискання показує сповіщення приложухи, тож Supernova потрібен доступ до них. Вони читаються лише на цьому телефоні.
-notification_access_restricted|Якшо перемикач доступу до сповіщень неактивний, Android блокує його, бо Supernova встановлено не з Play Маркету. Відкрийте «Про приложуху», торкніться меню ⋮ угорі праворуч, оберіть «Дозволити обмежені настройки», а потім знову відкрийте екран доступу до сповіщень.
-open_settings|Відкрити настройки
-not_now|Не зараз, я занятий
-continue_label|Ну давай
-accessibility_needed_title|Увімкніть службу спеціальних можливостей
-accessibility_needed_message|Блокування екрана, недавні приложухи та швидкі настройки потребують служби спеціальних можливостей Supernova. Лаунчер використовує її лише для цих дій.
-gestures_need_accessibility|Потрібна служба спеціальних можливостей
-gestures_need_accessibility_summary|Деякі жести потребують її. Натисніть, щоб увімкнути
-device_admin_confirm_title|Блокувати через адміністратора пристрою?
-device_admin_inactive|Адміністратор пристрою вимкнений
-device_admin_inactive_summary|Блокування екрана не працює, доки його не ввімкнено. Натисніть, щоб увімкнути
-icon_pack|Пакет іконок
-scroll_effect|Ефект прокручування сторінок
-icon_shape|Форма іконок
-reset_custom_icons|Скинуть власні іконки
-reset_custom_icons_none|Нічого такого не задано
-reset_custom_icons_none_toast|Жоден приложуху, папка чи ярлик не має власної іконки
-reset_custom_icons_message|Іконки, які ви змінили у вибраних групах, повернуться до типових разом із формою чи стилем, шо ви для них вибрали. Назви, приховані підписи, дії свайпу й розміри іконок залишаться.
-reset_custom_icons_apps|Приложухи в шухляді
-reset_custom_icons_placed_apps|Приложухи на головному екрані
-reset_custom_icons_folders|Папки й вкладки
-reset_custom_icons_shortcuts|Ярлики й контакти
-reset_hidden_labels|Скинуть приховані підписи
-reset_hidden_labels_none|Нічого такого не приховано
-reset_hidden_labels_none_toast|Жоден приложуху чи ярлик не має прихованого підпису
-reset_hidden_labels_message|Кожен приложуху і ярлик, чий підпис ви приховали, знову його покаже. Назви, іконки й дії свайпу залишаться.
-custom_icon_apps|%d приложуху|%d приложухи|%d приложух|%d приложухи
+widget_add_interrupted|Настройка виджета прервана, попробуйте ещё раз
+widget_settings|Настройки виджета
+widget_bind_failed|Виджет не захотел. Бывает
+widget_configure_failed|Не получилось открыть настройки виджета
+widget_provider_missing|Этот виджет ушёл гулять по Одессе и не вернулся
+widget_finish_setup|%1$s\nНажмите, чтобы завершить настройку
+export_backup|Забрать копию
+import_backup|Привезти копию
+import_backup_subtitle|Копия Supernova или файл копии другого лаунчера
+backup_exported|Копию забрали, можно спать спокойно
+backup_imported_count|Восстановлен %1$d элемент|Восстановлено %1$d элемента|Восстановлено %1$d элементов|Восстановлено %1$d элемента
+backup_dropped_apps|, пропущено %1$d отсутствующее приложение|, пропущено %1$d отсутствующих приложения|, пропущено %1$d отсутствующих приложений|, пропущено %1$d отсутствующего приложения
+backup_widgets_rebind|, %1$d виджет, возможно, придётся настроить заново|, %1$d виджета, возможно, придётся настроить заново|, %1$d виджетов, возможно, придётся настроить заново|, %1$d виджета, возможно, придётся настроить заново
+backup_left_out|, пропущен %1$d элемент, для которого в Supernova нет места|, пропущено %1$d элемента, для которых в Supernova нет места|, пропущено %1$d элементов, для которых в Supernova нет места|, пропущено %1$d элемента, для которых в Supernova нет места
+backup_export_failed|Копия не поехала: %1$s
+backup_import_failed|Копия не приехала: %1$s
+shortcut_failed|Ярлык не пошёл. Ничего не поделаешь
+unable_to_launch|Не запускается %1$s, хоть ты тресни
+grid_rows|Строки
+grid_cols|Столбцы
+dock_count|Места в док-панели
+show_labels|Показывать подписи значков
+wallpaper_scroll|Прокручивать обои вместе со страницами
+subgrid|Позиционирование по подсетке (половина клетки)
+badges|Цацки-уведомления
+badges_need_access_summary|Нажмите, чтобы разрешить, и значки появятся
+popup_needs_access_summary|Нажмите, чтобы разрешить, и меню покажет уведомления
+notification_access_title|Разрешить доступ к уведомлениям
+notification_access_badges|Значки считаются по вашим уведомлениям, поэтому Supernova нужен доступ к ним. Они читаются только на этом телефоне.
+notification_access_popup|Меню долгого нажатия показывает уведомления приложения, поэтому Supernova нужен доступ к ним. Они читаются только на этом телефоне.
+notification_access_restricted|Если переключатель доступа к уведомлениям неактивен, Android блокирует его, потому шо Supernova установлена не из Play Маркета. Откройте «О приложении», нажмите меню ⋮ вверху справа, выберите «Разрешить ограниченные настройки», затем снова откройте экран доступа к уведомлениям.
+open_settings|Открыть настройки
+not_now|Не сейчас, я занят
+continue_label|Ну давайте
+accessibility_needed_title|Включите службу специальных возможностей
+accessibility_needed_message|Блокировка экрана, недавние приложения и быстрые настройки требуют службы специальных возможностей Supernova. Лаунчер использует её только для этих действий.
+gestures_need_accessibility|Нужна служба специальных возможностей
+gestures_need_accessibility_summary|Некоторые жесты требуют её. Нажмите, чтобы включить
+device_admin_confirm_title|Блокировать через администратора устройства?
+device_admin_inactive|Администратор устройства выключен
+device_admin_inactive_summary|Блокировка экрана не работает, пока он не включён. Нажмите, чтобы включить
+icon_pack|Набор значков
+scroll_effect|Эффект прокрутки страниц
+icon_shape|Форма значков
+reset_custom_icons|Сбросить собственные значки
+reset_custom_icons_none|Ничего не задано
+reset_custom_icons_none_toast|Ни у одного приложения, папки или ярлыка нет собственного значка
+reset_custom_icons_message|Значки, которые вы изменили в отмеченных группах, вернутся к стандартным вместе с выбранной для них формой или стилем. Названия, скрытые подписи, действия жестов и размеры значков останутся.
+reset_custom_icons_apps|Приложения в меню
+reset_custom_icons_placed_apps|Приложения на главном экране
+reset_custom_icons_folders|Папки и вкладки
+reset_custom_icons_shortcuts|Ярлыки и контакты
+reset_hidden_labels|Сбросить скрытые подписи
+reset_hidden_labels_none|Ничего не скрыто
+reset_hidden_labels_none_toast|Ни у одного приложения или ярлыка нет скрытой подписи
+reset_hidden_labels_message|У каждого приложения и ярлыка, чью подпись вы скрыли, она снова появится. Названия, значки и действия жестов останутся.
+custom_icon_apps|%d приложение|%d приложения|%d приложений|%d приложения
 custom_icon_folders|%d папка|%d папки|%d папок|%d папки
-custom_icon_shortcuts|%d ярлик|%d ярлики|%d ярликів|%d ярлика
-gestures|Жести
-accessibility_description|Дозволяє Supernova блокувати екран жестом. Необовʼязково; вміст екрана не зчитується.
-hidden_apps|Шо ховається від людей
-drawer_groups|Як розкласти шухляду
-drawer_style|Стиль шухляди
-style_vertical_grid|Вертикальна сітка
-style_paged_grid|Горизонтальні сторінки
+custom_icon_shortcuts|%d ярлык|%d ярлыка|%d ярлыков|%d ярлыка
+gestures|Жесты
+accessibility_description|Позволяет Supernova закрыть экран жестом. Не обязательно; шо у вас на экране, она не читает.
+hidden_apps|Шо прячется от людей
+drawer_groups|Как разложить меню
+drawer_style|Стиль меню приложений
+style_vertical_grid|Вертикальная сетка
+style_paged_grid|Горизонтальные страницы
 style_vertical_list|Список
 drawer_columns_auto|Авто
-drawer_grid|Сітка шухляди
+drawer_grid|Сетка меню приложений
 drawer_grid_value|%1$s × %2$s
-drawer_grid_rows_note|Рядки ділять висоту шухляди; «Авто» тримає рядки ближче один до одного
-drawer_auto_keyboard|Показувать клавіатуру під час відкриття
-drawer_swipe_indicator|Індикатор свайпу
-drawer_swipe_indicator_summary|Маленька стрілка над док-панеллю
-drawer_swipe_haptic|Вібровідгук
-drawer_swipe_haptic_summary|Вібрація, коли свайп угору починає відкривати шухляду
-drawer_search_bar_position|Розташування рядка пошуку
-search_bar_page_summary|Вигляд і кнопки
-drawer_tab_bar|Розташування панелі вкладок
-tab_bar_top|Угорі
+drawer_grid_rows_note|Строки делят высоту меню; «Авто» держит строки ближе друг к другу
+drawer_auto_keyboard|Показывать клавиатуру при открытии
+drawer_swipe_indicator|Индикатор свайпа
+drawer_swipe_indicator_summary|Маленькая стрелка над док-панелью
+drawer_swipe_haptic|Вибрация
+drawer_swipe_haptic_summary|Вибрация, когда свайп вверх начинает открывать меню приложений
+drawer_search_bar_position|Положение строки поиска
+search_bar_page_summary|Вид и кнопки
+drawer_tab_bar|Положение панели вкладок
+tab_bar_top|Вверху
 tab_bar_bottom|Внизу
-tab_bar_none|Сховано
-drawer_tab_bar_hidden_note|Сховано — шухляда показує всі приложухи
-drawer_tab_bar_no_tabs|%1$s · додайте вкладки в «Групах шухляди»
-drawer_frequent_row|Верхній рядок
-drawer_frequent_row_summary|Рядок приложух над списком приложух
-drawer_sort_buttons|Кнопки сортування
-drawer_sort_buttons_summary|Змінюйте порядок угорі списку приложух
-drawer_sort_apps_desc|Порядок приложух: %1$s
-drawer_remember_position|Запамʼятовувати позицію
-drawer_auto_close|Закривати автоматично
-drawer_folders_first|Папки спочатку
-smart_folders|Розумні папки (не всі такі розумні, як вам здається)
-smart_folders_summary|Групує приложухи в папки за категорією
-category_games|Ігри
-category_entertainment|Розваги
+tab_bar_none|Скрыта
+drawer_tab_bar_hidden_note|Скрыта — меню показывает все приложения
+drawer_tab_bar_no_tabs|%1$s · добавьте вкладки в «Группах меню приложений»
+drawer_frequent_row|Верхний ряд
+drawer_frequent_row_summary|Ряд приложений над списком приложений
+drawer_sort_buttons|Кнопки сортировки
+drawer_sort_buttons_summary|Меняйте порядок вверху списка приложений
+drawer_sort_apps_desc|Порядок приложений: %1$s
+drawer_remember_position|Запоминать позицию
+drawer_auto_close|Закрывать автоматически
+drawer_folders_first|Сначала папки
+smart_folders|Умные папки (не все такие умные, как вам кажется)
+smart_folders_summary|Группирует приложения в папки по категории
+category_games|Игры
+category_entertainment|Развлечения
 category_image|Фото
-category_social|Балачки
-category_news|Новини
-category_maps|Подорожі
-category_productivity|Продуктивність
-category_finance|Гроші
-drawer_icon_scale|Масштаб іконок
-drawer_bg_opacity|Непрозорість фону
-drawer_fast_scroller|Швидка прокрутка
-drawer_labels|Підписи іконок
-drawer_sort|Порядок сортування
-sort_alpha|За алфавітом
-sort_alpha_reverse|Зворотний алфавіт
-sort_install|Спочатку нові
-sort_most_used|Найчастіше відкриті
-sort_recently_used|Нещодавно використані
-drawer_work_tab|Окрема вкладка «Робота»
-drawer_default_tab|Вкладка за замовчуванням
-drawer_hide_all_tab|Сховать вкладку «Усі»
-edit|Редагувати
-hide_label|Сховать підпис
-change_icon|Змінити іконку
-select_apps|Вибрати приложухи
-drawer_tab_empty|У цій вкладці ще немає приложух
-sort|Сортувати
-move_to_drawer|Перемістити в шухляду
-move_to_drawer_as_folder|Папка шухляди
-move_to_drawer_tab|Нова вкладка
-move_to_drawer_put_in|Помістити в
-move_to_drawer_tab_hint|Його приложухи отримають власну вкладку з назвою «%1$s».
-move|Перемістити
-move_to_drawer_summary|«%1$s» · %2$d приложуху|«%1$s» · %2$d приложухи|«%1$s» · %2$d приложух|«%1$s» · %2$d приложухи
-move_to_drawer_stays|%d ярлик не можна покласти в шухляду, тож він лишається на головному екрані.|%d ярлики не можна покласти в шухляду, тож вони лишаються на головному екрані.|%d ярликів не можна покласти в шухляду, тож вони лишаються на головному екрані.|%d ярлика не можна покласти в шухляду, тож вони лишаються на головному екрані.
-moved_to_drawer|Переміщено в шухляду
-moved_to_drawer_left_behind|Переміщено в шухляду. %d ярлик лишився на головному екрані|Переміщено в шухляду. %d ярлики лишилися на головному екрані|Переміщено в шухляду. %d ярликів лишилося на головному екрані|Переміщено в шухляду. %d ярлика лишилося на головному екрані
-reshape|Змінити форму
-reshape_summary|Підігнати іконку під форму іконок
-folder_menu|Параметри папки
-reset|Скинуть
-pick_icon|Вибрати іконку
-no_icons_in_pack|Нема тут іконок, порожньо, як у кишені
-search_icons_hint|Пошук іконок
-option_default|За замовчуванням
-folder_shape_match_icons|Як іконки
-option_none|Нема
-drawer_all|Усі
-drawer_work|Робота
-drawer_private|Приватне
-private_space_locked|Заблоковано
-private_space_unlocked|Розблоковано
-private_space_lock|Заблокувати
-private_space_unlock|Розблокувати
-private_space_install|Встановити
+category_social|Болтовня
+category_news|Новости
+category_maps|Путешествия
+category_productivity|Продуктивность
+category_finance|Деньги
+drawer_icon_scale|Масштаб значков
+drawer_bg_opacity|Непрозрачность фона
+drawer_fast_scroller|Быстрая прокрутка
+drawer_labels|Подписи значков
+drawer_sort|Порядок сортировки
+sort_alpha|По алфавиту
+sort_alpha_reverse|Обратный алфавит
+sort_install|Сначала новые
+sort_most_used|Чаще всего открываемые
+sort_recently_used|Недавно использованные
+drawer_work_tab|Отдельная вкладка «Работа»
+drawer_default_tab|Вкладка по умолчанию
+drawer_hide_all_tab|Скрыть вкладку «Все»
+edit|Изменить
+hide_label|Скрыть подпись
+change_icon|Сменить значок
+select_apps|Выбрать приложения
+drawer_tab_empty|В этой вкладке пока нет приложений
+sort|Сортировать
+move_to_drawer|Переместить в меню приложений
+move_to_drawer_as_folder|Папка меню
+move_to_drawer_tab|Новая вкладка
+move_to_drawer_put_in|Поместить в
+move_to_drawer_tab_hint|Его приложения получат собственную вкладку с названием «%1$s».
+move|Переместить
+move_to_drawer_summary|«%1$s» · %2$d приложение|«%1$s» · %2$d приложения|«%1$s» · %2$d приложений|«%1$s» · %2$d приложения
+move_to_drawer_stays|%d ярлык нельзя поместить в меню приложений, поэтому он остаётся на главном экране.|%d ярлыка нельзя поместить в меню приложений, поэтому они остаются на главном экране.|%d ярлыков нельзя поместить в меню приложений, поэтому они остаются на главном экране.|%d ярлыка нельзя поместить в меню приложений, поэтому они остаются на главном экране.
+moved_to_drawer|Перемещено в меню приложений
+moved_to_drawer_left_behind|Перемещено в меню приложений. %d ярлык остался на главном экране|Перемещено в меню приложений. %d ярлыка остались на главном экране|Перемещено в меню приложений. %d ярлыков осталось на главном экране|Перемещено в меню приложений. %d ярлыка осталось на главном экране
+reshape|Изменить форму
+reshape_summary|Подогнать значок под форму значков
+folder_menu|Параметры папки
+reset|Сбросить
+pick_icon|Выбрать значок
+no_icons_in_pack|Тут нет значков, пусто, как в кармане
+search_icons_hint|Поиск значков
+option_default|По умолчанию
+folder_shape_match_icons|Как у значков
+option_none|Нет
+drawer_all|Все
+drawer_work|Работа
+drawer_private|Личное
+private_space_locked|Заблокировано
+private_space_unlocked|Разблокировано
+private_space_lock|Заблокировать
+private_space_unlock|Разблокировать
+private_space_install|Установить
 private_space_settings|Настройки
-work_apps_paused_title|Робочі приложухи призупинено
-work_apps_paused_body|Ваші робочі приложухи не можуть надсилати сповіщення, витрачати заряд чи отримувати доступ до геолокації
-work_apps_turn_on|Увімкнути робочі приложухи
-work_apps_turn_off|Вимкнуть робочі приложухи
-private_space_install_apps|Встановити приложухи
-private_space_open_settings|Настройки приватного простору
-private_space_missing|На цьому телефоні немає приватного простору
-group_name|Назва групи
-edit_group_apps|Вибрати приложухи
-hide_app|Сховать з шухляди
-unhide_app|Показати
-set_swipe_up_action|Задати дію свайпу вгору
-swipe_none|Нічого такого
-swipe_up_title|Свайп вгору
+work_apps_paused_title|Рабочие приложения приостановлены
+work_apps_paused_body|Ваши рабочие приложения не могут отправлять уведомления, расходовать заряд и получать доступ к геолокации
+work_apps_turn_on|Включить рабочие приложения
+work_apps_turn_off|Выключить рабочие приложения
+private_space_install_apps|Установить приложения
+private_space_open_settings|Настройки приватного пространства
+private_space_missing|На этом телефоне нет приватного пространства
+group_name|Название группы
+edit_group_apps|Выбрать приложения
+hide_app|Скрыть из меню
+unhide_app|Показать
+set_swipe_up_action|Задать действие свайпа вверх
+swipe_none|Ничего
+swipe_up_title|Свайп вверх
 swipe_down_title|Свайп вниз
-swipe_to_open_folder|Свайп, щоб відкрити папку
-swipe_to_open_folder_summary|Дотик відкриває перший приложуху, свайп угору відкриває папку
-open_folder|Відкрити папку
-set_swipe_down_action|Задати дію свайпу вниз
-icon_row|Іконка
+swipe_to_open_folder|Свайп, чтобы открыть папку
+swipe_to_open_folder_summary|Нажатие открывает первое приложение, свайп вверх открывает папку
+open_folder|Открыть папку
+set_swipe_down_action|Задать действие свайпа вниз
+icon_row|Значок
 icon_photo|Фото
-icon_source_apps|Іконки приложух
-photo_from_gallery|Фото з галереї
-photo_from_files|Фото з файлів
-photo_load_failed|Не склалося завантажити це зображення
-icon_pack_system|Системний
-icon_pack_none_installed|Пакетів іконок не встановлено
-icon_pack_apply|Застосувати
-icon_pack_apply_confirm|Використати %1$s для іконок приложух?
-icon_pack_applied|%1$s застосовано
-icon_pack_apply_unknown|Цей пакет іконок не встановлено
-app_icon|Іконка приложухи
-label_size|Розмір підпису
+icon_source_apps|Значки приложений
+photo_from_gallery|Фото из галереи
+photo_from_files|Фото из файлов
+photo_load_failed|Не получилось загрузить это изображение
+icon_pack_system|Системный
+icon_pack_none_installed|Наборы значков не установлены
+icon_pack_apply|Применить
+icon_pack_apply_confirm|Использовать %1$s для значков приложений?
+icon_pack_applied|%1$s применён
+icon_pack_apply_unknown|Этот набор значков не установлен
+app_icon|Значок приложения
+label_size|Размер подписи
 label_size_value|%1$d sp
-label_color|Колір підпису
-label_shadow|Тінь підпису
-icon_shadow|Тінь іконки
-icon_glass|Скляний фон
-icon_glass_frosted|Матове
-icon_glass_clear|Прозоре
-icon_glass_smoked|Димчасте
-icon_swipe_indicator|Позначати іконки з діями свайпу
-badge_style|Стиль значків
-badge_style_dots|Крапки
-badge_style_numeric|Крапки з числом
-badge_style_dynamic|Динамічні значки
-badged_apps|Приложухи зі значками
-badge_color|Колір значка
-badge_color_icon|Збігається з іконкою приложухи
-badge_text_color|Колір числа
-badge_corner_radius|Радіус кутів
+label_color|Цвет подписи
+label_shadow|Тень подписи
+icon_shadow|Тень значка
+icon_glass|Стеклянный фон
+icon_glass_frosted|Матовое
+icon_glass_clear|Прозрачное
+icon_glass_smoked|Дымчатое
+icon_swipe_indicator|Отмечать значки с действиями свайпа
+badge_style|Стиль значков
+badge_style_dots|Точки
+badge_style_numeric|Точки с числом
+badge_style_dynamic|Динамические значки
+badged_apps|Приложения со значками
+badge_color|Цвет значка
+badge_color_icon|Совпадает со значком приложения
+badge_text_color|Цвет числа
+badge_corner_radius|Радиус углов
 badge_outline|Контур
-badge_position|Положення значка
-badge_size|Розмір значка
-badge_test|Перевірити значок сповіщення
-badge_test_summary|Надіслати сповіщення, щоб показати значок на іконці налаштувань
-badge_test_channel|Тестові сповіщення
-badge_test_title|Тестове сповіщення
-badge_test_text|Тепер на настройких Supernova є значок. Натисніть, щоб прибрати його.
-badge_test_blocked|Supernova не дозволено надсилати сповіщення
-badge_test_badges_off|Надіслано. Увімкніть «Значки сповіщень», щоб побачити значок.
-shortcut_unusable|Цей ярлик не вдалося використати
-pos_top_right|Угорі праворуч
-pos_top_left|Угорі ліворуч
-pos_bottom_right|Внизу праворуч
-pos_bottom_left|Внизу ліворуч
-folder_preview_style|Попередній перегляд папки
-preview_grid|Сітка
-preview_stack|Стос
-preview_fan|Віяло
-preview_line|Лінія
-preview_radial|Кільце
-preview_radial_dense|Щільне кільце
-preview_grid_3x3|Сітка 3 × 3
-folder_mode|Спосіб відкриття папки
-folder_mode_window|Вікно
-folder_mode_immersive|На весь екран
-folder_scroll|Прокручування папки
+badge_position|Положение значка
+badge_size|Размер значка
+badge_test|Проверить значок уведомления
+badge_test_summary|Отправить уведомление, чтобы показать значок на иконке настроек
+badge_test_channel|Тестовые уведомления
+badge_test_title|Тестовое уведомление
+badge_test_text|Теперь на настройках Supernova есть значок. Нажмите, чтобы убрать его.
+badge_test_blocked|Supernova не разрешено отправлять уведомления
+badge_test_badges_off|Отправлено. Включите «Значки уведомлений», чтобы увидеть значок.
+shortcut_unusable|Не получилось использовать этот ярлык
+pos_top_right|Вверху справа
+pos_top_left|Вверху слева
+pos_bottom_right|Внизу справа
+pos_bottom_left|Внизу слева
+folder_preview_style|Превью папки
+preview_grid|Сетка
+preview_stack|Стопка
+preview_fan|Веер
+preview_line|Линия
+preview_radial|Кольцо
+preview_radial_dense|Плотное кольцо
+preview_grid_3x3|Сетка 3 × 3
+folder_mode|Способ открытия папки
+folder_mode_window|Окно
+folder_mode_immersive|На весь экран
+folder_scroll|Прокрутка папки
 folder_scroll_vertical|Вертикально
-folder_scroll_horizontal|Горизонтальні сторінки
-folder_icon_appearance|Вигляд іконки папки
-folder_icon_shape|Форма фону
-folder_icon_outline|Контур кольору акценту
-folder_match_window_color|Колір, як у вікна папки
-folder_plate_color|Колір
-folder_columns|Стовпці
+folder_scroll_horizontal|Горизонтальные страницы
+folder_icon_appearance|Вид значка папки
+folder_icon_shape|Форма фона
+folder_icon_outline|Контур цвета акцента
+folder_match_window_color|Цвет как у окна папки
+folder_plate_color|Цвет
+folder_columns|Столбцы
 folder_columns_auto|Авто
-folder_labels|Підписи іконок
-folder_close_on_launch|Закривати після запуску
-color_default|За замовчуванням
-color_white|Білий
-color_black|Чорний
-color_red|Червоний
-color_orange|Помаранчевий
-color_yellow|Жовтий
-color_green|Зелений
-color_cyan|Блакитний
-color_blue|Синій
-color_purple|Фіолетовий
-settings_section_home|Головний екран
+folder_labels|Подписи значков
+folder_close_on_launch|Закрывать после запуска
+color_default|По умолчанию
+color_white|Белый
+color_black|Чёрный
+color_red|Красный
+color_orange|Оранжевый
+color_yellow|Жёлтый
+color_green|Зелёный
+color_cyan|Голубой
+color_blue|Синий
+color_purple|Фиолетовый
+settings_section_home|Главный экран
 settings_section_dock|Док-панель
-settings_section_drawer|Шухляда приложух
+settings_section_drawer|Меню приложений
 settings_section_folders|Папки
-settings_section_icons|Іконки й підписи
+settings_section_icons|Значки и подписи
 theme_mode|Тема
-theme_system|Як у системі
-theme_light|Світла
-theme_dark|Темна
-accent_color|Колір акценту
-accent_blue|Синій
-accent_indigo|Індиго
-accent_purple|Фіолетовий
-accent_pink|Рожевий
-accent_red|Червоний
-accent_orange|Помаранчевий
-accent_amber|Бурштиновий
-accent_green|Зелений
-accent_teal|Бірюзовий
-accent_cyan|Блакитний
+theme_system|Как в системе
+theme_light|Светлая
+theme_dark|Тёмная
+accent_color|Цвет акцента
+accent_blue|Синий
+accent_indigo|Индиго
+accent_purple|Фиолетовый
+accent_pink|Розовый
+accent_red|Красный
+accent_orange|Оранжевый
+accent_amber|Янтарный
+accent_green|Зелёный
+accent_teal|Бирюзовый
+accent_cyan|Голубой
 folder_desc|Папка: %1$s
-page_desc|Сторінка %1$d з %2$d
-auto_backups|Автоматичні копії
-no_auto_backups|Автоматичних копій ще немає
-restore_backup_q|Відновити цю копію?
-import_confirm_own|Це замінить ваш головний екран і всі настройки тими, шо в копії. Спершу ваше поточне настройки буде збережено в «Автоматичних копіях».
-import_confirm_other|Це замінить ваш головний екран розкладом із копії іншого лаунчера. Інші настройки залишаться. Спершу ваше поточне настройки буде збережено в «Автоматичних копіях».
-restore|Відновити
-settings_section_backup|Резервна копія
-back|Назад, до Привозу
-gesture_swipe_up|Свайп вгору
+page_desc|Страница %1$d из %2$d
+auto_backups|Автоматические копии
+no_auto_backups|Автоматических копий пока нет
+restore_backup_q|Восстановить эту копию?
+import_confirm_own|Это заменит ваш главный экран и все настройки теми, шо в копии. Сначала текущая настройка будет сохранена в «Автоматических копиях».
+import_confirm_other|Это заменит ваш главный экран раскладкой из копии другого лаунчера. Остальные настройки останутся. Сначала текущая настройка будет сохранена в «Автоматических копиях».
+restore|Восстановить
+settings_section_backup|Резервная копия
+back|Назад, на Привоз
+gesture_swipe_up|Свайп вверх
 gesture_swipe_down|Свайп вниз
-gesture_double_tap|Подвійний дотик
-gesture_pinch_in|Звести пальці
-gesture_pinch_out|Розвести пальці
-gesture_two_finger_swipe_up|Свайп двома пальцями вгору
-gesture_two_finger_swipe_down|Свайп двома пальцями вниз
-action_none|Нічого такого
-action_open_drawer|Відкрити шухляду приложух
-action_expand_notifications|Розгорнути сповіщення
-action_open_settings|Відкрити настройки лаунчера
-action_lock_screen|Заблокувати екран
-action_default_page|Перейти на сторінку за замовчуванням
-action_open_search|Відкрити пошук
-action_recents|Недавні приложухи
-action_quick_settings|Швидкі настройки
-action_assistant|Асистент
-action_launch_app|Запустити приложуху
-action_launch_shortcut|Запустити ярлик
-assistant_unavailable|Нема приложухи-асистента
-pick_shortcut|Виберіть ярлик
-no_shortcuts|У цього приложухи немає ярликів
-shape_system|Системна
-shape_circle|Коло
-shape_squircle|Сквіркл
-shape_rounded_square|Квадрат із заокругленнями
+gesture_double_tap|Двойное нажатие
+gesture_pinch_in|Свести пальцы
+gesture_pinch_out|Развести пальцы
+gesture_two_finger_swipe_up|Свайп двумя пальцами вверх
+gesture_two_finger_swipe_down|Свайп двумя пальцами вниз
+action_none|Ничего
+action_open_drawer|Открыть меню приложений
+action_expand_notifications|Развернуть уведомления
+action_open_settings|Открыть настройки лаунчера
+action_lock_screen|Закрыть экран на замок
+action_default_page|Перейти на страницу по умолчанию
+action_open_search|Открыть поиск
+action_recents|Недавние приложения
+action_quick_settings|Быстрые настройки
+action_assistant|Ассистент
+action_launch_app|Запустить приложение
+action_launch_shortcut|Запустить ярлык
+assistant_unavailable|Нету приложения-ассистента
+pick_shortcut|Выберите ярлык
+no_shortcuts|У этого приложения нет ярлыков
+shape_system|Системная
+shape_circle|Круг
+shape_squircle|Сквиркл
+shape_rounded_square|Квадрат со скруглениями
 shape_square|Квадрат
-shape_teardrop|Крапля
-shape_hexagon|Шестикутник
-shape_pebble|Камінець
-shape_vessel|Посудина
-shape_pentagon|П’ятикутник
-shape_hexagon_rounded|Шестикутник із заокругленнями
-shape_heptagon|Семикутник
-shape_octagon|Восьмикутник
-shape_crop|Обрізана
-shape_flower|Квітка
+shape_teardrop|Капля
+shape_hexagon|Шестиугольник
+shape_pebble|Галька
+shape_vessel|Сосуд
+shape_pentagon|Пятиугольник
+shape_hexagon_rounded|Шестиугольник со скруглениями
+shape_heptagon|Семиугольник
+shape_octagon|Восьмиугольник
+shape_crop|Обрезанная
+shape_flower|Цветок
 shape_platform|Платформа
-shape_custom|Власна
-custom_shape_title|Власна форма
-corner_top_left|Угорі ліворуч
-corner_top_right|Угорі праворуч
-corner_bottom_left|Внизу ліворуч
-corner_bottom_right|Внизу праворуч
-corner_round|Заокруглений
-corner_squircle|Сквіркл
-corner_cut|Зрізаний
-dock_bg_behind_nav|Малювати за панеллю навігації
-dock_bg_padding|Відступ фону від країв
-folder_shadow|Тінь вікна
-drawer_infinite_scroll|Нескінченне прокручування
-drawer_page_effect|Ефект переходу між сторінками
-drawer_transition|Анімація переходу
-transition_slide_up|Виїзд угору
+shape_custom|Своя
+custom_shape_title|Своя форма
+corner_top_left|Вверху слева
+corner_top_right|Вверху справа
+corner_bottom_left|Внизу слева
+corner_bottom_right|Внизу справа
+corner_round|Скруглённый
+corner_squircle|Сквиркл
+corner_cut|Срезанный
+dock_bg_behind_nav|Рисовать за панелью навигации
+dock_bg_padding|Отступ фона от краёв
+folder_shadow|Тень окна
+drawer_infinite_scroll|Бесконечная прокрутка
+drawer_page_effect|Эффект перехода между страницами
+drawer_transition|Анимация перехода
+transition_slide_up|Выезд вверх
 transition_zoom|Масштаб
-transition_fade|Згасання
-popup_card_bg|Групувати ярлики в картку
-popup_group_shortcuts|Візуально групувати ярлики
-popup_action_icons|Дії іконками
-popup_action_icons_summary|Дії меню одним рядом іконок
-popup_group_shortcuts_summary|Ярлики й сповіщення в окремих плитках
-popup_style|Стиль меню довгого натискання
+transition_fade|Затухание
+popup_card_bg|Группировать ярлыки в карточку
+popup_group_shortcuts|Визуально группировать ярлыки
+popup_action_icons|Действия значками
+popup_action_icons_summary|Действия меню одним рядом значков
+popup_group_shortcuts_summary|Ярлыки и уведомления в отдельных плитках
+popup_style|Стиль меню долгого нажатия
 popup_style_block|Блок
-popup_style_pills|Пігулки
+popup_style_pills|Таблетки
 popup_style_android12|Android 12
-folder_show_name|Показувать назву папки
-folder_show_count|Показувать кількість приложух
-folder_window_radius|Радіус кутів вікна
-placement_hidden|Сховано
-drawer_bar_filled|Заповнений фон
-drawer_search_bar|Рядок пошуку шухляди
-drawer_scrubber_color|Колір швидкої прокрутки
-drawer_isolate_tabs|Ізолювати вкладки
-drawer_isolate_tabs_summary|Не перемикати вкладки свайпом убік
-drawer_tabs_loop|Зациклити вкладки
-drawer_tabs_loop_summary|Свайп з останньої вкладки до першої
+folder_show_name|Показывать название папки
+folder_show_count|Показывать число приложений
+folder_window_radius|Радиус углов окна
+placement_hidden|Скрыто
+drawer_bar_filled|Закрашенный фон
+drawer_search_bar|Строка поиска меню приложений
+drawer_scrubber_color|Цвет быстрой прокрутки
+drawer_isolate_tabs|Изолировать вкладки
+drawer_isolate_tabs_summary|Не переключать вкладки свайпом в сторону
+drawer_tabs_loop|Зациклить вкладки
+drawer_tabs_loop_summary|Свайп с последней вкладки к первой
 drawer_tab_style|Тип вкладок
-tab_style_classic|Класичні
-tab_style_bubble|Бульбашки
-drawer_tab_content|Вміст вкладки
-tab_content_label|Підпис
-tab_content_icon|Іконка
-tab_content_both|Підпис та іконка
-drawer_tab_align|Вирівнювання вкладок
-tab_align_start|Ліворуч
+tab_style_classic|Классические
+tab_style_bubble|Пузырьки
+drawer_tab_content|Содержимое вкладки
+tab_content_label|Подпись
+tab_content_icon|Значок
+tab_content_both|Подпись и значок
+drawer_tab_align|Выравнивание вкладок
+tab_align_start|Слева
 tab_align_center|По центру
-group_keep_in_main|Лишати приложухи в головній вкладці
-group_keep_in_main_summary|Його приложухи також лишаються в головній вкладці
-group_kept_in_main|лишається в головній вкладці
-group_apps_count|%d приложуху|%d приложухи|%d приложух|%d приложухи
+group_keep_in_main|Оставлять приложения в основной вкладке
+group_keep_in_main_summary|Его приложения также остаются в основной вкладке
+group_kept_in_main|остаётся в основной вкладке
+group_apps_count|%d приложение|%d приложения|%d приложений|%d приложения
 group_folders_count|%d папка|%d папки|%d папок|%d папки
 group_tabs_count|%d вкладка|%d вкладки|%d вкладок|%d вкладки
-move_up|Вгору
+move_up|Вверх
 move_down|Вниз
-group_default_tag|За замовчуванням
-group_smart_tag|Розумна
-group_tab_hint|Перетягуйте рядки, щоб задати порядок на панелі вкладок.
-group_folder_hint|Папки стоять у списку приложух у цьому порядку.
-group_tab_bar_hidden|Панель вкладок приховано, тож вкладки не видно в шухляді. Шоб повернути їх, задайте «Розташування панелі вкладок» на сторінці «Шухляда приложух».
-groups_intro|Розкладіть шухляду приложух по-своєму. Група — це набір приложух, шо показується як вкладка або як папка.
-groups_tabs_blurb|Сторінки шухляди, між якими ви гортаєте, наприклад «Ігри» чи «Подорожі».
-groups_folders_blurb|Пов’язані приложухи, згорнуті в одну плитку у списку приложух.
-group_show_as|Показувать як
+group_default_tag|По умолчанию
+group_smart_tag|Умная
+group_tab_hint|Перетаскивайте строки, чтобы задать порядок на панели вкладок.
+group_folder_hint|Папки стоят в списке приложений в этом порядке.
+group_tab_bar_hidden|Панель вкладок скрыта, поэтому вкладки не видны в меню приложений. Чтобы вернуть их, задайте «Положение панели вкладок» на странице «Меню приложений».
+groups_intro|Разложите меню приложений по-своему. Группа — это набор приложений, показываемый как вкладка или как папка.
+groups_tabs_blurb|Страницы меню, между которыми вы листаете, например «Игры» или «Путешествия».
+groups_folders_blurb|Связанные приложения, свёрнутые в одну плитку в списке приложений.
+group_show_as|Показывать как
 group_type_tab|Вкладка
-group_type_tab_hint|Розміщується на панелі вкладок шухляди.
-group_type_folder_hint|Розміщується в списку приложух як одна плитка.
-group_folder_icon|Іконка папки
-group_tab_icon|Іконка вкладки
-group_folder_icon_change|Змінити
+group_type_tab_hint|Располагается на панели вкладок меню.
+group_type_folder_hint|Располагается в списке приложений как одна плитка.
+group_folder_icon|Значок папки
+group_tab_icon|Значок вкладки
+group_folder_icon_change|Изменить
 group_more_apps|+%d
-group_default_tab_summary|Шухляда відкривається на цій вкладці
-delete_tab|Знести вкладку
-delete_folder_group|Знести папку
-group_deleted|%1$s видалено
-group_name_required|Введіть назву
-new_tab|Нова вкладка
-edit_tab|Редагувати вкладку
-group_settings|Настройки групи
-show_hidden_apps|Показати приховані приложухи
-hide_hidden_apps|Знову сховать приховані приложухи
-app_hidden|%1$s приховано з шухляди
-hide_apps|Сховать приложухи
-new_folder_group|Нова папка
+group_default_tab_summary|Меню открывается на этой вкладке
+delete_tab|Удалить вкладку
+delete_folder_group|Удалить папку
+group_deleted|%1$s удалено
+group_name_required|Введите название
+new_tab|Новая вкладка
+edit_tab|Изменить вкладку
+group_settings|Настройки группы
+show_hidden_apps|Показать скрытые приложения
+hide_hidden_apps|Снова скрыть скрытые приложения
+app_hidden|%1$s скрыто из меню
+hide_apps|Скрыть приложения
+new_folder_group|Новая папка
 group_tabs_header|Вкладки
 group_folders_header|Папки
-group_empty|Порожньо
-picker_tab_apps|Приложухи
-swipe_down_haptic|Вібровідгук на свайп вниз
-swipe_down_haptic_summary|Легкий поштовх, коли свайп униз відкриває сповіщення
-picker_tab_shortcuts|Ярлики
-search_folders|Шукати папки
-theme_schedule|За розкладом
-theme_auto|Авто (від заходу до сходу сонця)
-theme_schedule_times|Розклад темного режиму
+group_empty|Пусто
+picker_tab_apps|Приложения
+swipe_down_haptic|Вибрация при свайпе вниз
+swipe_down_haptic_summary|Лёгкий толчок, когда свайп вниз открывает уведомления
+picker_tab_shortcuts|Ярлыки
+search_folders|Искать папки
+theme_schedule|По расписанию
+theme_auto|Авто (от заката до рассвета)
+theme_schedule_times|Расписание тёмного режима
 theme_schedule_range|%1$s – %2$s
-theme_schedule_from|Темна з
-theme_schedule_until|Темна до
-themed_icons_autogen|Створювати відсутні тематичні іконки
-search_window_mode|Стиль вікна пошуку
-search_window_immersive|На весь екран
-search_window_window|Вікно
-search_apps_one_row|Обмежити приложухи одним рядом
-search_apps_one_row_summary|Результати приложух в одному рядку, шо гортається вбік
-contact_call|Зателефонувати
-contact_message|Повідомлення
-search_contact_cards|Вигляд карток контактів
-language|Мова
-language_system|Як на телефоні
-language_summary|Мова інтерфейсу лаунчера
-about|Про лаунчер, коротко
-section_about_subtitle|Версія, шо нового і повідомлення про помилку
-about_version|Версія
-about_license|Ліцензія відкритого коду
+theme_schedule_from|Тёмная с
+theme_schedule_until|Тёмная до
+themed_icons_autogen|Создавать недостающие тематические значки
+search_window_mode|Стиль окна поиска
+search_window_immersive|На весь экран
+search_window_window|Окно
+search_apps_one_row|Ограничить приложения одним рядом
+search_apps_one_row_summary|Результаты приложений в одном ряду, который прокручивается вбок
+contact_call|Позвонить
+contact_message|Сообщение
+search_contact_cards|Вид карточек контактов
+language|Язык
+language_system|Как на телефоне
+language_summary|Язык интерфейса лаунчера
+about|О лаунчере, коротко
+section_about_subtitle|Версия, шо нового и сообщение об ошибке
+about_version|Версия
+about_license|Лицензия открытого кода
 about_license_name|AGPL-3.0
 about_whats_new|Шо нового
-about_whats_new_summary|Зміни в цій версії
+about_whats_new_summary|Изменения в этой версии
 about_whats_new_title|Шо нового в %1$s
-about_whats_new_none|Нічого нового, все як було
-about_report_issue|Нажалітись
-about_report_issue_summary|Відкриє скаргу на GitHub, пишіть, не соромтесь
+about_whats_new_none|Ничего нового, всё как было
+about_report_issue|Пожаловаться
+about_report_issue_summary|Откроет жалобу на GitHub, пишите, не стесняйтесь
 about_report_issue_body|\n\n---\nSupernova %1$s, Android %2$s (API %3$d), %4$s
-about_no_browser|Нема приложухи, шо відкриває посилання
-about_source|Вихідний код
-crash_log|Журнал, де все падало
-crash_log_none|Ще нічого не падало, тьху-тьху-тьху
-crash_log_count|Записано %1$d збій|Записано %1$d збої|Записано %1$d збоїв|Записано %1$d збою
-crash_log_message|Записано %1$d збій. Надішліть журнал розробнику, а потім очистіть його, щоб наступний звіт містив лише нові збої.|Записано %1$d збої. Надішліть журнал розробнику, а потім очистіть його, щоб наступний звіт містив лише нові збої.|Записано %1$d збоїв. Надішліть журнал розробнику, а потім очистіть його, щоб наступний звіт містив лише нові збої.|Записано %1$d збою. Надішліть журнал розробнику, а потім очистіть його, щоб наступний звіт містив лише нові збої.
-crash_log_recovered_message|Збоїв не записано, але в журналі є проблеми, з яких приложуху відновився. Якшо щось не працює, надішліть його розробнику, а потім очистіть.
-crash_log_share|Надіслати журнал збоїв
-crash_log_share_button|Показати
-crash_log_clear|Стерти
-crash_log_subject|Журнал збоїв Supernova
-crash_log_share_failed|Не склалося надіслати журнал збоїв: %1$s
-about_license_text|Supernova — вільне програмне забезпечення, випущене за ліцензією GNU Affero General Public License v3.0. Ви можете поширювати й змінювати його на умовах цієї ліцензії; воно постачається без жодних гарантій. Повний текст міститься у файлі LICENSE в репозиторії з вихідним кодом.
-section_home_subtitle|Сітка, іконки, підписи та сторінки
-section_dock_subtitle|Іконки, фон і сторінки
-section_drawer_subtitle|Розкладка, стиль і групи
-section_search_subtitle|Постачальники й вікно пошуку
-section_feed_subtitle|Сторінка перед головним екраном і її картки
-section_folders_subtitle|Вікно, іконка й підписи
-section_icons_subtitle|Форма, пакети, підписи та значки
-section_style_subtitle|Тема, кольори й поверхні
-section_gestures_subtitle|Свайпи, дотики, зведення пальців і кнопка «Додому»
-section_backup_subtitle|Резервне копіювання, відновлення чи скидання
-advanced|Додатково
-group_layout|Розкладка
-group_animations|Анімації
+about_no_browser|Нету приложения, открывающего ссылки
+about_source|Исходный код
+crash_log|Журнал, где всё падало
+crash_log_none|Ещё ничего не падало, тьфу-тьфу-тьфу
+crash_log_count|Записан %1$d сбой|Записано %1$d сбоя|Записано %1$d сбоев|Записано %1$d сбоя
+crash_log_message|Записан %1$d сбой. Отправьте журнал разработчику, а затем очистите его, чтобы следующий отчёт содержал только новые сбои.|Записано %1$d сбоя. Отправьте журнал разработчику, а затем очистите его, чтобы следующий отчёт содержал только новые сбои.|Записано %1$d сбоев. Отправьте журнал разработчику, а затем очистите его, чтобы следующий отчёт содержал только новые сбои.|Записано %1$d сбоя. Отправьте журнал разработчику, а затем очистите его, чтобы следующий отчёт содержал только новые сбои.
+crash_log_recovered_message|Сбоев не записано, но в журнале есть проблемы, из которых приложение восстановилось. Если что-то не работает, отправьте его разработчику, а затем очистите.
+crash_log_share|Отправить журнал сбоев
+crash_log_share_button|Показать
+crash_log_clear|Стереть
+crash_log_subject|Журнал сбоев Supernova
+crash_log_share_failed|Не получилось отправить журнал сбоев: %1$s
+about_license_text|Supernova — свободное программное обеспечение, выпущенное под лицензией GNU Affero General Public License v3.0. Вы можете распространять и изменять его на условиях этой лицензии; оно поставляется без каких-либо гарантий. Полный текст находится в файле LICENSE в репозитории с исходным кодом.
+section_home_subtitle|Сетка, значки, подписи и страницы
+section_dock_subtitle|Значки, фон и страницы
+section_drawer_subtitle|Раскладка, стиль и группы
+section_search_subtitle|Поставщики и окно поиска
+section_feed_subtitle|Страница перед главным экраном и её карточки
+section_folders_subtitle|Окно, значок и подписи
+section_icons_subtitle|Форма, наборы, подписи и значки
+section_style_subtitle|Тема, цвета и поверхности
+section_gestures_subtitle|Свайпы, нажатия, сведение пальцев и кнопка «Домой»
+section_backup_subtitle|Резервное копирование, восстановление или сброс
+advanced|Дополнительно
+group_layout|Раскладка
+group_animations|Анимации
 group_system|Система
-group_pages|Сторінки
-group_tabs|Вкладки й групи
-group_providers|Постачальники
-group_icons|Іконки
-group_appearance|Вигляд
-group_label_rows|Підписи
-group_badges|Значки
-group_popup|Спливне меню
-group_one_finger|Один палець
-group_two_fingers|Два пальці
+group_pages|Страницы
+group_tabs|Вкладки и группы
+group_providers|Поставщики
+group_icons|Значки
+group_appearance|Внешний вид
+group_label_rows|Подписи
+group_badges|Значки уведомлений
+group_popup|Всплывающее меню
+group_one_finger|Один палец
+group_two_fingers|Два пальца
 style_strip_sample|Аа
-dock_enabled|Показувать док-панель
-dock_pages|Сторінки док-панелі
-dock_bg_style|Фон док-панелі
-dock_bg_opacity|Непрозорість фону
-dock_bg_radius|Радіус фону
-dock_labels|Підписи іконок
-dock_icon_scale|Масштаб іконок
-dock_bg_none|Нема
-dock_bg_rounded|Закруглений прямокутник
+dock_enabled|Показывать док-панель
+dock_pages|Страницы док-панели
+dock_bg_style|Фон док-панели
+dock_bg_opacity|Непрозрачность фона
+dock_bg_radius|Радиус фона
+dock_labels|Подписи значков
+dock_icon_scale|Масштаб значков
+dock_bg_none|Нет
+dock_bg_rounded|Скруглённый прямоугольник
 dock_bg_square|Квадрат
 opacity_percent|%1$d%%
 color_with_opacity|%1$s, %2$d%%
-color_custom|Власний
-color_hue|Відтінок
-color_saturation|Насиченість
-color_brightness|Яскравість
+color_custom|Свой
+color_hue|Оттенок
+color_saturation|Насыщенность
+color_brightness|Яркость
 color_hex|Hex
-dock_padding_h|Горизонтальний відступ
-dock_padding_v|Вертикальний відступ
-drawer_padding_h|Горизонтальний відступ
-drawer_padding_v|Вертикальний відступ
-desktop_padding_h|Горизонтальний відступ сторінки
-desktop_padding_v|Вертикальний відступ сторінки
+dock_padding_h|Горизонтальный отступ
+dock_padding_v|Вертикальный отступ
+drawer_padding_h|Горизонтальный отступ
+drawer_padding_v|Вертикальный отступ
+desktop_padding_h|Горизонтальный отступ страницы
+desktop_padding_v|Вертикальный отступ страницы
 padding_dp_value|%1$d dp
-desktop_locked|Заблокувати розкладку
-widget_overlap|Дозволити розміщення над віджетами
-widget_padding|Відступ віджета
-desktop_locked_toast|Розкладку заблоковано
-page_indicator|Індикатор сторінок
-page_indicator_auto_hide|Автоприховування індикатора сторінок
-page_indicator_auto_hide_summary|Показувать лише під час перемикання сторінок
-page_indicator_color|Колір індикатора
-infinite_scroll|Нескінченне прокручування
-remove_empty_pages|Видаляти порожні сторінки
-remove_empty_pages_summary|Сторінка, на якій нічого не лишилося, зникає, коли ви її залишаєте
-indicator_none|Нема
-indicator_dots|Крапки
-indicator_line|Лінія
-indicator_circle|Кола
-home_orientation|Орієнтація екрана
-home_orientation_keywords|ландшафт портрет поворот обертання автоповорот горизонтально вертикально
-orientation_default|За замовчуванням (портрет)
-orientation_default_tablet|За замовчуванням (за автоповоротом)
-orientation_system_owned|На планшетах Android задає це системним автоповоротом
+desktop_locked|Заблокировать раскладку
+widget_overlap|Разрешить размещение поверх виджетов
+widget_padding|Отступ виджета
+desktop_locked_toast|Раскладка заблокирована
+page_indicator|Индикатор страниц
+page_indicator_auto_hide|Автоскрытие индикатора страниц
+page_indicator_auto_hide_summary|Показывать только при смене страниц
+page_indicator_color|Цвет индикатора
+infinite_scroll|Бесконечная прокрутка
+remove_empty_pages|Удалять пустые страницы
+remove_empty_pages_summary|Страница, на которой ничего не осталось, исчезает, когда вы её покидаете
+indicator_none|Нет
+indicator_dots|Точки
+indicator_line|Линия
+indicator_circle|Круги
+home_orientation|Ориентация экрана
+home_orientation_keywords|ландшафт портрет поворот вращение автоповорот горизонтально вертикально
+orientation_default|По умолчанию (портрет)
+orientation_default_tablet|По умолчанию (по автоповороту)
+orientation_system_owned|На планшетах Android задаёт это системным автоповоротом
 orientation_auto_rotate|Автоповорот
-orientation_portrait|Лише портрет
-orientation_landscape|Лише ландшафт
-overlap_when_placing|Дозволити накладання під час розміщення
-overlap_when_placing_summary|Перетягнутий елемент може лягти поверх іншого
-mode_on|Увімкнено
-mode_off|Вимкнено
-wallpaper_scroll_reverse|Навпаки
-reshape_legacy|Змінювати форму старих іконок
-reshape_legacy_auto|Лише масштабувати
-reshape_legacy_on|Масштабувати й додавати фон
-drawer_pull_to_search|Потягнути для пошуку
-folder_prioritize_first|Виділяти першу іконку
-folder_prioritize_first_summary|Перший приложуху великий в іконці папки, решта дрібні
-label_customize|Настроїти підписи
-folder_icon_scale|Масштаб іконок
-effect_none|Нема
-effect_simple|Простий
+orientation_portrait|Только портрет
+orientation_landscape|Только ландшафт
+overlap_when_placing|Разрешить наложение при размещении
+overlap_when_placing_summary|Перетащенный элемент может лечь поверх другого
+mode_on|Включено
+mode_off|Выключено
+wallpaper_scroll_reverse|Наоборот
+reshape_legacy|Менять форму старых значков
+reshape_legacy_auto|Только масштабировать
+reshape_legacy_on|Масштабировать и добавлять фон
+drawer_pull_to_search|Потянуть для поиска
+folder_prioritize_first|Выделять первый значок
+folder_prioritize_first_summary|Первое приложение крупное на значке папки, остальные мелкие
+label_customize|Настроить подписи
+folder_icon_scale|Масштаб значков
+effect_none|Нет
+effect_simple|Простой
 effect_zoom|Масштаб
-effect_accordion|Акордеон
+effect_accordion|Аккордеон
 effect_flip|Переворот
-effect_depth|Глибина
+effect_depth|Глубина
 effect_cube|Куб
-effect_card_stack|Стос карток
+effect_card_stack|Стопка карточек
 effect_tablet|Планшет
-effect_revolving_door|Обертові двері
-effect_flip_vertical|Вертикальний переворот
-effect_in_and_out|Входить і виходить
-effect_glass|Скло
-effect_wipe|Витирання
-effect_zoom_fade|Масштаб із згасанням
-effect_throw|Кидок
-stepper_decrease|Зменшити
-stepper_increase|Збільшити
+effect_revolving_door|Вращающаяся дверь
+effect_flip_vertical|Вертикальный переворот
+effect_in_and_out|Вход и выход
+effect_glass|Стекло
+effect_wipe|Стирание
+effect_zoom_fade|Масштаб с затуханием
+effect_throw|Бросок
+stepper_decrease|Уменьшить
+stepper_increase|Увеличить
 ok|Ну добре
-desktop_grid|Сітка головного екрана
+desktop_grid|Сетка главного экрана
 grid_value|%1$d × %2$d
-widget_corner_radius|Радіус кутів віджета
-show_scrims|Показувать тінь
-show_scrims_summary|М’яке затемнення за рядком стану й док-панеллю
-wallpaper_zoom|Ефект масштабування шпалер
-auto_add_apps|Додавати нові приложухи на головний екран
-label_font|Шрифт підпису
-label_single_line|Підписи в один рядок
-icon_size|Розмір іконок
-icon_size_fitted|Іконки найбільші, шо вміщує ця сітка. Шоб вони були більші, зменште кількість рядків чи стовпців або вимкніть підписи.
-label_group|Підпис
-label_card_size|Розмір
+widget_corner_radius|Радиус углов виджета
+show_scrims|Показывать тень
+show_scrims_summary|Мягкое затемнение за строкой состояния и док-панелью
+wallpaper_zoom|Эффект масштабирования обоев
+auto_add_apps|Добавлять новые приложения на главный экран
+label_font|Шрифт подписи
+label_single_line|Подписи в одну строку
+icon_size|Размер значков
+icon_size_fitted|Значки самые большие, какие вмещает эта сетка. Чтобы они были крупнее, уменьшите число строк или столбцов либо отключите подписи.
+label_group|Подпись
+label_card_size|Размер
 label_card_font|Шрифт
 label_group_summary|%1$s · шрифт %2$s
-label_card_shadow|Тінь
-label_card_single_line|Один рядок
-font_default|Типовий
-font_condensed|Вузький
-font_serif|З засічками
-font_monospace|Моноширинний
-dock_infinite_scroll|Нескінченне прокручування
-dock_match_desktop|Масштаб іконок, як на головному екрані
-dock_overlay|Показувать як накладання
-dock_overlay_summary|Док-панель лежить поверх головного екрана, а не під ним
-dock_auto_close|Закривати автоматично
-dock_remember_position|Запамʼятовувати позицію
-settings_group_screens|Екрани
-settings_group_customize|Настройки
+label_card_shadow|Тень
+label_card_single_line|Одна строка
+font_default|Обычный
+font_condensed|Узкий
+font_serif|С засечками
+font_monospace|Моноширинный
+dock_infinite_scroll|Бесконечная прокрутка
+dock_match_desktop|Масштаб значков как на главном экране
+dock_overlay|Показывать как наложение
+dock_overlay_summary|Док-панель лежит поверх главного экрана, а не под ним
+dock_auto_close|Закрывать автоматически
+dock_remember_position|Запоминать позицию
+settings_group_screens|Экраны
+settings_group_customize|Настройка
 settings_group_app|Supernova
 style_group_theme|Тема
-style_group_surfaces|Поверхні
+style_group_surfaces|Поверхности
 style_tab|Стиль
-color_palette|Палітра кольорів
-palette_system|Системна
-palette_wallpaper|Зі шпалер
-palette_custom|Власна
-palette_seed_title|Власний колір палітри
-palette_seed_hint|Hex-колір, наприклад 3366FF
-palette_seed_invalid|Недійсний hex-колір
-style_popup|Спливне меню
-style_cards|Картки
-style_bar_glass_note|Скло замінює колір поверхні. Його задають на окремій сторінці панелі.
+color_palette|Палитра цветов
+palette_system|Системная
+palette_wallpaper|По обоям
+palette_custom|Своя
+palette_seed_title|Свой цвет палитры
+palette_seed_hint|Hex-цвет, например 3366FF
+palette_seed_invalid|Недопустимый hex-цвет
+style_popup|Всплывающее меню
+style_cards|Карточки
+style_bar_glass_note|Стекло заменяет цвет поверхности. Его задают на отдельной странице панели.
 style_slot_surface|Фон
 style_slot_text|Текст
 style_slot_accent|Акцент
-style_fixed_colors|Фіксовані кольори
-style_role_primary|Основний
-style_role_neutral|Нейтральний
-style_role_neutral_variant|Нейтральний варіант
-style_opacity|Непрозорість
-labs|Лабораторія
-group_home_button|Кнопка «Додому»
-section_labs_subtitle|Експерименти та інструменти тем іконок
-labs_show_component|Показувать компонент у вікні редагування
-labs_show_component_summary|Показувать назву компонента у вікні редагування приложухи
-labs_big_grid|Великі розміри сітки
-labs_big_grid_summary|Сітки до 24×24, більше стовпців у док-панелі, шухляді й папках
-labs_export_png|Показувать «Експорт PNG» у меню довгого натискання
-labs_export_png_summary|Додає «Експорт PNG» до меню елементів головного екрана
-export_png|Експорт PNG
-export_png_saved|PNG збережено
-export_png_failed|Не склалося зберегти PNG: %1$s
-export_png_lost|Не склалося зберегти PNG: Supernova перезапустилась, поки було відкрите вікно вибору файлу
-labs_export_icons|Експорт іконок
-labs_export_icons_summary|Зберегти всі іконки приложух і appfilter.xml у zip
-labs_export_icons_failed|Не склалося експортувати іконки: %1$s
-labs_icons_exported|Експортовано %d іконку|Експортовано %d іконки|Експортовано %d іконок|Експортовано %d іконки
-labs_clear_icon_cache|Очистити кеш іконок
-permissions|Дозволи
-section_permissions_subtitle|Контакти, календар, доступ до сповіщень тощо
-permission_contacts|Контакти
-permission_contacts_use|контакти в пошуку та стрічці
-permission_calendar|Календар
-permission_calendar_use|картка календаря у стрічці
-permission_notifications|Доступ до сповіщень
-permission_notifications_use|значки, сповіщення у спливному меню й картка медіа
-permission_post_notifications|Надсилання сповіщень
-permission_post_notifications_use|тестовий значок сповіщення
-permission_accessibility|Спеціальні можливості
-permission_accessibility_use|жести, шо блокують екран або відкривають недавні приложухи й швидкі настройки
-permission_device_admin|Адміністратор пристрою
-permission_device_admin_use|блокування екрана методом адміністратора пристрою
+style_fixed_colors|Фиксированные цвета
+style_role_primary|Основной
+style_role_neutral|Нейтральный
+style_role_neutral_variant|Нейтральный вариант
+style_opacity|Непрозрачность
+labs|Лаборатория
+group_home_button|Кнопка «Домой»
+section_labs_subtitle|Эксперименты и инструменты тем значков
+labs_show_component|Показывать компонент в окне редактирования
+labs_show_component_summary|Показывать название компонента в окне редактирования приложения
+labs_big_grid|Большие размеры сетки
+labs_big_grid_summary|Сетки до 24×24, больше столбцов в док-панели, меню и папках
+labs_export_png|Показывать «Экспорт PNG» в меню долгого нажатия
+labs_export_png_summary|Добавляет «Экспорт PNG» в меню элементов главного экрана
+export_png|Экспорт PNG
+export_png_saved|PNG сохранён
+export_png_failed|Не получилось сохранить PNG: %1$s
+export_png_lost|Не получилось сохранить PNG: Supernova перезапустилась, пока было открыто окно выбора файла
+labs_export_icons|Экспорт значков
+labs_export_icons_summary|Сохранить все значки приложений и appfilter.xml в zip
+labs_export_icons_failed|Не получилось экспортировать значки: %1$s
+labs_icons_exported|Экспортирован %d значок|Экспортировано %d значка|Экспортировано %d значков|Экспортировано %d значка
+labs_clear_icon_cache|Очистить кеш значков
+permissions|Разрешения
+section_permissions_subtitle|Контакты, календарь, доступ к уведомлениям и другое
+permission_contacts|Контакты
+permission_contacts_use|контакты в поиске и ленте
+permission_calendar|Календарь
+permission_calendar_use|карточка календаря в ленте
+permission_notifications|Доступ к уведомлениям
+permission_notifications_use|значки, уведомления во всплывающем меню и карточка медиа
+permission_post_notifications|Отправка уведомлений
+permission_post_notifications_use|тестовый значок уведомления
+permission_accessibility|Специальные возможности
+permission_accessibility_use|жесты, блокирующие экран или открывающие недавние приложения и быстрые настройки
+permission_device_admin|Администратор устройства
+permission_device_admin_use|блокировка экрана методом администратора устройства
 permission_status_line|%1$s · %2$s
-permission_allowed|Дозволено
-permission_not_allowed|Не дозволено
-permission_on|Увімкнено
-permission_off|Вимкнено
-device_admin_off_title|Вимкнуть адміністратора пристрою?
-device_admin_off_message|Блокування екрана методом адміністратора пристрою не працюватиме, доки його знову не ввімкнуть.
-turn_off|Вимкнуть
-labs_clear_icon_cache_summary|Перемалювати всі іконки, заново прочитавши пакет іконок
-labs_icon_cache_cleared|Кеш іконок очищено
-style_min_contrast|Мінімальна контрастність
-style_min_contrast_summary|Відтінки тексту світлішають чи темнішають, щоб лишатися на цій відстані від поверхні
+permission_allowed|Разрешено
+permission_not_allowed|Не разрешено
+permission_on|Включено
+permission_off|Выключено
+device_admin_off_title|Выключить администратора устройства?
+device_admin_off_message|Блокировка экрана методом администратора устройства не будет работать, пока его снова не включат.
+turn_off|Выключить
+labs_clear_icon_cache_summary|Перерисовать все значки, заново прочитав набор значков
+labs_icon_cache_cleared|Кеш значков очищен
+style_min_contrast|Минимальная контрастность
+style_min_contrast_summary|Оттенки текста светлеют или темнеют, чтобы оставаться на этом расстоянии от поверхности
 style_min_contrast_value|%dΔ
-style_corner_radius|Радіус кутів
-style_preview_sample|Зразок тексту
-settings_section_search|Пошук
-search_hint|Пошук
-search_web_provider|Пошукова система
-search_contacts|Шукати контакти
-search_shortcuts|Шукати ярлики приложух
+style_corner_radius|Радиус углов
+style_preview_sample|Образец текста
+settings_section_search|Поиск
+search_hint|Поиск
+search_web_provider|Поисковая система
+search_contacts|Искать контакты
+search_shortcuts|Искать ярлыки приложений
 search_calculator|Калькулятор
-search_hidden_apps|Шукати приховані приложухи
-search_hidden_apps_summary|Приховані приложухи зʼявляться в результатах пошуку
-search_private_keyboard|Приватний режим клавіатури
-search_private_keyboard_summary|Просить клавіатуру не вчитися на ваших запитах
-home_button_action|Дія кнопки «Додому»
-settings_search_hint|Пошук у настройких
-desktop_search_bar|Рядок пошуку на головному екрані
-search_bar_placement|Розташування
-search_bar_none|Нема
-search_bar_above_dock|Над док-панеллю
-search_bar_below_dock|Під док-панеллю
-search_bar_persistent|Завжди показувати внизу
-search_bar_top|Завжди показувати вгорі
-search_bar_widget|Віджет робочого простору
-search_bar_wireframe|Каркасний стиль
-search_bar_wireframe_summary|Лише контур, без заливки
-search_bar_shadow|Тінь
-search_bar_hint_text|Показувать текст «Пошук»
-drawer_bar_hint_text|Показувать текст «Пошук»
+search_hidden_apps|Искать скрытые приложения
+search_hidden_apps_summary|Скрытые приложения появятся в результатах поиска
+search_private_keyboard|Приватный режим клавиатуры
+search_private_keyboard_summary|Просит клавиатуру не учиться на ваших запросах
+home_button_action|Действие кнопки «Домой»
+settings_search_hint|Поиск по настройкам
+desktop_search_bar|Строка поиска на главном экране
+search_bar_placement|Расположение
+search_bar_none|Нет
+search_bar_above_dock|Над док-панелью
+search_bar_below_dock|Под док-панелью
+search_bar_persistent|Всегда показывать внизу
+search_bar_top|Всегда показывать вверху
+search_bar_widget|Виджет рабочего пространства
+search_bar_wireframe|Каркасный стиль
+search_bar_wireframe_summary|Только контур, без заливки
+search_bar_shadow|Тень
+search_bar_hint_text|Показывать текст «Поиск»
+drawer_bar_hint_text|Показывать текст «Поиск»
 search_bar_chips|Кнопки
-search_bar_chip_voice|Голосовий пошук
-search_bar_chip_assistant|Асистент
+search_bar_chip_voice|Голосовой поиск
+search_bar_chip_assistant|Ассистент
 search_bar_chip_date|Дата
-drawer_search_global|Пошук у шухляді відкриває загальний пошук
-search_web_for|Шукати «%2$s» у %1$s
+drawer_search_global|Поиск в меню открывает общий поиск
+search_web_for|Искать «%2$s» в %1$s
 search_demo_calc|12 × 8 = 96
-search_demo_shortcut|Ярлик приложухи
+search_demo_shortcut|Ярлык приложения
 search_demo_contact|Контакт
 search_demo_folder|Папка
-copied_to_clipboard|Скопіював. Користуйтесь на здоров’я
-contacts_permission_needed|Дайте дозвіл на контакти, щоб шукати їх
+copied_to_clipboard|Скопировал. Пользуйтесь на здоровье
+contacts_permission_needed|Дайте разрешение на контакты, чтобы искать их
 chip_play_store|Play Маркет
-chip_maps|Карти
+chip_maps|Карты
 chip_youtube|YouTube
-chip_wikipedia|Вікіпедія
+chip_wikipedia|Википедия
 chip_spotify|Spotify
 chip_google|Google
-search_with|Шукати в
-search_recent_header|Шо шукали останнім часом
-search_recent_clear|Очистити
-search_recent_desc|Шукати ще раз: %1$s
-search_no_matches|На цьому телефоні такого нема, шукайте на Привозі
-needs_drawer_search_bar|Потрібен рядок пошуку шухляди, у «Пошуку»
-needs_swipe_up_drawer|Потрібно, щоб свайп угору відкривав шухляду приложух, у «Жестах»
-needs_dock|Потрібна док-панель, у «Док-панелі»
-needs_badges|Потрібні значки сповіщень, в «Іконках і підписах»
-needs_animations|Анімації вимкнено, у «Головному екрані»
-infinite_scroll_summary|Свайп за останню сторінку веде до першої; вимикає жести свайпу вліво/вправо
-settings_search_no_matches|Нема таких налаштувань: «%1$s». Ви шо, придумали?
-settings_search_needs_on|Потрібно ввімкнути «%1$s»
-settings_search_needs_off|Потрібно вимкнути «%1$s»
-settings_search_depends_on|Залежить від «%1$s»
-search_bar_replace|Замінити
-search_bar_settings|Настройки рядка пошуку
-search_bar_restore|Використати вбудований рядок
-search_bar_widget_gone|Цей віджет більше недоступний
-search_chips|Кнопки пошукових систем
-gesture_swipe_left|Свайп ліворуч
-gesture_swipe_right|Свайп праворуч
-gesture_left_right_conflict|Свайп ліворуч/праворуч
-gesture_left_right_conflict_summary|Не працюють, поки ввімкнено нескінченне прокручування
-gesture_double_tap_swipe_up|Подвійний дотик і свайп угору
-gesture_double_tap_swipe_down|Подвійний дотик і свайп униз
-gesture_rotate_cw|Обертання двома пальцями за годинниковою стрілкою
-gesture_rotate_ccw|Обертання двома пальцями проти годинникової стрілки
-action_toggle_status_bar|Перемкнути рядок стану
-action_toggle_dock|Перемкнути док-панель
-action_jump_to_page|Перейти на сторінку
-action_desktop_previews|Огляд сторінок головного екрана
-action_open_feed|Сторінка стрічки
-action_voice_search|Голосовий пошук
-action_private_space|Приватний простір
+search_with|Искать в
+search_recent_header|Шо искали недавно
+search_recent_clear|Очистить
+search_recent_desc|Искать ещё раз: %1$s
+search_no_matches|На этом телефоне такого нет, ищите на Привозе
+needs_drawer_search_bar|Нужна строка поиска меню приложений, в «Поиске»
+needs_swipe_up_drawer|Таки нужно, чтобы свайп вверх открывал меню приложений, в «Жестах»
+needs_dock|Нужна док-панель, в «Док-панели»
+needs_badges|Нужны значки уведомлений, в «Значках и подписях»
+needs_animations|Анимации выключены, в «Главном экране»
+infinite_scroll_summary|Свайп за последнюю страницу ведёт к первой; отключает жесты свайпа влево/вправо
+settings_search_no_matches|Нет таких настроек: «%1$s». Вы шо, придумали?
+settings_search_needs_on|Таки нужно включить «%1$s»
+settings_search_needs_off|Таки нужно выключить «%1$s»
+settings_search_depends_on|Зависит от «%1$s»
+search_bar_replace|Заменить
+search_bar_settings|Настройки строки поиска
+search_bar_restore|Использовать встроенную строку
+search_bar_widget_gone|Этот виджет больше недоступен
+search_chips|Кнопки поисковых систем
+gesture_swipe_left|Свайп влево
+gesture_swipe_right|Свайп вправо
+gesture_left_right_conflict|Свайп влево/вправо
+gesture_left_right_conflict_summary|Не работают, пока включена бесконечная прокрутка
+gesture_double_tap_swipe_up|Двойное нажатие и свайп вверх
+gesture_double_tap_swipe_down|Двойное нажатие и свайп вниз
+gesture_rotate_cw|Вращение двумя пальцами по часовой стрелке
+gesture_rotate_ccw|Вращение двумя пальцами против часовой стрелки
+action_toggle_status_bar|Переключить строку состояния
+action_toggle_dock|Переключить док-панель
+action_jump_to_page|Перейти на страницу
+action_desktop_previews|Обзор страниц главного экрана
+action_open_feed|Страница ленты
+action_voice_search|Голосовой поиск
+action_private_space|Приватное пространство
 settings_launcher_label|Настройки Supernova
-lock_method|Спосіб блокування екрана
-lock_method_accessibility|Служба спеціальних можливостей
-lock_method_device_admin|Адміністратор пристрою
-lock_admin_explanation|Дозволяє Supernova блокувати екран. Вона ніколи не стирає дані й не керує паролями.
-lock_admin_note|Адміністратор пристрою блокує миттєво, але біометричне розблокування одразу після цього вимкнене; вимкніть адміністратора перед видаленням.
-voice_search_unavailable|Не знайдено приложухи голосового пошуку
-page_number|Сторінка %1$d
-launch_animation|Анімація приложухи
-anim_system|Системна
-anim_adaptive_icon|Адаптивна іконка
-anim_circle|Коло
-anim_reveal|Розкриття
-anim_slide_up|Виїзд угору
+lock_method|Способ блокировки экрана
+lock_method_accessibility|Служба специальных возможностей
+lock_method_device_admin|Администратор устройства
+lock_admin_explanation|Позволяет Supernova блокировать экран. Она никогда не стирает данные и не управляет паролями.
+lock_admin_note|Администратор устройства блокирует мгновенно, но биометрическая разблокировка сразу после этого отключена; выключите администратора перед удалением.
+voice_search_unavailable|Приложение голосового поиска не найдено
+page_number|Страница %1$d
+launch_animation|Анимация приложения
+anim_system|Системная
+anim_adaptive_icon|Адаптивный значок
+anim_circle|Круг
+anim_reveal|Раскрытие
+anim_slide_up|Выезд вверх
 anim_zoom|Масштаб
-anim_blink|Блимання
-anim_slide_left|Виїзд ліворуч
-disable_animations|Вимкнуть анімації
-animation_speed|Швидкість анімації
-anim_speed_relaxed|Спокійна
-anim_speed_fast|Швидка
-drop_targets|Цілі для скидання
-drop_targets_summary|«Прибрати», «Про приложуху» і «Знести» вгорі під час перетягування
-undo_remove|Панель скасування після видалення
+anim_blink|Мигание
+anim_slide_left|Выезд влево
+disable_animations|Отключить анимации
+animation_speed|Скорость анимации
+anim_speed_relaxed|Спокойная
+anim_speed_fast|Быстрая
+drop_targets|Цели для сброса
+drop_targets_summary|«Убрать», «О приложении» и «Удалить» вверху при перетаскивании
+undo_remove|Панель отмены после удаления
 item_removed|Забрали
 undo|Ой, назад
-folder_sorted|Відсортовано А–Я
-popup_menu_rows|Пункти спливного меню
-popup_notifications|Сповіщення у спливному меню
-popup_row_store|Показати в магазині
-popup_row_close_app|Закрити приложуху
-popup_row_relaunch|Перезапустити
-popup_row_save_apk|Зберегти APK
-app_closed|Фонові завдання «%s» закрито
-apk_saved|APK збережено
-apk_saved_base|Базовий APK збережено (приложуху використовує розділені APK)
-apk_save_failed|Не склалося зберегти APK
-hide_status_bar|Сховать рядок стану
-status_bar_icons|Колір іконок рядка стану
-status_icons_auto|За темою
-status_icons_wallpaper|За шпалерами
-status_icons_dark|Темні іконки
-status_icons_light|Світлі іконки
-transparent_nav|Прозора панель навігації
-transparent_status|Прозорий рядок стану
-home_button_main_page_only|Лише на головній сторінці
-settings_section_feed|Стрічка
-feed_enabled|Показувать перед першою сторінкою
-feed_enabled_subtitle|Показувать стрічку як додаткову сторінку головного екрана перед першою
-feed_card_colors|Кольори карток
-feed_edge_swipe|Відкривати свайпом від лівого краю
-feed_show_search|Рядок пошуку
-feed_show_media|Показувать, коли грає медіа
-cards_media_title|Керування медіа
-feed_show_calendar|Показувать найближчі події
-feed_show_contacts|Показувать обраних контактів
-feed_media_needs_access|Потрібен доступ до сповіщень
-feed_media_needs_access_summary|Натисніть, щоб дозволити, і картка покаже, шо грає
-feed_disabled_hint|Спершу увімкніть стрічку в настройках
-feed_add_card|Докинуть картку
-feed_calendar_title|Календар
-feed_calendar_permission|Дозвольте доступ до календаря, щоб бачити найближчі події
-feed_contacts_title|Обрані контакти
-feed_contacts_permission|Дозвольте доступ до контактів, щоб бачити обраних
-feed_grant_access|Надати доступ
-calendar_permission_needed|Для картки календаря потрібен дозвіл на календар
-contacts_permission_feed_needed|Для картки контактів потрібен дозвіл на контакти
-media_play_pause|Грати або пауза
-media_next|Наступний трек
-media_previous|Попередній трек
+folder_sorted|Отсортировано А–Я
+popup_menu_rows|Пункты всплывающего меню
+popup_notifications|Уведомления во всплывающем меню
+popup_row_store|Показать в магазине
+popup_row_close_app|Закрыть приложение
+popup_row_relaunch|Перезапустить
+popup_row_save_apk|Сохранить APK
+app_closed|Фоновые задачи «%s» закрыты
+apk_saved|APK сохранён
+apk_saved_base|Базовый APK сохранён (приложение использует разделённые APK)
+apk_save_failed|Не получилось сохранить APK
+hide_status_bar|Скрыть строку состояния
+status_bar_icons|Цвет значков строки состояния
+status_icons_auto|По теме
+status_icons_wallpaper|По обоям
+status_icons_dark|Тёмные значки
+status_icons_light|Светлые значки
+transparent_nav|Прозрачная панель навигации
+transparent_status|Прозрачная строка состояния
+home_button_main_page_only|Только на главной странице
+settings_section_feed|Лента
+feed_enabled|Показывать перед первой страницей
+feed_enabled_subtitle|Показывать ленту как дополнительную страницу главного экрана перед первой
+feed_card_colors|Цвета карточек
+feed_edge_swipe|Открывать свайпом от левого края
+feed_show_search|Строка поиска
+feed_show_media|Показывать, когда играет медиа
+cards_media_title|Управление медиа
+feed_show_calendar|Показывать ближайшие события
+feed_show_contacts|Показывать избранные контакты
+feed_media_needs_access|Нужен доступ к уведомлениям
+feed_media_needs_access_summary|Нажмите, чтобы разрешить, и карточка покажет, шо играет
+feed_disabled_hint|Сначала включите ленту в настройках
+feed_add_card|Добавить карточку
+feed_calendar_title|Календарь
+feed_calendar_permission|Разрешите доступ к календарю, чтобы видеть ближайшие события
+feed_contacts_title|Избранные контакты
+feed_contacts_permission|Разрешите доступ к контактам, чтобы видеть избранные
+feed_grant_access|Предоставить доступ
+calendar_permission_needed|Для карточки календаря нужно разрешение на календарь
+contacts_permission_feed_needed|Для карточки контактов нужно разрешение на контакты
+media_play_pause|Играть или пауза
+media_next|Следующий трек
+media_previous|Предыдущий трек
 card_widget_height_value|%1$d dp
-card_widget_fill|Заповнити сторінку
-feed_settings|Настройки стрічки
-feed_empty_title|Ваша стрічка
-feed_empty_text|Складіть сюди віджети, приложухи й ярлики, шо потрібні кожного дня, і не гайте час.
-feed_add_title|Докинуть до стрічки
-feed_add_widget|Докинуть віджет
-feed_add_widget_short|Віджет
-feed_add_widget_desc|Будь-який розмір, до цілої сторінки
-feed_add_shortcuts|Приложухи та ярлики
-feed_add_shortcuts_cta|Докинуть приложухи й ярлики
-feed_add_shortcuts_desc|До шести в одній картці
-feed_ready_made|Готові картки
-card_menu_remove|Прибрати
-card_removed|Картку забрали
-card_caption_pinned|Закріплено
-card_name_optional|Назва (необовʼязково)
-card_widget_kind|Віджет
-card_widget_change|Змінити
-card_height|Висота
-card_height_set|Задати висоту
-card_items_label|Приложухи та ярлики
-card_widget_items|Ярлики під віджетом
-card_items_count|%1$d з %2$d
-card_items_add|+  Докинуть
-card_item_earlier|Перемістити раніше
-card_item_later|Перемістити пізніше
-card_item_remove|Прибрати %1$s
-card_large_tile|Показувать перший великою плиткою
-card_summary_widget|Віджет
-card_summary_fills|Віджет · Заповнює сторінку
-card_items_summary|%d приложуху або ярлик|%d приложухи та ярлики|%d приложух і ярликів|%d приложухи та ярлика
-card_widget_fill_desc|Картка займає всю сторінку, і стрічка зупиняється на ній під час прокручування.
-card_frame|Фон картки
-card_frame_desc|Вимкнено — віджет показується сам по собі
-card_reorder|Перетягніть, щоб змінити порядок
-decrease|Зменшити
-increase|Збільшити
-card_featured_app|Приложуха
-card_featured_shortcut|Ярлик
-card_add_action|Докинуть дію
-card_menu_edit|Редагувати
-card_menu_pin|Закріпити вгорі
-card_menu_unpin|Відкріпити
-card_untitled|Картка
-card_widget_unavailable|Віджет недоступний
-search_cards|Шукати ваші картки
-settings_section_cards|Картки
-cards_add|Докинуть картку
-today|Сьогодні
-tomorrow|Завтра, якшо дасть Бог
-onboarding_welcome_to|Ну шо, ласкаво просимо до
-onboarding_tagline|Головний екран, налаштуй хоч до ранку
-onboarding_design_home|Зробити красиво
-onboarding_restore_backup|Привезти стару копію
-onboarding_skip_setup|Та ну його, пропустити
-onboarding_skip_hint|Не хочете налаштовувати? Тиснете «Та ну його, пропустити» і йдете по своїх справах
-onboarding_animations_title|Анімації лаунчера
-onboarding_animations_message|Анімації вашого телефона вимкнені. Анімації Supernova мають власний перемикач. Залишити їх увімкненими? Це можна змінити пізніше в настройких.
-onboarding_animations_keep|Залишити
-onboarding_animations_off|Вимкнуть
+card_widget_fill|Заполнить страницу
+feed_settings|Настройки ленты
+feed_empty_title|Ваша лента
+feed_empty_text|Положите сюда виджеты, приложения и ярлыки, шо нужны каждый день, и не теряйте время.
+feed_add_title|Добавить в ленту
+feed_add_widget|Добавить виджет
+feed_add_widget_short|Виджет
+feed_add_widget_desc|Любой размер, вплоть до целой страницы
+feed_add_shortcuts|Приложения и ярлыки
+feed_add_shortcuts_cta|Добавить приложения и ярлыки
+feed_add_shortcuts_desc|До шести в одной карточке
+feed_ready_made|Готовые карточки
+card_menu_remove|Убрать
+card_removed|Карточку забрали
+card_caption_pinned|Закреплено
+card_name_optional|Название (необязательно)
+card_widget_kind|Виджет
+card_widget_change|Изменить
+card_height|Высота
+card_height_set|Задать высоту
+card_items_label|Приложения и ярлыки
+card_widget_items|Ярлыки под виджетом
+card_items_count|%1$d из %2$d
+card_items_add|+  Добавить
+card_item_earlier|Переместить раньше
+card_item_later|Переместить позже
+card_item_remove|Убрать %1$s
+card_large_tile|Показывать первый крупной плиткой
+card_summary_widget|Виджет
+card_summary_fills|Виджет · Заполняет страницу
+card_items_summary|%d приложение или ярлык|%d приложения и ярлыка|%d приложений и ярлыков|%d приложения и ярлыка
+card_widget_fill_desc|Карточка занимает всю страницу, и лента останавливается на ней при прокрутке.
+card_frame|Фон карточки
+card_frame_desc|Выключено — виджет показывается сам по себе
+card_reorder|Перетащите, чтобы изменить порядок
+decrease|Уменьшить
+increase|Увеличить
+card_featured_app|Приложение
+card_featured_shortcut|Ярлык
+card_add_action|Добавить действие
+card_menu_edit|Изменить
+card_menu_pin|Закрепить вверху
+card_menu_unpin|Открепить
+card_untitled|Карточка
+card_widget_unavailable|Виджет недоступен
+search_cards|Искать ваши карточки
+settings_section_cards|Карточки
+cards_add|Добавить карточку
+today|Сегодня
+tomorrow|Завтра, если Бог даст
+onboarding_welcome_to|Ну шо, добро пожаловать в
+onboarding_tagline|Главный экран, настраивайте хоть до утра
+onboarding_design_home|Сделать красиво
+onboarding_restore_backup|Привезти старую копию
+onboarding_skip_setup|Да ну его, пропустить
+onboarding_skip_hint|Не хотите настраивать? Жмёте «Да ну его, пропустить» и идёте по своим делам
+onboarding_animations_title|Анимации лаунчера
+onboarding_animations_message|Анимации вашего телефона выключены. У анимаций Supernova свой переключатель. Оставить их включёнными? Это можно изменить позже в настройках.
+onboarding_animations_keep|Оставить
+onboarding_animations_off|Выключить
 onboarding_previous|Назад
-onboarding_skip|Пропустити
-onboarding_look_title|Звідки починаємо?
-onboarding_look_summary|Один дотик змінює стиль усього екрана. Доналаштуєте на наступних кроках.
-onboarding_look_classic|Класика
-onboarding_look_glass|Скло
-onboarding_look_quiet|Спокій
-onboarding_look_bold|Сміливість
-onboarding_shuffle|Зробити так, шоб ні в кого такого не було
-onboarding_color_title|Який колір по-вашому красивий?
-onboarding_color_summary|Він підфарбовує пошук, меню та тоновані іконки.
-onboarding_shape_title|Оформіть форму іконок
-onboarding_finish_title|Виберіть оздоблення
-onboarding_finish_summary|Скло дозволяє шпалерам просвічувати.
-onboarding_finish_original|Оригінал
-onboarding_finish_tinted|Тоноване
-onboarding_density_title|Скільки влізе на сторінку?
-onboarding_density_summary|Менше, але більших іконок, чи більше, але менших.
-onboarding_density_roomy|Просторо, як на Дерибасівській
-onboarding_density_balanced|Як годиться
-onboarding_density_packed|Тісно, як у трамваї
+onboarding_skip|Пропустить
+onboarding_look_title|Откуда начинаем?
+onboarding_look_summary|Одно нажатие меняет стиль всего экрана. Доработаете на следующих шагах.
+onboarding_look_classic|Классика
+onboarding_look_glass|Стекло
+onboarding_look_quiet|Спокойствие
+onboarding_look_bold|Смелость
+onboarding_shuffle|Сделать так, шоб ни у кого такого не было
+onboarding_color_title|Какой цвет вам красивый?
+onboarding_color_summary|Он подкрашивает поиск, меню и тонированные значки.
+onboarding_shape_title|Оформите форму значков
+onboarding_finish_title|Выберите отделку
+onboarding_finish_summary|Стекло позволяет обоям просвечивать.
+onboarding_finish_original|Оригинал
+onboarding_finish_tinted|Тонированное
+onboarding_density_title|Сколько влезет на страницу?
+onboarding_density_summary|Меньше, но крупнее значки, или больше, но мельче.
+onboarding_density_roomy|Просторно, как на Дерибасовской
+onboarding_density_balanced|Как положено
+onboarding_density_packed|Тесно, как в трамвае
 onboarding_grid_size|%1$d × %2$d
-onboarding_names_title|Як будемо називать приложухи?
-onboarding_names_summary|Виберіть шрифт або приховайте назви.
-onboarding_names_standard|Стандартний
-onboarding_names_narrow|Вузький
-onboarding_names_serif|З засічками
-onboarding_names_mono|Моноширинний
-onboarding_names_hidden|Сховано
+onboarding_names_title|Как будем называть приложения?
+onboarding_names_summary|Выберите шрифт или скройте названия.
+onboarding_names_standard|Стандартный
+onboarding_names_narrow|Узкий
+onboarding_names_serif|С засечками
+onboarding_names_mono|Моноширинный
+onboarding_names_hidden|Скрыто
 onboarding_names_sample|Аа
-onboarding_done_title|Ось ваш екран. Таки красота.
-onboarding_done_later|Все можна поміняти потім, в настройках, у «Швидкому старті».
-onboarding_set_home|Зробить це моїм екраном
+onboarding_done_title|Вот ваш экран. Таки красота.
+onboarding_done_later|Всё можно поменять потом, в настройках, в «Быстром старте».
+onboarding_set_home|Сделать это моим экраном
 onboarding_done_rerun|Таки готово
-onboarding_selected|%1$s, вибрано
-next|Йдемо далі
-share_backup|Поділитися резервною копією
-reset_to_default|Скинути все до початку
-reset_to_default_subtitle|Очистити розкладку й усі настройки
-reset_to_default_message|Це очищає розкладку головного екрана й скидає всі настройки. Спершу знімок зберігається в «Автоматичних копіях», тож його можна відновити.
-reset_done|Лаунчер як новий, наче вчора народився
-reset_failed|Не вийшло скинути: %1$s
-quick_start|Швидкий старт
-quick_start_subtitle|Запустити початкове настройки ще раз
-restart_supernova|Перезапустити, шоб ви були здорові
-restart_launcher_q|Перезапустити Supernova?
-restart_launcher_message|Настройки й головний екран закриються й відкриються знову. Нічого не пропаде, слово одесита.
-restart|Перезапустити
-widgets_row|Віджети
+onboarding_selected|%1$s, выбрано
+next|Идём дальше
+share_backup|Поделиться резервной копией
+reset_to_default|Сбросить всё к началу
+reset_to_default_subtitle|Очистить раскладку и все настройки
+reset_to_default_message|Это очищает раскладку главного экрана и сбрасывает все настройки. Сначала снимок сохраняется в «Автоматических копиях», так шо его можно восстановить.
+reset_done|Лаунчер как новый, будто вчера родился
+reset_failed|Не вышло сбросить: %1$s
+quick_start|Быстрый старт
+quick_start_subtitle|Запустить начальную настройку ещё раз
+restart_supernova|Перезапустить, шоб вы были здоровы
+restart_launcher_q|Перезапустить Supernova?
+restart_launcher_message|Настройки и главный экран закроются и откроются снова. Ничего не пропадёт, слово одессита.
+restart|Перезапустить
+widgets_row|Виджеты
 folder_badges|Значки на папках
-themed_icons|Тематичні іконки
-icon_variant|Стиль іконки
-variant_default|За замовчуванням
-variant_themed|Тематична
-variant_original|Оригінальна
-variant_default_hint|Слідує за лаунчером: його формою іконок, склом і тематичними іконками.
-variant_themed_hint|Одноколірна іконка на тонованій підкладці, навіть коли тематичні іконки вимкнено.
-variant_original_hint|Іконка така, як її зробив приложуху. Діє лише форма, вибрана тут.
-edit_preview|Перегляд
-edit_name|Назва
-edit_no_changes|Без змін
-edit_change_renamed|Перейменовано
-edit_change_hidden|Назву приховано
-edit_change_icon|Іконка: %1$s
-edit_shape_default|За замовчуванням (форма лаунчера)
-save_changes|Зберегти %d зміну|Зберегти %d зміни|Зберегти %d змін|Зберегти %d зміни
-edit_widgets_title|Віджети
-search_widgets_hint|Пошук віджетів
-edit_home_page|Головна сторінка
-edit_make_home_page|Зробити це головною сторінкою
-edit_home_page_set|Задано як головну сторінку
-shortcut_row_subtitle|Ярлик
-launcher_action_row_subtitle|Дія лаунчера
-activities_row_subtitle|Будь-яка активність приложухи
-shortcut_count|%d ярлик|%d ярлики|%d ярликів|%d ярлика
-add_category_activities|Активності
-no_activities|Нема активностей
-search_activities_hint|Пошук активностей
-activity_count|%d активність|%d активності|%d активностей|%d активності
-launch_failed|Не склалося це запустити
-a11y_move_left|Перемістити ліворуч
-a11y_move_right|Перемістити праворуч
-a11y_move_up|Перемістити вгору
-a11y_move_down|Перемістити вниз
-a11y_move_previous_page|Перемістити на попередню сторінку
-a11y_move_next_page|Перемістити на наступну сторінку
-a11y_move_to_dock|Перемістити в док-панель
-a11y_move_to_home|Перемістити на головний екран
-a11y_moved|Переміщено
+themed_icons|Тематические значки
+icon_variant|Стиль значка
+variant_default|По умолчанию
+variant_themed|Тематический
+variant_original|Оригинальный
+variant_default_hint|Следует за лаунчером: его формой значков, стеклом и тематическими значками.
+variant_themed_hint|Одноцветный значок на тонированной подложке, даже когда тематические значки выключены.
+variant_original_hint|Значок таким, каким его сделало приложение. Действует только форма, выбранная здесь.
+edit_preview|Просмотр
+edit_name|Название
+edit_no_changes|Без изменений
+edit_change_renamed|Переименовано
+edit_change_hidden|Название скрыто
+edit_change_icon|Значок: %1$s
+edit_shape_default|По умолчанию (форма лаунчера)
+save_changes|Сохранить %d изменение|Сохранить %d изменения|Сохранить %d изменений|Сохранить %d изменения
+edit_widgets_title|Виджеты
+search_widgets_hint|Поиск виджетов
+edit_home_page|Главная страница
+edit_make_home_page|Сделать это главной страницей
+edit_home_page_set|Задано как главная страница
+shortcut_row_subtitle|Ярлык
+launcher_action_row_subtitle|Действие лаунчера
+activities_row_subtitle|Любая активность приложения
+shortcut_count|%d ярлык|%d ярлыка|%d ярлыков|%d ярлыка
+add_category_activities|Активности
+no_activities|Нету активностей
+search_activities_hint|Поиск активностей
+activity_count|%d активность|%d активности|%d активностей|%d активности
+launch_failed|Не получилось это запустить
+a11y_move_left|Переместить влево
+a11y_move_right|Переместить вправо
+a11y_move_up|Переместить вверх
+a11y_move_down|Переместить вниз
+a11y_move_previous_page|Переместить на предыдущую страницу
+a11y_move_next_page|Переместить на следующую страницу
+a11y_move_to_dock|Переместить в док-панель
+a11y_move_to_home|Переместить на главный экран
+a11y_moved|Перемещено
 a11y_swatch_tone|%1$s, тон %2$d
-a11y_expanded|Розгорнуто
-a11y_collapsed|Згорнуто
-a11y_expand|Розгорнути
-a11y_collapse|Згорнути
-a11y_decrease|Зменшити %1$s
-a11y_increase|Збільшити %1$s
-a11y_preview|Перегляд цих налаштувань
-a11y_resized|Розмір змінено
-a11y_wider|Зробити ширшим
-a11y_narrower|Зробити вужчим
-a11y_taller|Зробити вищим
-a11y_shorter|Зробити нижчим
-a11y_no_room|Там немає вільного місця
+a11y_expanded|Развёрнуто
+a11y_collapsed|Свёрнуто
+a11y_expand|Развернуть
+a11y_collapse|Свернуть
+a11y_decrease|Уменьшить %1$s
+a11y_increase|Увеличить %1$s
+a11y_preview|Просмотр этих настроек
+a11y_resized|Размер изменён
+a11y_wider|Сделать шире
+a11y_narrower|Сделать уже
+a11y_taller|Сделать выше
+a11y_shorter|Сделать ниже
+a11y_no_room|Там нет свободного места
