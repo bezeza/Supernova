@@ -3,5 +3,5 @@
     <locale android:name="en" />
     <locale android:name="uk" />
     <locale android:name="ru" />
-    <locale android:name="ru-UA-odesa" />
+    <locale android:name="ru-Cyrl-UA-odesa" />
 </locale-config>

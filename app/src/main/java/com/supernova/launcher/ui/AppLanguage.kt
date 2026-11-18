@@ -18,7 +18,7 @@ object AppLanguage {
         "en" to "English",
         "uk" to "Українська",
         "ru" to "Русский",
-        "ru-UA-odesa" to "Одесский"
+        "ru-Cyrl-UA-odesa" to "Одесский"
     )
 
     private fun currentTag(): String =
