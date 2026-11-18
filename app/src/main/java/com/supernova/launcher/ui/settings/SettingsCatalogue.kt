@@ -94,6 +94,8 @@ object SettingsCatalogue {
         val resetToDefaults: () -> Unit = {},
         val quickStart: () -> Unit = {},
         val restartLauncher: () -> Unit = {},
+        // About > Language: pick the interface language (per-app locale).
+        val pickLanguage: () -> Unit = {},
         // About > Crash log: share the crash handler's log, or clear it.
         val showCrashLog: () -> Unit = {},
         // Fired only on a genuine user enable, so the activity can route to
@@ -1743,6 +1745,11 @@ object SettingsCatalogue {
         SettingsSection(
             R.string.about,
             listOf(
+                SettingItem.Row(
+                    R.string.language,
+                    subtitle = { com.supernova.launcher.ui.AppLanguage.currentLabel(context) },
+                    onClick = actions.pickLanguage
+                ),
                 SettingItem.Row(
                     R.string.about_version,
                     subtitle = { SupernovaApp.versionLabel(context) },

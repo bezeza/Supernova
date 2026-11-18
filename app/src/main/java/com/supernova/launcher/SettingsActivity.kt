@@ -488,6 +488,7 @@ class SettingsActivity : AppCompatActivity() {
                     .setNegativeButton(R.string.cancel, null)
                     .show()
             },
+            pickLanguage = { com.supernova.launcher.ui.AppLanguage.showPicker(this) },
             showCrashLog = ::showCrashLog,
             onBadgesEnabled = {
                 com.supernova.launcher.ui.PermissionPrompts
