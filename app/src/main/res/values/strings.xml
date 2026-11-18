@@ -533,7 +533,7 @@
     <string name="about">About</string>
     <string name="language">Language</string>
     <string name="language_system">System default</string>
-    <string name="language_summary">Language of the launcher's interface</string>
+    <string name="language_summary">Language of the launcher\'s interface</string>
     <string name="section_about_subtitle">Version, what\'s new and reporting an issue</string>
     <string name="about_version">Version</string>
     <string name="about_license">Open-source license</string>
