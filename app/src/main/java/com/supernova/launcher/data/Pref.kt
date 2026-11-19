@@ -133,8 +133,11 @@ object Pref {
     private const val LABEL_SIZE_MAX = 18
     private const val DAY_LAST_MINUTE = 1439
 
-    // Dock pages, and the feed's rows of shortcuts.
+    // The feed's rows of shortcuts.
     private const val PAGES_OR_ROWS_MAX = 3
+
+    // Dock pages: more than the feed has rows.
+    private const val DOCK_PAGES_MAX = 7
 
     private val specs = mutableListOf<PrefSpec<*>>()
     val all: List<PrefSpec<*>> get() = specs
@@ -181,7 +184,7 @@ object Pref {
     val desktopPaddingV = int("desktop_padding_v", 0..DESKTOP_PADDING_MAX)
     val desktopLocked = bool("desktop_locked")
     val dockEnabled = bool("dock_enabled")
-    val dockPages = int("dock_pages", 1..PAGES_OR_ROWS_MAX)
+    val dockPages = int("dock_pages", 1..DOCK_PAGES_MAX)
     val dockBgStyle = choice("dock_bg_style", DockBgStyle.entries)
     val dockBgOpacity = float("dock_bg_opacity", 0f..1f)
     val dockBgRadius = int("dock_bg_radius", 0..DOCK_BG_RADIUS_MAX)

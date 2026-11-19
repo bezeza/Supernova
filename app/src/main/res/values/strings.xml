@@ -1148,4 +1148,7 @@
     <string name="move_to_start">To the start</string>
     <string name="move_to_end">To the end</string>
     <string name="folder_order_changed">Order changed</string>
+    <string name="reset_folder_order">Reset order</string>
+    <string name="suggest_folder">%1$s fits the folder %2$s</string>
+    <string name="suggest_folder_action">Put it there</string>
 </resources>

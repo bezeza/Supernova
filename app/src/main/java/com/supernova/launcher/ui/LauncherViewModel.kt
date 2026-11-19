@@ -331,6 +331,8 @@ class LauncherViewModel(
                     // ...and, when asked, into the user's own folders.
                     if (state.value.prefs.autoSortNewApps) {
                         viewModelScope.launch { autoSortUnplaced() }
+                    } else {
+                        viewModelScope.launch { suggestFolderFor(change.packageName) }
                     }
                 }
                 is AppChange.Updated -> {
@@ -1308,7 +1310,18 @@ class LauncherViewModel(
     // folders already hold (FolderAutoSort). Returns how many moved. Only
     // folders the user owns take apps: a smart folder is regenerated from
     // categories and would drop them again.
-    suspend fun autoSortUnplaced(): Int {
+    // A new app and the folder that fits it, waiting for the home screen to
+    // offer it (the screen may not be on top when the install lands).
+    data class FolderSuggestion(val app: LaunchableApp, val folderId: String, val folderName: String)
+
+    private val _folderSuggestion = MutableStateFlow<FolderSuggestion?>(null)
+    val folderSuggestion: StateFlow<FolderSuggestion?> = _folderSuggestion
+
+    fun clearFolderSuggestion() { _folderSuggestion.value = null }
+
+    // The apps in no folder and where FolderAutoSort would put each: key to
+    // folder id, plus the apps by key.
+    private suspend fun unplacedPlan(): Pair<Map<String, String>, Map<String, LaunchableApp>> {
         val hidden = state.value.prefs.hiddenApps
         val apps = withContext(Dispatchers.Default) {
             catalog.listLaunchableApps().filterNot { it.privateSpace || hiddenKey(it) in hidden }
@@ -1316,14 +1329,18 @@ class LauncherViewModel(
         val byKey = apps.associateBy { hiddenKey(it) }
         val folders = drawerFolderGroups()
         val owned = folders.filter { !it.smart }
-        if (owned.isEmpty()) return 0
+        if (owned.isEmpty()) return emptyMap<String, String>() to byKey
         val placedKeys = folders.flatMap { it.members }.toSet()
         val placed = owned.flatMap { f ->
             f.members.mapNotNull { key -> byKey[key]?.let { FolderAutoSort.Placed(f.id, it.packageName, it.label) } }
         }
         val candidates = apps.filter { hiddenKey(it) !in placedKeys }
             .map { FolderAutoSort.Candidate(hiddenKey(it), it.packageName, it.label) }
-        val plan = FolderAutoSort.suggest(placed, candidates)
+        return FolderAutoSort.suggest(placed, candidates) to byKey
+    }
+
+    suspend fun autoSortUnplaced(): Int {
+        val plan = unplacedPlan().first
         if (plan.isEmpty()) return 0
         preferences.updateDrawerGroups { groups ->
             groups.map { g ->
@@ -1332,6 +1349,24 @@ class LauncherViewModel(
             }
         }
         return plan.size
+    }
+
+    // A fresh install with a confident fit gets offered its folder.
+    private suspend fun suggestFolderFor(packageName: String) {
+        val (plan, byKey) = unplacedPlan()
+        val entry = plan.entries.firstOrNull { byKey[it.key]?.packageName == packageName } ?: return
+        val app = byKey[entry.key] ?: return
+        val folder = drawerFolderGroups().firstOrNull { it.id == entry.value } ?: return
+        _folderSuggestion.value = FolderSuggestion(app, folder.id, folder.name)
+    }
+
+    // Back to the folder's own order (the drawer's), dropping a hand-set one.
+    fun resetFolderOrder(folderId: String) {
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { groups ->
+                groups.map { g -> if (g.id == folderId) g.copy(manualOrder = false) else g }
+            }
+        }
     }
 
     enum class InFolderMove { START, UP, DOWN, END }

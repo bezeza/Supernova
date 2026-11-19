@@ -693,6 +693,7 @@ class LauncherActivity :
         maybeShowOnboarding()
         widgets.sweepOrphanIds()
         observeBadges()
+        observeFolderSuggestions()
         restoreDockPage()
 
         // Wallpaper-derived palettes go stale without any prefs emission, so
@@ -781,6 +782,22 @@ class LauncherActivity :
         lastWallpaperPages = -1
         binding.workspacePager.post {
             updateWallpaperOffset(binding.workspacePager.currentItem.toFloat())
+        }
+    }
+
+    // A new install that fits one of the user's folders: offer it.
+    private fun observeFolderSuggestions() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.folderSuggestion.collect { s ->
+                    if (s == null) return@collect
+                    viewModel.clearFolderSuggestion()
+                    Snackbar.make(binding.root, getString(R.string.suggest_folder, s.app.label, s.folderName), Snackbar.LENGTH_LONG)
+                        .setAction(R.string.suggest_folder_action) { viewModel.moveAppToFolder(s.app, s.folderId) }
+                        .apply { view.elevation = dp(OVER_OVERLAYS_ELEVATION_DP) }
+                        .show()
+                }
+            }
         }
     }
 
@@ -3341,6 +3358,13 @@ class LauncherActivity :
                 menu.addRow(getString(R.string.move_down), R.drawable.ic_menu_to_back) {
                     viewModel.moveGroup(group.id, 1)
                 }
+            }
+        }
+        // A hand-set order goes back to the drawer's own.
+        if (group.type == DrawerGroupType.FOLDER && group.manualOrder) {
+            menu.addRow(getString(R.string.reset_folder_order), R.drawable.ic_menu_edit) {
+                viewModel.resetFolderOrder(group.id)
+                Toast.makeText(this, R.string.folder_order_changed, Toast.LENGTH_SHORT).show()
             }
         }
         // Its page in Settings > Drawer groups: name, icon, tab or folder,
