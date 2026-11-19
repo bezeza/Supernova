@@ -66,6 +66,7 @@ import com.supernova.launcher.ui.WorkspaceCanvas
 import com.supernova.launcher.data.AppOverride
 import com.supernova.launcher.data.ContainerType
 import com.supernova.launcher.data.DrawerGroup
+import com.supernova.launcher.data.DrawerGroupType
 import com.supernova.launcher.data.DrawerTarget
 import com.supernova.launcher.data.FolderToDrawer
 import com.supernova.launcher.data.ItemType
@@ -3283,6 +3284,23 @@ class LauncherActivity :
         // A drawer folder lists its apps in the drawer's order, so it has no
         // order of its own to Sort.
         menu.addRow(getString(R.string.select_apps), R.drawable.ic_menu_select_apps) { showDrawerGroupChecklist(group) }
+        // Folders sit in the drawer in their stored order, the one the Drawer
+        // groups page drags. Move up / down swaps with the neighbour folder,
+        // so the order can be changed from the drawer itself.
+        if (group.type == DrawerGroupType.FOLDER) {
+            val folders = viewModel.drawerFolderGroups()
+            val index = folders.indexOfFirst { it.id == group.id }
+            if (index > 0) {
+                menu.addRow(getString(R.string.move_up), R.drawable.ic_menu_to_front) {
+                    viewModel.moveGroup(group.id, -1)
+                }
+            }
+            if (index in 0 until folders.lastIndex) {
+                menu.addRow(getString(R.string.move_down), R.drawable.ic_menu_to_back) {
+                    viewModel.moveGroup(group.id, 1)
+                }
+            }
+        }
         // Its page in Settings > Drawer groups: name, icon, tab or folder,
         // apps, and Delete.
         menu.addRow(getString(R.string.edit), R.drawable.ic_menu_edit) { openDrawerGroupSettings(group.id) }
