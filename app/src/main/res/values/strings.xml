@@ -1151,4 +1151,6 @@
     <string name="reset_folder_order">Reset order</string>
     <string name="suggest_folder">%1$s fits the folder %2$s</string>
     <string name="suggest_folder_action">Put it there</string>
+    <string name="merge_folder">Merge into…</string>
+    <string name="merge_folder_title">Merge %1$s into</string>
 </resources>

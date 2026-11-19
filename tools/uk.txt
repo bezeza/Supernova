@@ -1024,3 +1024,5 @@ auto_sort_done|%d застосунок розкладено по папках|%d
 reset_folder_order|Скинути порядок
 suggest_folder|«%1$s» пасує до папки «%2$s»
 suggest_folder_action|Покласти
+merge_folder|Об’єднати з…
+merge_folder_title|Об’єднати «%1$s» з

@@ -609,3 +609,5 @@ auto_sort_done|%d приложение уже на своём месте, ша|%
 reset_folder_order|Сбросить порядочек
 suggest_folder|«%1$s» таки просится в папку «%2$s»
 suggest_folder_action|Положить, шо ли
+merge_folder|Слить с…
+merge_folder_title|Слить «%1$s» с

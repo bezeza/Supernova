@@ -1024,3 +1024,5 @@ auto_sort_done|%d приложение разложено по папкам|%d �
 reset_folder_order|Сбросить порядок
 suggest_folder|«%1$s» подходит к папке «%2$s»
 suggest_folder_action|Положить
+merge_folder|Объединить с…
+merge_folder_title|Объединить «%1$s» с

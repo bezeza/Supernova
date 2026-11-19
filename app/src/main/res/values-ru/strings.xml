@@ -1136,4 +1136,6 @@
     <string name="reset_folder_order">Сбросить порядок</string>
     <string name="suggest_folder">«%1$s» подходит к папке «%2$s»</string>
     <string name="suggest_folder_action">Положить</string>
+    <string name="merge_folder">Объединить с…</string>
+    <string name="merge_folder_title">Объединить «%1$s» с</string>
 </resources>

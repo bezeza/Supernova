@@ -1360,6 +1360,25 @@ class LauncherViewModel(
         _folderSuggestion.value = FolderSuggestion(app, folder.id, folder.name)
     }
 
+    // One folder poured into another: the target keeps its own apps first,
+    // the source's follow, and the source goes.
+    fun mergeFolderInto(sourceId: String, targetId: String) {
+        if (sourceId == targetId) return
+        viewModelScope.launch {
+            var dismissed: String? = null
+            preferences.updateDrawerGroups { groups ->
+                val source = groups.firstOrNull { it.id == sourceId } ?: return@updateDrawerGroups groups
+                if (source.smart) dismissed = source.name
+                val moved = source.members.filter { it != targetId }
+                val merged = groups.map { g ->
+                    if (g.id == targetId) g.copy(members = (g.members + moved).toCollection(LinkedHashSet())) else g
+                }
+                TabFolders.forgotten(merged.filterNot { it.id == sourceId }, sourceId)
+            }
+            dismissed?.let { preferences.dismissSmartGroup(it) }
+        }
+    }
+
     // Back to the folder's own order (the drawer's), dropping a hand-set one.
     fun resetFolderOrder(folderId: String) {
         viewModelScope.launch {
