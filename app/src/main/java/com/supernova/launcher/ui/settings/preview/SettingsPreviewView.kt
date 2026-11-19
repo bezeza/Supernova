@@ -18,6 +18,9 @@ import com.supernova.launcher.data.Pref
 import com.supernova.launcher.ui.DockBgStyle
 import com.supernova.launcher.ui.DockPages
 import com.supernova.launcher.ui.FolderIconDrawable
+import com.supernova.launcher.ui.FolderMode
+import com.supernova.launcher.ui.FolderPopup
+import com.supernova.launcher.ui.FolderPreviewPick
 import com.supernova.launcher.ui.FolderPreviewStyle
 import com.supernova.launcher.ui.IconFitRoom
 import com.supernova.launcher.ui.LabelContext
@@ -133,20 +136,7 @@ class SettingsPreviewView @JvmOverloads constructor(
                 styleLabels(prefs, visible = prefs.showLabels, onWallpaper = true)
                 fitHomeIcons(prefs)
             }
-            PreviewKind.DOCK -> {
-                com.supernova.launcher.ui.theme.SurfaceShapes.setColor(surfaceBg, withAlpha(styleAlpha ?: prefs.dockBgOpacity))
-                // The radius bar ticks here too.
-                if (prefs.dockBgStyle == DockBgStyle.ROUNDED) {
-                    (surfaceBg as? GradientDrawable)?.cornerRadius = dp(prefs.dockBgRadius).toFloat()
-                }
-                slotViews.forEachIndexed { index, slot ->
-                    slot.visibility = if (index < prefs.dockCount) VISIBLE else GONE
-                }
-                sizeIcons(if (prefs.dockMatchDesktop) prefs.iconScale else prefs.dockIconScale)
-                // The dock's own switch alone, as on the real dock.
-                styleLabels(prefs, visible = prefs.dockLabels, context = LabelContext.DOCK)
-                applyDockPageDots(prefs)
-            }
+            PreviewKind.DOCK -> tickDock(prefs)
             PreviewKind.FOLDER -> {
                 sizeIcons(if (prefs.folderMatchDesktop) prefs.iconScale else prefs.folderIconScale)
                 styleLabels(prefs, visible = prefs.folderLabels, context = LabelContext.FOLDER)
@@ -185,6 +175,22 @@ class SettingsPreviewView @JvmOverloads constructor(
             PreviewKind.DRAWER_SEARCH_BAR -> styleDrawerField(prefs)
             null -> Unit
         }
+    }
+
+    // Background, how many slots show, labels, and a dot per dock page.
+    private fun tickDock(prefs: LauncherPrefs) {
+        com.supernova.launcher.ui.theme.SurfaceShapes.setColor(surfaceBg, withAlpha(styleAlpha ?: prefs.dockBgOpacity))
+        // The radius bar ticks here too.
+        if (prefs.dockBgStyle == DockBgStyle.ROUNDED) {
+            (surfaceBg as? GradientDrawable)?.cornerRadius = dp(prefs.dockBgRadius).toFloat()
+        }
+        slotViews.forEachIndexed { index, slot ->
+            slot.visibility = if (index < prefs.dockCount) VISIBLE else GONE
+        }
+        sizeIcons(if (prefs.dockMatchDesktop) prefs.iconScale else prefs.dockIconScale)
+        // The dock's own switch alone, as on the real dock.
+        styleLabels(prefs, visible = prefs.dockLabels, context = LabelContext.DOCK)
+        applyDockPageDots(prefs)
     }
 
     // The prefs the Home strip was last fitted for, refitted once the strip
@@ -581,7 +587,21 @@ class SettingsPreviewView @JvmOverloads constructor(
 
     private fun folderIconView(prefs: LauncherPrefs, viewModel: LauncherViewModel): View {
         val resolved = Styles.resolve(context, prefs).of(SurfaceId.FOLDER)
-        val icons = sampleApps(viewModel, 9).map { it.second }
+        // The window's own sample, picked as the real folder icon picks its
+        // members (FolderPreviewPick): a grid is that window's top-left
+        // corner, and every other style takes the first apps.
+        val members = sampleApps(viewModel, FOLDER_PREVIEW_COLS * 2)
+        val scale = if (prefs.folderMatchDesktop) prefs.iconScale else prefs.folderIconScale
+        val columns = FolderPopup.columnsFor(
+            context,
+            members.size,
+            prefs.folderColumns,
+            prefs.folderMode == FolderMode.IMMERSIVE,
+            scale
+        )
+        val icons = FolderPreviewPick.shown(
+            members, columns, prefs.folderPreviewStyle, prefs.folderPrioritizeFirst, FOLDER_PREVIEW_ICONS
+        ).map { it.second }
         val image = ImageView(context)
         image.setImageDrawable(
             FolderIconDrawable(
@@ -1044,6 +1064,8 @@ class SettingsPreviewView @JvmOverloads constructor(
         const val DOCK_PAGE_DOT_GAP_DP = 4
         // Widest grid the preview draws; the columns slider hides the rest.
         const val FOLDER_PREVIEW_COLS = 5
+        // Members a folder icon draws, the same cap the real icon uses.
+        const val FOLDER_PREVIEW_ICONS = 9
         // bg_folder's built-in radius, the fallback the real window uses.
         const val DEFAULT_FOLDER_RADIUS_DP = 24f
         const val IMMERSIVE_STAGE_SCRIM = -0x4D000000
