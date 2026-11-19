@@ -3145,6 +3145,20 @@ class LauncherActivity :
     // after Hide, which takes the app out of it, and after a shortcut the
     // menu opens on a locked desktop if the Close folder when launching
     // setting is on, as after the card's own launches.
+    private fun pickFolderFor(app: LaunchableApp) {
+        val folders = viewModel.drawerFolderGroups()
+        val key = viewModel.hiddenKey(app)
+        val current = folders.indexOfFirst { key in it.members }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.move_to_folder)
+            .setSingleChoiceItems(folders.map { it.name }.toTypedArray(), current) { dialog, which ->
+                viewModel.moveAppToFolder(app, folders[which].id)
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun showDrawerItemMenu(
         anchor: View,
         app: LaunchableApp,
@@ -3168,6 +3182,14 @@ class LauncherActivity :
                     source?.dismiss()
                     closeItemSources()
                 }
+            }
+        }
+        // Into one of the drawer folders, out of the others: no trip through
+        // the folder's Select apps for one app. Not for a private space app.
+        if (!app.privateSpace && viewModel.drawerFolderGroups().isNotEmpty()) {
+            menu.addRow(getString(R.string.move_to_folder), R.drawable.ic_menu_select_apps) {
+                source?.dismiss()
+                pickFolderFor(app)
             }
         }
         menu.addRow(getString(R.string.app_info), R.drawable.ic_menu_info) {

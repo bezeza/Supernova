@@ -30,9 +30,33 @@ object AppMatcher {
         return (exact.ifEmpty { found }).map { it.first }
     }
 
+    // A query typed with the wrong keyboard layout (Ukrainian or Russian
+    // letters on the Latin keys, or the other way round) is retried as the
+    // other layout, so "мшиук" finds Viber and "ntktuhfv" finds Телеграм.
+    // Same length, so the bolded ranges stay valid.
     fun match(label: String, query: String): Match? {
         val q = query.trim().lowercase()
         if (q.isEmpty()) return null
+        matchExact(label, q)?.let { return it }
+        val swapped = swapLayout(q)
+        return if (swapped != q) matchExact(label, swapped) else null
+    }
+
+    private const val LATIN = "qwertyuiop[]asdfghjkl;'zxcvbnm,./"
+    private const val CYR_UK = "йцукенгшщзхїфівапролджєячсмитьбю."
+    private const val CYR_RU = "йцукенгшщзхъфывапролджэячсмитьбю."
+
+    private val toCyrillic: Map<Char, Char> = LATIN.zip(CYR_UK).toMap()
+    private val toLatin: Map<Char, Char> =
+        (CYR_UK.zip(LATIN) + CYR_RU.zip(LATIN)).toMap()
+
+    private fun swapLayout(q: String): String {
+        val cyrillic = q.any { it in toLatin }
+        val map = if (cyrillic) toLatin else toCyrillic
+        return q.map { map[it] ?: it }.joinToString("")
+    }
+
+    private fun matchExact(label: String, q: String): Match? {
         val l = label.lowercase()
         if (l.startsWith(q)) return Match(TIER_PREFIX, listOf(0 until q.length))
         val starts = wordStarts(l)

@@ -94,4 +94,12 @@ class AppMatcherTest {
         )
         assertEquals(listOf(0 until 1, 4 until 6), results.last().highlight)
     }
+
+    @Test
+    fun aQueryTypedInTheWrongLayoutIsRetriedAsTheOtherOne() {
+        assertTrue(AppMatcher.matches("Viber", "мшиук"))
+        assertTrue(AppMatcher.matches("Телеграм", "ntktuhfv"))
+        assertNull(AppMatcher.match("Viber", "ntktuhfv"))
+        assertEquals(0 until 3, AppMatcher.match("Viber", "мші")!!.ranges.single())
+    }
 }

@@ -1119,4 +1119,5 @@
     <string name="a11y_taller">Сделать выше</string>
     <string name="a11y_shorter">Сделать ниже</string>
     <string name="a11y_no_room">Там нет свободного места</string>
+    <string name="move_to_folder">В папочку, шоб лежало…</string>
 </resources>

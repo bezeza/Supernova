@@ -1280,6 +1280,25 @@ class LauncherViewModel(
         }
     }
 
+    // An app moved into a drawer folder from its own menu: out of every other
+    // folder (a move, not a second copy), into this one. A smart folder that
+    // changes this way is the user's now, or the next regeneration undoes it.
+    fun moveAppToFolder(app: LaunchableApp, folderId: String) {
+        val key = hiddenKey(app)
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { groups ->
+                groups.map { group ->
+                    when {
+                        group.type != DrawerGroupType.FOLDER -> group
+                        group.id == folderId -> group.copy(members = group.members + key, smart = false)
+                        key in group.members -> group.copy(members = group.members - key, smart = false)
+                        else -> group
+                    }
+                }
+            }
+        }
+    }
+
     // A drag on the Drawer groups page: one type's groups (their ids) in a
     // new order.
     fun setGroupOrder(type: DrawerGroupType, ids: List<String>) {

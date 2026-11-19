@@ -1136,4 +1136,5 @@
     <string name="a11y_taller">Make taller</string>
     <string name="a11y_shorter">Make shorter</string>
     <string name="a11y_no_room">No free spot there</string>
+    <string name="move_to_folder">Move to folder…</string>
 </resources>
