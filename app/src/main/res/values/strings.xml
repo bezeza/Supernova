@@ -1145,4 +1145,7 @@
         <item quantity="one">%d app moved into folders</item>
         <item quantity="other">%d apps moved into folders</item>
     </plurals>
+    <string name="move_to_start">To the start</string>
+    <string name="move_to_end">To the end</string>
+    <string name="folder_order_changed">Order changed</string>
 </resources>

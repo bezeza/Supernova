@@ -3162,10 +3162,30 @@ class LauncherActivity :
     private fun showDrawerItemMenu(
         anchor: View,
         app: LaunchableApp,
-        source: android.widget.PopupWindow? = null
+        source: android.widget.PopupWindow? = null,
+        inFolder: DrawerGroup? = null
     ): SupernovaPopupMenu {
         val menu = newItemPopup(forItem = true)
         addNotificationRows(menu, app.packageName, app.userSerial)
+        // Opened from a drawer folder's card: move the app within the folder.
+        // The card closes; the folder shows the new order when it opens again.
+        if (inFolder != null) {
+            val shown = viewModel.appsInGroup(inFolder)
+            val at = shown.indexOfFirst { it.packageName == app.packageName && it.className == app.className && it.userSerial == app.userSerial }
+            fun move(m: LauncherViewModel.InFolderMove) {
+                viewModel.moveAppInFolder(inFolder.id, app, m)
+                source?.dismiss()
+                android.widget.Toast.makeText(this, R.string.folder_order_changed, android.widget.Toast.LENGTH_SHORT).show()
+            }
+            if (at > 0) {
+                menu.addRow(getString(R.string.move_to_start), R.drawable.ic_menu_to_front) { move(LauncherViewModel.InFolderMove.START) }
+                menu.addRow(getString(R.string.move_up), R.drawable.ic_menu_to_front) { move(LauncherViewModel.InFolderMove.UP) }
+            }
+            if (at in 0 until shown.lastIndex) {
+                menu.addRow(getString(R.string.move_down), R.drawable.ic_menu_to_back) { move(LauncherViewModel.InFolderMove.DOWN) }
+                menu.addRow(getString(R.string.move_to_end), R.drawable.ic_menu_to_back) { move(LauncherViewModel.InFolderMove.END) }
+            }
+        }
         val extras = PopupRows.decode(
             viewModel.state.value.prefs.popupItemsDrawer, PopupRows.drawerDefaults
         )
@@ -4289,7 +4309,7 @@ class LauncherActivity :
                 }
                 item.toLaunchableApp()?.let { app ->
                     drag.arm(memberView, DragPayload.DrawerApp(app), window = popup) {
-                        showDrawerItemMenu(memberView, app, source = popup).also { memberMenu = it }
+                        showDrawerItemMenu(memberView, app, source = popup, inFolder = group).also { memberMenu = it }
                     }
                 }
             }

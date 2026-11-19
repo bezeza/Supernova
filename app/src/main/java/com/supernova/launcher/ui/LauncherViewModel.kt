@@ -1334,6 +1334,35 @@ class LauncherViewModel(
         return plan.size
     }
 
+    enum class InFolderMove { START, UP, DOWN, END }
+
+    // Moves an app within a drawer folder. The folder takes the order it
+    // shows now as its own (members in that order), then the app moves; from
+    // then on the folder keeps it, and a new app lands at the end.
+    fun moveAppInFolder(folderId: String, app: LaunchableApp, move: InFolderMove) {
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { groups ->
+                groups.map { g ->
+                    if (g.id != folderId) return@map g
+                    val shown = appsInGroup(g).map { hiddenKey(it) }.toMutableList()
+                    val at = shown.indexOf(hiddenKey(app))
+                    if (at < 0) return@map g
+                    val to = when (move) {
+                        InFolderMove.START -> 0
+                        InFolderMove.UP -> maxOf(at - 1, 0)
+                        InFolderMove.DOWN -> minOf(at + 1, shown.lastIndex)
+                        InFolderMove.END -> shown.lastIndex
+                    }
+                    shown.add(to, shown.removeAt(at))
+                    // Members that are not apps shown here (folders held, apps
+                    // hidden now) keep their place after the shown ones.
+                    val rest = g.members.filter { it !in shown }
+                    g.copy(members = (shown + rest).toCollection(LinkedHashSet()), manualOrder = true, smart = false)
+                }
+            }
+        }
+    }
+
     // A drag on the Drawer groups page: one type's groups (their ids) in a
     // new order.
     fun setGroupOrder(type: DrawerGroupType, ids: List<String>) {
@@ -1353,7 +1382,11 @@ class LauncherViewModel(
     fun appsInGroup(group: DrawerGroup?): List<LaunchableApp> {
         val visible = visibleApps()
         if (group == null) return visible
-        return visible.filter { hiddenKey(it) in group.members }
+        val inGroup = visible.filter { hiddenKey(it) in group.members }
+        if (!group.manualOrder) return inGroup
+        // A folder whose apps were moved by hand lists them in members' order.
+        val rank = group.members.withIndex().associate { it.value to it.index }
+        return inGroup.sortedBy { rank[hiddenKey(it)] ?: Int.MAX_VALUE }
     }
 
     // A group's Select apps rows: [apps], and first the drawer folders it

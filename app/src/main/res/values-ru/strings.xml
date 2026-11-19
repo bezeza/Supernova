@@ -1130,4 +1130,7 @@
         <item quantity="many">%d приложений разложено по папкам</item>
         <item quantity="other">%d приложения разложено по папкам</item>
     </plurals>
+    <string name="move_to_start">В начало</string>
+    <string name="move_to_end">В конец</string>
+    <string name="folder_order_changed">Порядок изменён</string>
 </resources>

@@ -1130,4 +1130,7 @@
         <item quantity="many">%d приложений уже на своих местах, ша</item>
         <item quantity="other">%d приложения уже на своих местах, ша</item>
     </plurals>
+    <string name="move_to_start">В самое начало</string>
+    <string name="move_to_end">В самый конец</string>
+    <string name="folder_order_changed">Порядочек наведён</string>
 </resources>

@@ -1130,4 +1130,7 @@
         <item quantity="many">%d додатків розкладено по папках</item>
         <item quantity="other">%d додатка розкладено по папках</item>
     </plurals>
+    <string name="move_to_start">На початок</string>
+    <string name="move_to_end">В кінець</string>
+    <string name="folder_order_changed">Порядок змінено</string>
 </resources>
