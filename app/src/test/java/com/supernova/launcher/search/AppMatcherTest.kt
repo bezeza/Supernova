@@ -102,4 +102,26 @@ class AppMatcherTest {
         assertNull(AppMatcher.match("Viber", "ntktuhfv"))
         assertEquals(0 until 3, AppMatcher.match("Viber", "мші")!!.ranges.single())
     }
+
+    @Test
+    fun aSpokenNameFindsTheLatinBrand() {
+        assertTrue(AppMatcher.matches("Viber", "вайбер"))
+        assertTrue(AppMatcher.matches("Viber", "вибер"))
+        assertTrue(AppMatcher.matches("WhatsApp", "ватсап"))
+        assertTrue(AppMatcher.matches("Telegram", "телеграм"))
+        assertTrue(AppMatcher.matches("Instagram", "инста"))
+    }
+
+    @Test
+    fun aRenamedCyrillicAppIsFoundByItsLatinName() {
+        assertTrue(AppMatcher.matches("Вайбер", "viber"))
+        assertTrue(AppMatcher.matches("Телеграм", "telegram"))
+        assertNull(AppMatcher.match("Вайбер", "calc"))
+    }
+
+    @Test
+    fun transliterationDoesNotInventMatches() {
+        assertNull(AppMatcher.match("Calculator", "вайбер"))
+        assertNull(AppMatcher.match("Camera", "телеграм"))
+    }
 }

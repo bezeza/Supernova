@@ -39,7 +39,65 @@ object AppMatcher {
         if (q.isEmpty()) return null
         matchExact(label, q)?.let { return it }
         val swapped = swapLayout(q)
-        return if (swapped != q) matchExact(label, swapped) else null
+        if (swapped != q) matchExact(label, swapped)?.let { return it }
+        return matchTransliterated(label, q)
+    }
+
+    // Last resorts, for a query and a name written in different alphabets:
+    // a spoken name ("вайбер", "телеграм") read as the Latin brand, and
+    // either side transliterated. A match on the name itself keeps its
+    // bolding; one found through a transliterated name can't point at
+    // letters of the real one, so it has no ranges.
+    private fun matchTransliterated(label: String, q: String): Match? {
+        val queries = linkedSetOf<String>()
+        ALIASES.forEach { (spoken, brand) -> if (q.length >= ALIAS_MIN_CHARS && spoken.startsWith(q)) queries.add(brand) }
+        if (q.any { it in CYRILLIC }) queries.addAll(transliterate(q))
+        for (v in queries) matchExact(label, v)?.let { return it }
+        val l = label.lowercase()
+        if (l.any { it in CYRILLIC }) {
+            val names = transliterate(l)
+            val all = linkedSetOf(q, swapLayout(q)).also { set -> set.addAll(queries) }
+            for (name in names) for (v in all) {
+                if (v.any { it in CYRILLIC }) continue
+                matchExact(name, v)?.let { return Match(it.tier, emptyList()) }
+            }
+        }
+        return null
+    }
+
+    private const val ALIAS_MIN_CHARS = 3
+    private const val CYRILLIC_LETTERS = "абвгґдеёжзиіїйклмнопрстуфхцчшщъыьэєюя"
+    private val CYRILLIC: Set<Char> = CYRILLIC_LETTERS.toSet()
+
+    // Spoken (Cyrillic) names of apps people search for, and the brand as it
+    // is written on the icon.
+    private val ALIASES: List<Pair<String, String>> = listOf(
+        "вайбер" to "viber", "вибер" to "viber", "ватсап" to "whatsapp", "вотсап" to "whatsapp",
+        "ватсапп" to "whatsapp", "телеграм" to "telegram", "телега" to "telegram",
+        "инстаграм" to "instagram", "інстаграм" to "instagram", "инста" to "instagram",
+        "фейсбук" to "facebook", "фэйсбук" to "facebook", "мессенджер" to "messenger",
+        "ютуб" to "youtube", "ютьюб" to "youtube", "гугл" to "google", "гугль" to "google",
+        "хром" to "chrome", "твиттер" to "twitter", "тикток" to "tiktok", "тік ток" to "tiktok",
+        "дискорд" to "discord", "спотифай" to "spotify", "нетфликс" to "netflix",
+        "сигнал" to "signal", "скайп" to "skype", "зум" to "zoom", "яндекс" to "yandex",
+        "вконтакте" to "vk", "одноклассники" to "ok", "тимс" to "teams", "джимейл" to "gmail",
+        "гмейл" to "gmail", "почта" to "mail", "карты" to "maps", "мапс" to "maps",
+        "приват" to "privat", "монобанк" to "mono", "моно" to "mono", "дія" to "diia", "дия" to "diia",
+        "анидеск" to "anydesk", "тор" to "tor", "вайфай" to "wifi"
+    )
+
+    // Two ways of spelling Cyrillic in Latin: the usual one, and the other
+    // that swaps и/й and х/ц, so both "вайбер" -> "vayber" and "vaiber".
+    private fun transliterate(text: String): Set<String> {
+        val a = mapOf(
+            'а' to "a", 'б' to "b", 'в' to "v", 'г' to "g", 'ґ' to "g", 'д' to "d", 'е' to "e", 'ё' to "e",
+            'ж' to "zh", 'з' to "z", 'и' to "i", 'і' to "i", 'ї' to "yi", 'й' to "y", 'к' to "k", 'л' to "l",
+            'м' to "m", 'н' to "n", 'о' to "o", 'п' to "p", 'р' to "r", 'с' to "s", 'т' to "t", 'у' to "u",
+            'ф' to "f", 'х' to "h", 'ц' to "ts", 'ч' to "ch", 'ш' to "sh", 'щ' to "sch", 'ъ' to "", 'ы' to "y",
+            'ь' to "", 'э' to "e", 'є' to "ye", 'ю' to "yu", 'я' to "ya"
+        )
+        val b = a + mapOf('и' to "y", 'й' to "i", 'х' to "kh", 'ц' to "c", 'ы' to "y", 'я' to "ia", 'ю' to "iu")
+        return setOf(a, b).mapTo(linkedSetOf()) { m -> text.map { m[it] ?: it.toString() }.joinToString("") }
     }
 
     private const val LATIN = "qwertyuiop[]asdfghjkl;'zxcvbnm,./"
