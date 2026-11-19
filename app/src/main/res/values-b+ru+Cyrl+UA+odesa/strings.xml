@@ -1120,4 +1120,14 @@
     <string name="a11y_shorter">Сделать ниже</string>
     <string name="a11y_no_room">Там нет свободного места</string>
     <string name="move_to_folder">В папочку, шоб лежало…</string>
+    <string name="auto_sort_new_apps">Шоб само раскладывало новое</string>
+    <string name="auto_sort_new_apps_summary">Новые приложения сами лягут в ваши папочки, как родные</string>
+    <string name="auto_sort_now">Раскидать шо без места</string>
+    <string name="auto_sort_now_summary">Шо лежит без папки — по полочкам, быстро и без нервов</string>
+    <plurals name="auto_sort_done">
+        <item quantity="one">%d приложение уже на своём месте, ша</item>
+        <item quantity="few">%d приложения уже на своих местах, ша</item>
+        <item quantity="many">%d приложений уже на своих местах, ша</item>
+        <item quantity="other">%d приложения уже на своих местах, ша</item>
+    </plurals>
 </resources>

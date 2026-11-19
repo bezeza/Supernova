@@ -262,6 +262,8 @@ data class LauncherPrefs(
     val drawerFoldersFirst: Boolean = true,
     // Auto-generate FOLDER groups from on-device app categories.
     val smartFolders: Boolean = true,
+    // New installs go into the user's own folders by what those hold.
+    val autoSortNewApps: Boolean = false,
     // Smart folders the user deleted, or a fresh install left out as too big,
     // by name: regenerating on an install leaves them out. Turning Smart
     // Folders on again clears it.

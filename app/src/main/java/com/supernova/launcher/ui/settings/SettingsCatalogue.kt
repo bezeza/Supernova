@@ -96,6 +96,7 @@ object SettingsCatalogue {
         val restartLauncher: () -> Unit = {},
         // About > Language: pick the interface language (per-app locale).
         val pickLanguage: () -> Unit = {},
+    val autoSortNow: () -> Unit = {},
         // About > Crash log: share the crash handler's log, or clear it.
         val showCrashLog: () -> Unit = {},
         // Fired only on a genuine user enable, so the activity can route to
@@ -1002,6 +1003,17 @@ object SettingsCatalogue {
                     get = { it.smartFolders },
                     set = { viewModel.setSmartFolders(it) },
                     subtitle = R.string.smart_folders_summary
+                ),
+                SettingItem.Toggle(
+                    R.string.auto_sort_new_apps,
+                    get = { it.autoSortNewApps },
+                    set = { viewModel.set(Pref.autoSortNewApps, it) },
+                    subtitle = R.string.auto_sort_new_apps_summary
+                ),
+                SettingItem.Row(
+                    R.string.auto_sort_now,
+                    subtitle = { context.getString(R.string.auto_sort_now_summary) },
+                    onClick = actions.autoSortNow
                 ),
                 SettingItem.Toggle(
                     R.string.drawer_folders_first,

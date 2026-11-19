@@ -26,6 +26,7 @@ import com.supernova.launcher.data.DrawerGroupType
 import com.supernova.launcher.data.DrawerTarget
 import com.supernova.launcher.data.FolderMove
 import com.supernova.launcher.data.FolderToDrawer
+import com.supernova.launcher.data.FolderAutoSort
 import com.supernova.launcher.data.GroupPick
 import com.supernova.launcher.data.HiddenLabels
 import com.supernova.launcher.data.IconPack
@@ -326,6 +327,10 @@ class LauncherViewModel(
                     // New installs slot into their smart folder while enabled.
                     if (state.value.prefs.smartFolders) {
                         viewModelScope.launch { regenerateSmartFolders() }
+                    }
+                    // ...and, when asked, into the user's own folders.
+                    if (state.value.prefs.autoSortNewApps) {
+                        viewModelScope.launch { autoSortUnplaced() }
                     }
                 }
                 is AppChange.Updated -> {
@@ -1297,6 +1302,36 @@ class LauncherViewModel(
                 }
             }
         }
+    }
+
+    // Apps in no drawer folder, put into the user's folders by what those
+    // folders already hold (FolderAutoSort). Returns how many moved. Only
+    // folders the user owns take apps: a smart folder is regenerated from
+    // categories and would drop them again.
+    suspend fun autoSortUnplaced(): Int {
+        val hidden = state.value.prefs.hiddenApps
+        val apps = withContext(Dispatchers.Default) {
+            catalog.listLaunchableApps().filterNot { it.privateSpace || hiddenKey(it) in hidden }
+        }
+        val byKey = apps.associateBy { hiddenKey(it) }
+        val folders = drawerFolderGroups()
+        val owned = folders.filter { !it.smart }
+        if (owned.isEmpty()) return 0
+        val placedKeys = folders.flatMap { it.members }.toSet()
+        val placed = owned.flatMap { f ->
+            f.members.mapNotNull { key -> byKey[key]?.let { FolderAutoSort.Placed(f.id, it.packageName, it.label) } }
+        }
+        val candidates = apps.filter { hiddenKey(it) !in placedKeys }
+            .map { FolderAutoSort.Candidate(hiddenKey(it), it.packageName, it.label) }
+        val plan = FolderAutoSort.suggest(placed, candidates)
+        if (plan.isEmpty()) return 0
+        preferences.updateDrawerGroups { groups ->
+            groups.map { g ->
+                val add = plan.filterValues { it == g.id }.keys
+                if (add.isEmpty()) g else g.copy(members = g.members + add)
+            }
+        }
+        return plan.size
     }
 
     // A drag on the Drawer groups page: one type's groups (their ids) in a

@@ -1120,4 +1120,14 @@
     <string name="a11y_shorter">Сделать ниже</string>
     <string name="a11y_no_room">Там нет свободного места</string>
     <string name="move_to_folder">В папку…</string>
+    <string name="auto_sort_new_apps">Автосортировка новых приложений</string>
+    <string name="auto_sort_new_apps_summary">Новые приложения попадают в ваши папки по сходству с тем, что там лежит</string>
+    <string name="auto_sort_now">Разложить нераспределённые сейчас</string>
+    <string name="auto_sort_now_summary">Кладёт приложения без папки в подходящие папки</string>
+    <plurals name="auto_sort_done">
+        <item quantity="one">%d приложение разложено по папкам</item>
+        <item quantity="few">%d приложения разложены по папкам</item>
+        <item quantity="many">%d приложений разложено по папкам</item>
+        <item quantity="other">%d приложения разложено по папкам</item>
+    </plurals>
 </resources>

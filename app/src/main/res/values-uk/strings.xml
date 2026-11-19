@@ -1120,4 +1120,14 @@
     <string name="a11y_shorter">Зробити нижчим</string>
     <string name="a11y_no_room">Там немає вільного місця</string>
     <string name="move_to_folder">У папку…</string>
+    <string name="auto_sort_new_apps">Автосортування нових додатків</string>
+    <string name="auto_sort_new_apps_summary">Нові додатки потрапляють у ваші папки за схожістю з тим, що там лежить</string>
+    <string name="auto_sort_now">Розкласти нерозкладені зараз</string>
+    <string name="auto_sort_now_summary">Кладе додатки без папки у відповідні папки</string>
+    <plurals name="auto_sort_done">
+        <item quantity="one">%d додаток розкладено по папках</item>
+        <item quantity="few">%d додатки розкладено по папках</item>
+        <item quantity="many">%d додатків розкладено по папках</item>
+        <item quantity="other">%d додатка розкладено по папках</item>
+    </plurals>
 </resources>

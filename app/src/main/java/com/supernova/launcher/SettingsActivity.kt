@@ -489,6 +489,16 @@ class SettingsActivity : AppCompatActivity() {
                     .show()
             },
             pickLanguage = { com.supernova.launcher.ui.AppLanguage.showPicker(this) },
+        autoSortNow = {
+            lifecycleScope.launch {
+                val moved = viewModel.autoSortUnplaced()
+                android.widget.Toast.makeText(
+                    this@SettingsActivity,
+                    resources.getQuantityString(R.plurals.auto_sort_done, moved, moved),
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        },
             showCrashLog = ::showCrashLog,
             onBadgesEnabled = {
                 com.supernova.launcher.ui.PermissionPrompts
