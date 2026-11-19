@@ -134,11 +134,12 @@ object Pref {
     private const val LABEL_SIZE_MAX = 18
     private const val DAY_LAST_MINUTE = 1439
 
-    // The feed's rows of shortcuts.
-    private const val FEED_SHORTCUT_ROWS_MAX = 3
+    // The most pages the dock pager, its setting and an imported layout use.
+    const val DOCK_PAGES_MAX = 9
 
-    // Dock pages; the settings slider reads it too.
-    const val DOCK_PAGES_MAX = 5
+    // The feed's rows of shortcuts. Kept apart from the dock: that one used
+    // to share this ceiling, and raising the dock must not raise the feed.
+    private const val FEED_SHORTCUT_ROWS_MAX = 3
 
     private val specs = mutableListOf<PrefSpec<*>>()
     val all: List<PrefSpec<*>> get() = specs

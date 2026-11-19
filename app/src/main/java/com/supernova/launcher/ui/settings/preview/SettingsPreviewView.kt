@@ -13,8 +13,10 @@ import android.widget.TextView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.LaunchableApp
 import com.supernova.launcher.data.LauncherPrefs
+import com.supernova.launcher.data.Pref
 import com.supernova.launcher.ui.BadgeLook
 import com.supernova.launcher.ui.DockBgStyle
+import com.supernova.launcher.ui.DockPages
 import com.supernova.launcher.ui.FolderIconDrawable
 import com.supernova.launcher.ui.FolderPreviewStyle
 import com.supernova.launcher.ui.IconFitRoom
@@ -87,6 +89,10 @@ class SettingsPreviewView @JvmOverloads constructor(
     // and the list's icons, which have a box of their own.
     private var drawerItems: View? = null
     private val listIconViews = mutableListOf<PreviewIcon>()
+    // Dock preview: one dot per page the dock can have. tick shows the
+    // current count and fills the main page's dot; a single page hides them.
+    private val dockPageDots = mutableListOf<View>()
+    private var dockPageDotsRow: View? = null
     // Home strip: the row its padding bar insets.
     private var homeRow: View? = null
     // Dock: whether its background runs to the edges with square bottom
@@ -134,6 +140,8 @@ class SettingsPreviewView @JvmOverloads constructor(
         listIconViews.clear()
         homeRow = null
         dockSquareBottom = false
+        dockPageDots.clear()
+        dockPageDotsRow = null
         folderCells.clear()
         folderColumnCount = 0
         folderNameRow = null
@@ -281,6 +289,7 @@ class SettingsPreviewView @JvmOverloads constructor(
         slotViews.forEachIndexed { index, slot ->
             slot.visibility = if (index < prefs.dockCount) VISIBLE else GONE
         }
+        applyDockPageDots(prefs)
         sizeIcons(if (prefs.dockMatchDesktop) prefs.iconScale else prefs.dockIconScale)
         // The dock's own switch alone, as on the real dock.
         styleLabels(prefs, visible = prefs.dockLabels, context = LabelContext.DOCK)
@@ -695,10 +704,51 @@ class SettingsPreviewView @JvmOverloads constructor(
             rightMargin = side
             bottomMargin = bottom
         })
+        content.addView(
+            dockPageDotRow(),
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                .apply { gravity = Gravity.CENTER_HORIZONTAL }
+        )
         addView(
             FitWidthFrame(context, keepsHeight = false).apply { addView(content) },
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM)
         )
+    }
+
+    // One dot per page the setting allows, in the order the dock draws its
+    // pages. tick shows how many there are and fills the main page's place.
+    private fun dockPageDotRow(): LinearLayout {
+        val row = newRow()
+        row.setPadding(0, dp(DOCK_PAGE_DOT_GAP_DP), 0, 0)
+        row.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        val side = dp(DOCK_PAGE_DOT_DP)
+        repeat(Pref.DOCK_PAGES_MAX) {
+            val dot = View(context)
+            dot.background = GradientDrawable().apply { shape = GradientDrawable.OVAL }
+            dockPageDots += dot
+            row.addView(
+                dot,
+                LinearLayout.LayoutParams(side, side).apply {
+                    marginStart = dp(DOCK_PAGE_DOT_GAP_DP)
+                    marginEnd = dp(DOCK_PAGE_DOT_GAP_DP)
+                }
+            )
+        }
+        dockPageDotsRow = row
+        return row
+    }
+
+    private fun applyDockPageDots(prefs: LauncherPrefs) {
+        val row = dockPageDotsRow ?: return
+        val pages = prefs.dockPages.coerceIn(1, dockPageDots.size)
+        row.visibility = if (pages > 1) VISIBLE else GONE
+        val active = DockPages.position(0, pages)
+        val filled = context.getColor(R.color.textPrimary)
+        val idle = context.getColor(R.color.textSecondary)
+        dockPageDots.forEachIndexed { index, dot ->
+            dot.visibility = if (index < pages) VISIBLE else GONE
+            (dot.background as? GradientDrawable)?.setColor(if (index == active) filled else idle)
+        }
     }
 
     // The dock's background, its bottom corners square when it runs to the
@@ -1584,6 +1634,10 @@ class SettingsPreviewView @JvmOverloads constructor(
     }
 
     private companion object {
+        // Page-indicator dots under a dock of more than one page: the real
+        // indicator's 8dp mark, with a gap that keeps the centres clear.
+        const val DOCK_PAGE_DOT_DP = 8
+        const val DOCK_PAGE_DOT_GAP_DP = 4
         // The home bar's height and side inset, with room above and below.
         const val SEARCH_BAR_HEIGHT_DP = 48
         const val SEARCH_BAR_INSET_DP = 16
