@@ -130,7 +130,7 @@ tab_bar_none|Скрыта
 drawer_tab_bar_hidden_note|Скрыта — меню показывает все приложения
 drawer_tab_bar_no_tabs|%1$s · добавьте вкладки в «Группах меню приложений»
 drawer_frequent_row|Верхний ряд
-drawer_frequent_row_summary|Ряд приложений над списком приложений
+drawer_frequent_row_summary|Ряд приложений над общим списком
 drawer_sort_buttons|Кнопки сортировки
 drawer_sort_buttons_summary|Меняйте порядок вверху списка приложений
 drawer_sort_apps_desc|Порядок приложений: %1$s
@@ -167,7 +167,7 @@ select_apps|Выбрать приложения
 drawer_tab_empty|В этой вкладке пока нет приложений
 sort|Сортировать
 move_to_drawer|Переместить в меню приложений
-move_to_drawer_as_folder|Папка меню
+move_to_drawer_as_folder|Папка в меню
 move_to_drawer_tab|Новая вкладка
 move_to_drawer_put_in|Поместить в
 move_to_drawer_tab_hint|Его приложения получат собственную вкладку с названием «%1$s».
@@ -188,7 +188,7 @@ folder_shape_match_icons|Как у значков
 option_none|Нет
 drawer_all|Все
 drawer_work|Работа
-drawer_private|Личное
+drawer_private|Частное
 private_space_locked|Заблокировано
 private_space_unlocked|Разблокировано
 private_space_lock|Заблокировать
@@ -200,8 +200,8 @@ work_apps_paused_body|Ваши рабочие приложения не могу
 work_apps_turn_on|Включить рабочие приложения
 work_apps_turn_off|Выключить рабочие приложения
 private_space_install_apps|Установить приложения
-private_space_open_settings|Настройки приватного пространства
-private_space_missing|На этом телефоне нет приватного пространства
+private_space_open_settings|Настройки частного пространства
+private_space_missing|На этом телефоне нет частного пространства
 group_name|Название группы
 edit_group_apps|Выбрать приложения
 hide_app|Скрыть из меню
@@ -250,7 +250,7 @@ badge_outline|Контур
 badge_position|Положение значка
 badge_size|Размер значка
 badge_test|Проверить значок уведомления
-badge_test_summary|Отправить уведомление, чтобы показать значок на иконке настроек
+badge_test_summary|Отправить уведомление, чтобы показать значок на значке настроек
 badge_test_channel|Тестовые уведомления
 badge_test_title|Тестовое уведомление
 badge_test_text|Теперь на настройках Supernova есть значок. Нажмите, чтобы убрать его.
@@ -261,7 +261,7 @@ pos_top_right|Вверху справа
 pos_top_left|Вверху слева
 pos_bottom_right|Внизу справа
 pos_bottom_left|Внизу слева
-folder_preview_style|Превью папки
+folder_preview_style|Предпросмотр папки
 preview_grid|Сетка
 preview_stack|Стопка
 preview_fan|Веер
@@ -387,7 +387,7 @@ popup_action_icons_summary|Действия меню одним рядом зн�
 popup_group_shortcuts_summary|Ярлыки и уведомления в отдельных плитках
 popup_style|Стиль меню долгого нажатия
 popup_style_block|Блок
-popup_style_pills|Таблетки
+popup_style_pills|Капсулы
 popup_style_android12|Android 12
 folder_show_name|Показывать название папки
 folder_show_count|Показывать число приложений
@@ -416,8 +416,8 @@ group_kept_in_main|остаётся в основной вкладке
 group_apps_count|%d приложение|%d приложения|%d приложений|%d приложения
 group_folders_count|%d папка|%d папки|%d папок|%d папки
 group_tabs_count|%d вкладка|%d вкладки|%d вкладок|%d вкладки
-move_up|Вверх
-move_down|Вниз
+move_up|Выше
+move_down|Ниже
 group_default_tag|По умолчанию
 group_smart_tag|Умная
 group_tab_hint|Перетаскивайте строки, чтобы задать порядок на панели вкладок.
@@ -719,7 +719,7 @@ search_bar_above_dock|Над док-панелью
 search_bar_below_dock|Под док-панелью
 search_bar_persistent|Всегда показывать внизу
 search_bar_top|Всегда показывать вверху
-search_bar_widget|Виджет рабочего пространства
+search_bar_widget|Виджет главного экрана
 search_bar_wireframe|Каркасный стиль
 search_bar_wireframe_summary|Только контур, без заливки
 search_bar_shadow|Тень
@@ -777,7 +777,7 @@ action_jump_to_page|Перейти на страницу
 action_desktop_previews|Обзор страниц главного экрана
 action_open_feed|Страница ленты
 action_voice_search|Голосовой поиск
-action_private_space|Приватное пространство
+action_private_space|Частное пространство
 settings_launcher_label|Настройки Supernova
 lock_method|Способ блокировки экрана
 lock_method_accessibility|Служба специальных возможностей
@@ -920,7 +920,7 @@ onboarding_look_bold|Смелость
 onboarding_shuffle|Создать вид, которого больше ни у кого нет
 onboarding_color_title|Выберите свой цвет
 onboarding_color_summary|Он подкрашивает поиск, меню и тонированные значки.
-onboarding_shape_title|Оформите форму значков
+onboarding_shape_title|Выберите форму значков
 onboarding_finish_title|Выберите отделку
 onboarding_finish_summary|Стекло позволяет обоям просвечивать.
 onboarding_finish_original|Оригинал
@@ -931,7 +931,7 @@ onboarding_density_roomy|Просторно
 onboarding_density_balanced|Сбалансированно
 onboarding_density_packed|Плотно
 onboarding_grid_size|%1$d × %2$d
-onboarding_names_title|Назовите свои приложения
+onboarding_names_title|Подписи приложений
 onboarding_names_summary|Выберите шрифт или скройте названия.
 onboarding_names_standard|Стандартный
 onboarding_names_narrow|Узкий
@@ -967,7 +967,7 @@ variant_original|Оригинальный
 variant_default_hint|Следует за лаунчером: его формой значков, стеклом и тематическими значками.
 variant_themed_hint|Одноцветный значок на тонированной подложке, даже когда тематические значки выключены.
 variant_original_hint|Значок таким, каким его сделало приложение. Действует только форма, выбранная здесь.
-edit_preview|Просмотр
+edit_preview|Предпросмотр
 edit_name|Название
 edit_no_changes|Без изменений
 edit_change_renamed|Переименовано
@@ -1005,10 +1005,19 @@ a11y_expand|Развернуть
 a11y_collapse|Свернуть
 a11y_decrease|Уменьшить %1$s
 a11y_increase|Увеличить %1$s
-a11y_preview|Просмотр этих настроек
+a11y_preview|Предпросмотр этих настроек
 a11y_resized|Размер изменён
 a11y_wider|Сделать шире
 a11y_narrower|Сделать уже
 a11y_taller|Сделать выше
 a11y_shorter|Сделать ниже
 a11y_no_room|Там нет свободного места
+move_to_folder|В папку…
+move_to_start|В начало
+move_to_end|В конец
+folder_order_changed|Порядок изменён
+auto_sort_new_apps|Автосортировка новых приложений
+auto_sort_new_apps_summary|Новые приложения попадают в ваши папки по сходству с тем, что там лежит
+auto_sort_now|Разложить нераспределённые сейчас
+auto_sort_now_summary|Кладёт приложения без папки в подходящие папки
+auto_sort_done|%d приложение разложено по папкам|%d приложения разложены по папкам|%d приложений разложено по папкам|%d приложения разложено по папкам

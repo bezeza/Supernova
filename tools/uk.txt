@@ -130,7 +130,7 @@ tab_bar_none|Приховано
 drawer_tab_bar_hidden_note|Приховано — шухляда показує всі застосунки
 drawer_tab_bar_no_tabs|%1$s · додайте вкладки в «Групах шухляди»
 drawer_frequent_row|Верхній рядок
-drawer_frequent_row_summary|Рядок застосунків над списком застосунків
+drawer_frequent_row_summary|Рядок застосунків над загальним списком
 drawer_sort_buttons|Кнопки сортування
 drawer_sort_buttons_summary|Змінюйте порядок угорі списку застосунків
 drawer_sort_apps_desc|Порядок застосунків: %1$s
@@ -167,7 +167,7 @@ select_apps|Вибрати застосунки
 drawer_tab_empty|У цій вкладці ще немає застосунків
 sort|Сортувати
 move_to_drawer|Перемістити в шухляду
-move_to_drawer_as_folder|Папка шухляди
+move_to_drawer_as_folder|Папка в шухляді
 move_to_drawer_tab|Нова вкладка
 move_to_drawer_put_in|Помістити в
 move_to_drawer_tab_hint|Його застосунки отримають власну вкладку з назвою «%1$s».
@@ -387,7 +387,7 @@ popup_action_icons_summary|Дії меню одним рядом іконок
 popup_group_shortcuts_summary|Ярлики й сповіщення в окремих плитках
 popup_style|Стиль меню довгого натискання
 popup_style_block|Блок
-popup_style_pills|Пігулки
+popup_style_pills|Капсули
 popup_style_android12|Android 12
 folder_show_name|Показувати назву папки
 folder_show_count|Показувати кількість застосунків
@@ -416,8 +416,8 @@ group_kept_in_main|лишається в головній вкладці
 group_apps_count|%d застосунок|%d застосунки|%d застосунків|%d застосунку
 group_folders_count|%d папка|%d папки|%d папок|%d папки
 group_tabs_count|%d вкладка|%d вкладки|%d вкладок|%d вкладки
-move_up|Вгору
-move_down|Вниз
+move_up|Вище
+move_down|Нижче
 group_default_tag|За замовчуванням
 group_smart_tag|Розумна
 group_tab_hint|Перетягуйте рядки, щоб задати порядок на панелі вкладок.
@@ -920,7 +920,7 @@ onboarding_look_bold|Сміливість
 onboarding_shuffle|Створити вигляд, якого ні в кого немає
 onboarding_color_title|Виберіть свій колір
 onboarding_color_summary|Він підфарбовує пошук, меню та тоновані іконки.
-onboarding_shape_title|Оформіть форму іконок
+onboarding_shape_title|Оберіть форму іконок
 onboarding_finish_title|Виберіть оздоблення
 onboarding_finish_summary|Скло дозволяє шпалерам просвічувати.
 onboarding_finish_original|Оригінал
@@ -931,7 +931,7 @@ onboarding_density_roomy|Просторо
 onboarding_density_balanced|Збалансовано
 onboarding_density_packed|Щільно
 onboarding_grid_size|%1$d × %2$d
-onboarding_names_title|Назвіть свої застосунки
+onboarding_names_title|Підписи застосунків
 onboarding_names_summary|Виберіть шрифт або приховайте назви.
 onboarding_names_standard|Стандартний
 onboarding_names_narrow|Вузький
@@ -967,7 +967,7 @@ variant_original|Оригінальна
 variant_default_hint|Слідує за лаунчером: його формою іконок, склом і тематичними іконками.
 variant_themed_hint|Одноколірна іконка на тонованій підкладці, навіть коли тематичні іконки вимкнено.
 variant_original_hint|Іконка така, як її зробив застосунок. Діє лише форма, вибрана тут.
-edit_preview|Перегляд
+edit_preview|Попередній перегляд
 edit_name|Назва
 edit_no_changes|Без змін
 edit_change_renamed|Перейменовано
@@ -1005,10 +1005,19 @@ a11y_expand|Розгорнути
 a11y_collapse|Згорнути
 a11y_decrease|Зменшити %1$s
 a11y_increase|Збільшити %1$s
-a11y_preview|Перегляд цих налаштувань
+a11y_preview|Попередній перегляд цих налаштувань
 a11y_resized|Розмір змінено
 a11y_wider|Зробити ширшим
 a11y_narrower|Зробити вужчим
 a11y_taller|Зробити вищим
 a11y_shorter|Зробити нижчим
 a11y_no_room|Там немає вільного місця
+move_to_folder|У папку…
+move_to_start|На початок
+move_to_end|В кінець
+folder_order_changed|Порядок змінено
+auto_sort_new_apps|Автосортування нових застосунків
+auto_sort_new_apps_summary|Нові застосунки потрапляють у ваші папки за схожістю з тим, що там лежить
+auto_sort_now|Розкласти нерозкладені зараз
+auto_sort_now_summary|Кладе застосунки без папки у відповідні папки
+auto_sort_done|%d застосунок розкладено по папках|%d застосунки розкладено по папках|%d застосунків розкладено по папках|%d застосунка розкладено по папках

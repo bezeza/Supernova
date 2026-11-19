@@ -172,7 +172,7 @@
     <string name="drawer_tab_bar_hidden_note">Скрыта — меню показывает все приложения</string>
     <string name="drawer_tab_bar_no_tabs">%1$s · добавьте вкладки в «Группах меню приложений»</string>
     <string name="drawer_frequent_row">Верхний ряд</string>
-    <string name="drawer_frequent_row_summary">Ряд приложений над списком приложений</string>
+    <string name="drawer_frequent_row_summary">Ряд приложений над общим списком</string>
     <string name="drawer_sort_buttons">Кнопки сортировки</string>
     <string name="drawer_sort_buttons_summary">Меняйте порядок вверху списка приложений</string>
     <string name="drawer_sort_apps_desc">Порядок приложений: %1$s</string>
@@ -209,7 +209,7 @@
     <string name="drawer_tab_empty">В этой вкладке пока нет приложений</string>
     <string name="sort">Сортировать</string>
     <string name="move_to_drawer">Переместить в меню приложений</string>
-    <string name="move_to_drawer_as_folder">Папка меню</string>
+    <string name="move_to_drawer_as_folder">Папка в меню</string>
     <string name="move_to_drawer_tab">Новая вкладка</string>
     <string name="move_to_drawer_put_in">Поместить в</string>
     <string name="move_to_drawer_tab_hint">Его приложения получат собственную вкладку с названием «%1$s».</string>
@@ -245,7 +245,7 @@
     <string name="option_none">Нет</string>
     <string name="drawer_all">Все</string>
     <string name="drawer_work">Работа</string>
-    <string name="drawer_private">Личное</string>
+    <string name="drawer_private">Частное</string>
     <string name="private_space_locked">Заблокировано</string>
     <string name="private_space_unlocked">Разблокировано</string>
     <string name="private_space_lock">Заблокировать</string>
@@ -257,8 +257,8 @@
     <string name="work_apps_turn_on">Включить рабочие приложения</string>
     <string name="work_apps_turn_off">Выключить рабочие приложения</string>
     <string name="private_space_install_apps">Установить приложения</string>
-    <string name="private_space_open_settings">Настройки приватного пространства</string>
-    <string name="private_space_missing">На этом телефоне нет приватного пространства</string>
+    <string name="private_space_open_settings">Настройки частного пространства</string>
+    <string name="private_space_missing">На этом телефоне нет частного пространства</string>
     <string name="group_name">Название группы</string>
     <string name="edit_group_apps">Выбрать приложения</string>
     <string name="hide_app">Скрыть из меню</string>
@@ -307,7 +307,7 @@
     <string name="badge_position">Положение значка</string>
     <string name="badge_size">Размер значка</string>
     <string name="badge_test">Проверить значок уведомления</string>
-    <string name="badge_test_summary">Отправить уведомление, чтобы показать значок на иконке настроек</string>
+    <string name="badge_test_summary">Отправить уведомление, чтобы показать значок на значке настроек</string>
     <string name="badge_test_channel">Тестовые уведомления</string>
     <string name="badge_test_title">Тестовое уведомление</string>
     <string name="badge_test_text">Теперь на настройках Supernova есть значок. Нажмите, чтобы убрать его.</string>
@@ -318,7 +318,7 @@
     <string name="pos_top_left">Вверху слева</string>
     <string name="pos_bottom_right">Внизу справа</string>
     <string name="pos_bottom_left">Внизу слева</string>
-    <string name="folder_preview_style">Превью папки</string>
+    <string name="folder_preview_style">Предпросмотр папки</string>
     <string name="preview_grid">Сетка</string>
     <string name="preview_stack">Стопка</string>
     <string name="preview_fan">Веер</string>
@@ -444,7 +444,7 @@
     <string name="popup_group_shortcuts_summary">Ярлыки и уведомления в отдельных плитках</string>
     <string name="popup_style">Стиль меню долгого нажатия</string>
     <string name="popup_style_block">Блок</string>
-    <string name="popup_style_pills">Таблетки</string>
+    <string name="popup_style_pills">Капсулы</string>
     <string name="popup_style_android12">Android 12</string>
     <string name="folder_show_name">Показывать название папки</string>
     <string name="folder_show_count">Показывать число приложений</string>
@@ -488,8 +488,8 @@
         <item quantity="many">%d вкладок</item>
         <item quantity="other">%d вкладки</item>
     </plurals>
-    <string name="move_up">Вверх</string>
-    <string name="move_down">Вниз</string>
+    <string name="move_up">Выше</string>
+    <string name="move_down">Ниже</string>
     <string name="group_default_tag">По умолчанию</string>
     <string name="group_smart_tag">Умная</string>
     <string name="group_tab_hint">Перетаскивайте строки, чтобы задать порядок на панели вкладок.</string>
@@ -806,7 +806,7 @@
     <string name="search_bar_below_dock">Под док-панелью</string>
     <string name="search_bar_persistent">Всегда показывать внизу</string>
     <string name="search_bar_top">Всегда показывать вверху</string>
-    <string name="search_bar_widget">Виджет рабочего пространства</string>
+    <string name="search_bar_widget">Виджет главного экрана</string>
     <string name="search_bar_wireframe">Каркасный стиль</string>
     <string name="search_bar_wireframe_summary">Только контур, без заливки</string>
     <string name="search_bar_shadow">Тень</string>
@@ -864,7 +864,7 @@
     <string name="action_desktop_previews">Обзор страниц главного экрана</string>
     <string name="action_open_feed">Страница ленты</string>
     <string name="action_voice_search">Голосовой поиск</string>
-    <string name="action_private_space">Приватное пространство</string>
+    <string name="action_private_space">Частное пространство</string>
     <string name="settings_launcher_label">Настройки Supernova</string>
     <string name="lock_method">Способ блокировки экрана</string>
     <string name="lock_method_accessibility">Служба специальных возможностей</string>
@@ -1012,7 +1012,7 @@
     <string name="onboarding_shuffle">Создать вид, которого больше ни у кого нет</string>
     <string name="onboarding_color_title">Выберите свой цвет</string>
     <string name="onboarding_color_summary">Он подкрашивает поиск, меню и тонированные значки.</string>
-    <string name="onboarding_shape_title">Оформите форму значков</string>
+    <string name="onboarding_shape_title">Выберите форму значков</string>
     <string name="onboarding_finish_title">Выберите отделку</string>
     <string name="onboarding_finish_summary">Стекло позволяет обоям просвечивать.</string>
     <string name="onboarding_finish_original">Оригинал</string>
@@ -1023,7 +1023,7 @@
     <string name="onboarding_density_balanced">Сбалансированно</string>
     <string name="onboarding_density_packed">Плотно</string>
     <string name="onboarding_grid_size">%1$d × %2$d</string>
-    <string name="onboarding_names_title">Назовите свои приложения</string>
+    <string name="onboarding_names_title">Подписи приложений</string>
     <string name="onboarding_names_summary">Выберите шрифт или скройте названия.</string>
     <string name="onboarding_names_standard">Стандартный</string>
     <string name="onboarding_names_narrow">Узкий</string>
@@ -1059,7 +1059,7 @@
     <string name="variant_default_hint">Следует за лаунчером: его формой значков, стеклом и тематическими значками.</string>
     <string name="variant_themed_hint">Одноцветный значок на тонированной подложке, даже когда тематические значки выключены.</string>
     <string name="variant_original_hint">Значок таким, каким его сделало приложение. Действует только форма, выбранная здесь.</string>
-    <string name="edit_preview">Просмотр</string>
+    <string name="edit_preview">Предпросмотр</string>
     <string name="edit_name">Название</string>
     <string name="edit_no_changes">Без изменений</string>
     <string name="edit_change_renamed">Переименовано</string>
@@ -1112,7 +1112,7 @@
     <string name="a11y_collapse">Свернуть</string>
     <string name="a11y_decrease">Уменьшить %1$s</string>
     <string name="a11y_increase">Увеличить %1$s</string>
-    <string name="a11y_preview">Просмотр этих настроек</string>
+    <string name="a11y_preview">Предпросмотр этих настроек</string>
     <string name="a11y_resized">Размер изменён</string>
     <string name="a11y_wider">Сделать шире</string>
     <string name="a11y_narrower">Сделать уже</string>

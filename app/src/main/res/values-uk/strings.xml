@@ -172,7 +172,7 @@
     <string name="drawer_tab_bar_hidden_note">Приховано — шухляда показує всі застосунки</string>
     <string name="drawer_tab_bar_no_tabs">%1$s · додайте вкладки в «Групах шухляди»</string>
     <string name="drawer_frequent_row">Верхній рядок</string>
-    <string name="drawer_frequent_row_summary">Рядок застосунків над списком застосунків</string>
+    <string name="drawer_frequent_row_summary">Рядок застосунків над загальним списком</string>
     <string name="drawer_sort_buttons">Кнопки сортування</string>
     <string name="drawer_sort_buttons_summary">Змінюйте порядок угорі списку застосунків</string>
     <string name="drawer_sort_apps_desc">Порядок застосунків: %1$s</string>
@@ -209,7 +209,7 @@
     <string name="drawer_tab_empty">У цій вкладці ще немає застосунків</string>
     <string name="sort">Сортувати</string>
     <string name="move_to_drawer">Перемістити в шухляду</string>
-    <string name="move_to_drawer_as_folder">Папка шухляди</string>
+    <string name="move_to_drawer_as_folder">Папка в шухляді</string>
     <string name="move_to_drawer_tab">Нова вкладка</string>
     <string name="move_to_drawer_put_in">Помістити в</string>
     <string name="move_to_drawer_tab_hint">Його застосунки отримають власну вкладку з назвою «%1$s».</string>
@@ -444,7 +444,7 @@
     <string name="popup_group_shortcuts_summary">Ярлики й сповіщення в окремих плитках</string>
     <string name="popup_style">Стиль меню довгого натискання</string>
     <string name="popup_style_block">Блок</string>
-    <string name="popup_style_pills">Пігулки</string>
+    <string name="popup_style_pills">Капсули</string>
     <string name="popup_style_android12">Android 12</string>
     <string name="folder_show_name">Показувати назву папки</string>
     <string name="folder_show_count">Показувати кількість застосунків</string>
@@ -488,8 +488,8 @@
         <item quantity="many">%d вкладок</item>
         <item quantity="other">%d вкладки</item>
     </plurals>
-    <string name="move_up">Вгору</string>
-    <string name="move_down">Вниз</string>
+    <string name="move_up">Вище</string>
+    <string name="move_down">Нижче</string>
     <string name="group_default_tag">За замовчуванням</string>
     <string name="group_smart_tag">Розумна</string>
     <string name="group_tab_hint">Перетягуйте рядки, щоб задати порядок на панелі вкладок.</string>
@@ -1012,7 +1012,7 @@
     <string name="onboarding_shuffle">Створити вигляд, якого ні в кого немає</string>
     <string name="onboarding_color_title">Виберіть свій колір</string>
     <string name="onboarding_color_summary">Він підфарбовує пошук, меню та тоновані іконки.</string>
-    <string name="onboarding_shape_title">Оформіть форму іконок</string>
+    <string name="onboarding_shape_title">Оберіть форму іконок</string>
     <string name="onboarding_finish_title">Виберіть оздоблення</string>
     <string name="onboarding_finish_summary">Скло дозволяє шпалерам просвічувати.</string>
     <string name="onboarding_finish_original">Оригінал</string>
@@ -1023,7 +1023,7 @@
     <string name="onboarding_density_balanced">Збалансовано</string>
     <string name="onboarding_density_packed">Щільно</string>
     <string name="onboarding_grid_size">%1$d × %2$d</string>
-    <string name="onboarding_names_title">Назвіть свої застосунки</string>
+    <string name="onboarding_names_title">Підписи застосунків</string>
     <string name="onboarding_names_summary">Виберіть шрифт або приховайте назви.</string>
     <string name="onboarding_names_standard">Стандартний</string>
     <string name="onboarding_names_narrow">Вузький</string>
@@ -1059,7 +1059,7 @@
     <string name="variant_default_hint">Слідує за лаунчером: його формою іконок, склом і тематичними іконками.</string>
     <string name="variant_themed_hint">Одноколірна іконка на тонованій підкладці, навіть коли тематичні іконки вимкнено.</string>
     <string name="variant_original_hint">Іконка така, як її зробив застосунок. Діє лише форма, вибрана тут.</string>
-    <string name="edit_preview">Перегляд</string>
+    <string name="edit_preview">Попередній перегляд</string>
     <string name="edit_name">Назва</string>
     <string name="edit_no_changes">Без змін</string>
     <string name="edit_change_renamed">Перейменовано</string>
@@ -1112,7 +1112,7 @@
     <string name="a11y_collapse">Згорнути</string>
     <string name="a11y_decrease">Зменшити %1$s</string>
     <string name="a11y_increase">Збільшити %1$s</string>
-    <string name="a11y_preview">Перегляд цих налаштувань</string>
+    <string name="a11y_preview">Попередній перегляд цих налаштувань</string>
     <string name="a11y_resized">Розмір змінено</string>
     <string name="a11y_wider">Зробити ширшим</string>
     <string name="a11y_narrower">Зробити вужчим</string>
@@ -1120,15 +1120,15 @@
     <string name="a11y_shorter">Зробити нижчим</string>
     <string name="a11y_no_room">Там немає вільного місця</string>
     <string name="move_to_folder">У папку…</string>
-    <string name="auto_sort_new_apps">Автосортування нових додатків</string>
-    <string name="auto_sort_new_apps_summary">Нові додатки потрапляють у ваші папки за схожістю з тим, що там лежить</string>
+    <string name="auto_sort_new_apps">Автосортування нових застосунків</string>
+    <string name="auto_sort_new_apps_summary">Нові застосунки потрапляють у ваші папки за схожістю з тим, що там лежить</string>
     <string name="auto_sort_now">Розкласти нерозкладені зараз</string>
-    <string name="auto_sort_now_summary">Кладе додатки без папки у відповідні папки</string>
+    <string name="auto_sort_now_summary">Кладе застосунки без папки у відповідні папки</string>
     <plurals name="auto_sort_done">
-        <item quantity="one">%d додаток розкладено по папках</item>
-        <item quantity="few">%d додатки розкладено по папках</item>
-        <item quantity="many">%d додатків розкладено по папках</item>
-        <item quantity="other">%d додатка розкладено по папках</item>
+        <item quantity="one">%d застосунок розкладено по папках</item>
+        <item quantity="few">%d застосунки розкладено по папках</item>
+        <item quantity="many">%d застосунків розкладено по папках</item>
+        <item quantity="other">%d застосунка розкладено по папках</item>
     </plurals>
     <string name="move_to_start">На початок</string>
     <string name="move_to_end">В кінець</string>
