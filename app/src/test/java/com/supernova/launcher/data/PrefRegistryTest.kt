@@ -117,15 +117,26 @@ class PrefRegistryTest {
 
     @Test
     fun `a number outside its range is held to it, read or written`() {
-        val stored = mutablePreferencesOf(Pref.gridRows.key to 99, Pref.iconScale.key to 9f)
+        val stored = mutablePreferencesOf(
+            Pref.gridRows.key to 99,
+            Pref.iconScale.key to 9f,
+            Pref.dockPages.key to Pref.DOCK_PAGES_MAX + 3,
+            Pref.feedShortcutRows.key to 9
+        )
         val read = LauncherPreferences.decode(stored)
         assertEquals(GridLimits.DESKTOP_BIG, read.gridRows)
         assertEquals(2f, read.iconScale)
+        assertEquals(Pref.DOCK_PAGES_MAX, read.dockPages)
+        assertEquals(3, read.feedShortcutRows)
 
         val written = mutablePreferencesOf()
-        LauncherPreferences.writeAll(written, LauncherPrefs(gridRows = 1, feedShortcutRows = 9))
+        LauncherPreferences.writeAll(
+            written,
+            LauncherPrefs(gridRows = 1, feedShortcutRows = 9, dockPages = Pref.DOCK_PAGES_MAX + 3)
+        )
         assertEquals(2, written[Pref.gridRows.key])
         assertEquals(3, written[Pref.feedShortcutRows.key])
+        assertEquals(Pref.DOCK_PAGES_MAX, written[Pref.dockPages.key])
     }
 
     // The keys and types version 0.1.8 stored its settings under. A key
