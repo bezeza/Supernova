@@ -24,6 +24,7 @@ import com.supernova.launcher.data.DrawerGroupEdit
 import com.supernova.launcher.data.DrawerGroupOrder
 import com.supernova.launcher.data.DrawerGroupType
 import com.supernova.launcher.data.DrawerTarget
+import com.supernova.launcher.data.FolderManualOrder
 import com.supernova.launcher.data.FolderMove
 import com.supernova.launcher.data.FolderToDrawer
 import com.supernova.launcher.data.FolderAutoSort
@@ -1360,6 +1361,19 @@ class LauncherViewModel(
                     g.copy(members = (shown + rest).toCollection(LinkedHashSet()), manualOrder = true, smart = false)
                 }
             }
+        }
+    }
+
+    // Back to the drawer's own order. The members stay, so Undo is the flag.
+    fun clearFolderManualOrder(id: String) {
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { FolderManualOrder.cleared(it, id) }
+        }
+    }
+
+    fun restoreFolderManualOrder(id: String) {
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { FolderManualOrder.restored(it, id) }
         }
     }
 

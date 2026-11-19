@@ -47,6 +47,7 @@ import com.supernova.launcher.ui.ShortcutItem
 import com.supernova.launcher.ui.dp
 import com.supernova.launcher.ui.showTracked
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import android.graphics.Bitmap
@@ -130,6 +131,7 @@ import com.supernova.launcher.ui.theme.AccentColor
 import com.supernova.launcher.ui.theme.ThemeEngine
 import com.supernova.launcher.widget.WidgetResizeFrame
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -3168,22 +3170,31 @@ class LauncherActivity :
         val menu = newItemPopup(forItem = true)
         addNotificationRows(menu, app.packageName, app.userSerial)
         // Opened from a drawer folder's card: move the app within the folder.
-        // The card closes; the folder shows the new order when it opens again.
+        // The card stays open; its grid shows the new order in place.
         if (inFolder != null) {
             val shown = viewModel.appsInGroup(inFolder)
-            val at = shown.indexOfFirst { it.packageName == app.packageName && it.className == app.className && it.userSerial == app.userSerial }
+            val at = shown.indexOfFirst {
+                it.packageName == app.packageName && it.className == app.className && it.userSerial == app.userSerial
+            }
             fun move(m: LauncherViewModel.InFolderMove) {
                 viewModel.moveAppInFolder(inFolder.id, app, m)
-                source?.dismiss()
-                android.widget.Toast.makeText(this, R.string.folder_order_changed, android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.folder_order_changed, Toast.LENGTH_SHORT).show()
             }
             if (at > 0) {
-                menu.addRow(getString(R.string.move_to_start), R.drawable.ic_menu_to_front) { move(LauncherViewModel.InFolderMove.START) }
-                menu.addRow(getString(R.string.move_up), R.drawable.ic_menu_to_front) { move(LauncherViewModel.InFolderMove.UP) }
+                menu.addRow(getString(R.string.move_to_start), R.drawable.ic_menu_to_front) {
+                    move(LauncherViewModel.InFolderMove.START)
+                }
+                menu.addRow(getString(R.string.move_up), R.drawable.ic_menu_to_front) {
+                    move(LauncherViewModel.InFolderMove.UP)
+                }
             }
             if (at in 0 until shown.lastIndex) {
-                menu.addRow(getString(R.string.move_down), R.drawable.ic_menu_to_back) { move(LauncherViewModel.InFolderMove.DOWN) }
-                menu.addRow(getString(R.string.move_to_end), R.drawable.ic_menu_to_back) { move(LauncherViewModel.InFolderMove.END) }
+                menu.addRow(getString(R.string.move_down), R.drawable.ic_menu_to_back) {
+                    move(LauncherViewModel.InFolderMove.DOWN)
+                }
+                menu.addRow(getString(R.string.move_to_end), R.drawable.ic_menu_to_back) {
+                    move(LauncherViewModel.InFolderMove.END)
+                }
             }
         }
         val extras = PopupRows.decode(
@@ -3323,9 +3334,14 @@ class LauncherActivity :
                 }
             }
         }
-        // A drawer folder lists its apps in the drawer's order, so it has no
-        // order of its own to Sort.
+        // A drawer folder lists its apps in the drawer's order. Once they were
+        // moved by hand it keeps that order, and this puts the drawer's back.
         menu.addRow(getString(R.string.select_apps), R.drawable.ic_menu_select_apps) { showDrawerGroupChecklist(group) }
+        if (group.type == DrawerGroupType.FOLDER && group.manualOrder) {
+            menu.addRow(getString(R.string.reset_folder_order), R.drawable.ic_menu_sort) {
+                resetDrawerFolderOrder(group)
+            }
+        }
         // Folders sit in the drawer in their stored order, the one the Drawer
         // groups page drags. Move up / down swaps with the neighbour folder,
         // so the order can be changed from the drawer itself.
@@ -3350,6 +3366,48 @@ class LauncherActivity :
         menu.addRow(getString(R.string.group_settings), R.drawable.ic_tab_settings) { openDrawerGroupSettings(null) }
         menu.show(anchor, menuTouchX)
         return menu
+    }
+
+    // The open drawer folder's grid follows the stored groups, so a move
+    // inside it and a reset (or its Undo) show up without closing the card.
+    private class OpenDrawerFolder(
+        val held: MutableMap<String, DrawerGroup>,
+        val icons: MutableMap<String, android.graphics.drawable.Drawable>,
+        val adapter: FolderMemberAdapter,
+        val onGroup: (DrawerGroup) -> Unit
+    )
+
+    private fun watchOpenDrawerFolder(
+        window: android.widget.PopupWindow,
+        groupId: String,
+        card: OpenDrawerFolder
+    ): Job = lifecycleScope.launch {
+            viewModel.state.map { it.prefs.drawerGroups }.distinctUntilChanged().drop(1).collect { _ ->
+                if (activeFolderPopup !== window) return@collect
+                val latest = viewModel.drawerFolderGroups().firstOrNull { it.id == groupId }
+                if (latest == null) {
+                    window.dismiss()
+                    return@collect
+                }
+                card.onGroup(latest)
+                card.held.clear()
+                card.icons.clear()
+                card.adapter.submit(drawerFolderItems(latest, viewModel.drawerFolderApps(latest), card.held))
+            }
+        }
+
+    // The folder follows the drawer's order again. Undo puts the flag back.
+    // An open card refills from the groups flow, so it shows either order.
+    private fun resetDrawerFolderOrder(group: DrawerGroup) {
+        viewModel.clearFolderManualOrder(group.id)
+        val host = activeFolderPopup?.contentView ?: binding.root
+        val bar = Snackbar.make(host, R.string.reset_folder_order, UNDO_DURATION_MS)
+            .setAction(R.string.undo) { viewModel.restoreFolderManualOrder(group.id) }
+        if (host === binding.root) {
+            bar.view.elevation = dp(OVER_OVERLAYS_ELEVATION_DP)
+            if (binding.dockBar.isVisible) bar.anchorView = binding.dockBar
+        }
+        bar.show()
     }
 
     // A shortcut held in an item's menu drags out of it onto the home screen
@@ -4280,6 +4338,9 @@ class LauncherActivity :
         // The group's name as of now: a rename typed into the title is saved
         // as the popup closes, which Edit does before opening the checklist.
         var groupName = group.name
+        // The group as stored now: a move inside the card rewrites it, and the
+        // next long-press has to see that order rather than the one at open.
+        var openGroup = group
         val adapter = FolderMemberAdapter(
             appCatalog = viewModel.appCatalog(),
             showLabels = prefs.folderLabels,
@@ -4309,7 +4370,8 @@ class LauncherActivity :
                 }
                 item.toLaunchableApp()?.let { app ->
                     drag.arm(memberView, DragPayload.DrawerApp(app), window = popup) {
-                        showDrawerItemMenu(memberView, app, source = popup, inFolder = group).also { memberMenu = it }
+                        showDrawerItemMenu(memberView, app, source = popup, inFolder = openGroup)
+                            .also { memberMenu = it }
                     }
                 }
             }
@@ -4325,6 +4387,9 @@ class LauncherActivity :
                 }
             }
         }
+        // Refills this card when its groups change (an app moved inside it, or
+        // its hand-set order reset and undone). The card stays open.
+        var watch: Job? = null
         popup = folderPopup.show(
             anchor = anchor,
             title = group.name,
@@ -4364,6 +4429,7 @@ class LauncherActivity :
                 drag.onWindowDismissed(popup)
                 activeFolderPopup = null
                 activeFolderAdapter = null
+                watch?.cancel()
                 // The drawer sheet is usually still open underneath; only
                 // release the wallpaper zoom when it isn't.
                 if (!drawer.isExpanded) animateWallpaperZoom(0f)
@@ -4375,6 +4441,8 @@ class LauncherActivity :
         popup?.let { window -> window.setTouchInterceptor { _, ev -> drag.routeGesture(ev, window) } }
         activeFolderPopup = popup
         activeFolderAdapter = adapter
+        val card = OpenDrawerFolder(held, heldIcons, adapter) { openGroup = it }
+        watch = watchOpenDrawerFolder(popup, group.id, card)
     }
 
     // Full screen over the desktop, the search window keeps it faded as the

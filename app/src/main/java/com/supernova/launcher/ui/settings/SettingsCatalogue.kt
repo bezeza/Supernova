@@ -617,10 +617,11 @@ object SettingsCatalogue {
                 ).hiddenWhen(dockHidden),
                 SettingItem.Slider(
                     R.string.dock_pages,
-                    min = 1, max = 3,
+                    min = 1, max = Pref.DOCK_PAGES_MAX,
                     get = { it.dockPages },
                     set = { viewModel.set(Pref.dockPages, it) },
-                    display = { it.toString() }
+                    display = { it.toString() },
+                    preview = { p, v -> p.copy(dockPages = v) }
                 ).hiddenWhen(dockHidden),
                 SettingItem.Toggle(
                     R.string.dock_bg_style,
