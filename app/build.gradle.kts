@@ -68,6 +68,18 @@ android {
         viewBinding = true
     }
 
+    // Slim build (./gradlew assembleRelease -Pslim): English and Russian only,
+    // 32- and 64-bit ARM, xxhdpi resources. A plain build is unchanged.
+    if (providers.gradleProperty("slim").isPresent) {
+        defaultConfig {
+            ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
+        }
+        androidResources {
+            localeFilters += listOf("en", "ru")
+            additionalParameters += listOf("--preferred-density", "xxhdpi")
+        }
+    }
+
     // No Google-encrypted dependency report in the APK signing block: F-Droid's
     // scanner rejects it, and it breaks reproducible-build verification.
     dependenciesInfo {

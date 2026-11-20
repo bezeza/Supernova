@@ -1,4 +1,4 @@
-name: Build release APK
+name: Build slim release APK
 
 on:
   workflow_dispatch:
@@ -30,8 +30,8 @@ jobs:
           EOF
           sed -i 's/^ *//' keystore.properties
       - run: chmod +x gradlew
-      - run: ./gradlew --no-daemon assembleRelease
+      - run: ./gradlew --no-daemon assembleRelease -Pslim
       - uses: actions/upload-artifact@v4
         with:
-          name: supernova-release-apk
+          name: supernova-0.2.6-slim-ru
           path: app/build/outputs/apk/release/*.apk
