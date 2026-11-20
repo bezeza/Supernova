@@ -1,4 +1,4 @@
-name: Build debug APK
+name: Build release APK
 
 on:
   workflow_dispatch:
@@ -15,9 +15,22 @@ jobs:
           distribution: temurin
           java-version: '21'
       - uses: android-actions/setup-android@v3
+      - name: Create a self-signed key for sideloading
+        run: |
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/ci.keystore" -alias supernova \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass supernova-ci -keypass supernova-ci \
+            -dname "CN=Supernova CI"
+          cat > keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/ci.keystore
+          storePassword=supernova-ci
+          keyAlias=supernova
+          keyPassword=supernova-ci
+          EOF
+          sed -i 's/^ *//' keystore.properties
       - run: chmod +x gradlew
-      - run: ./gradlew --no-daemon assembleDebug
+      - run: ./gradlew --no-daemon assembleRelease
       - uses: actions/upload-artifact@v4
         with:
-          name: supernova-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: supernova-release-apk
+          path: app/build/outputs/apk/release/*.apk
