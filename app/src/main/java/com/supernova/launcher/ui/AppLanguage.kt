@@ -14,12 +14,13 @@ import com.supernova.launcher.R
  */
 object AppLanguage {
     // BCP-47 tag to the name shown in the list; an empty tag follows the system.
+    // The slim build ships only English and Russian.
     private val choices = listOf(
         "en" to "English",
         "uk" to "Українська",
         "ru" to "Русский",
         "ru-Cyrl-UA-odesa" to "Одесский"
-    )
+    ).filter { !com.supernova.launcher.BuildConfig.SLIM || it.first in setOf("en", "ru") }
 
     private fun currentTag(): String =
         AppCompatDelegate.getApplicationLocales().toLanguageTags()

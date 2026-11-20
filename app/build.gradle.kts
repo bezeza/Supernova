@@ -66,11 +66,17 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     // Slim build (./gradlew assembleRelease -Pslim): English and Russian only,
     // 32- and 64-bit ARM, xxhdpi resources. A plain build is unchanged.
-    if (providers.gradleProperty("slim").isPresent) {
+    val slim = providers.gradleProperty("slim").isPresent
+    defaultConfig {
+        buildConfigField("boolean", "SLIM", slim.toString())
+        manifestPlaceholders["localeConfig"] = if (slim) "locales_config_slim" else "locales_config"
+    }
+    if (slim) {
         defaultConfig {
             ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
         }

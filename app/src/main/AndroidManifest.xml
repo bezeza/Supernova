@@ -87,7 +87,7 @@
         android:label="@string/app_label"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:localeConfig="@xml/locales_config"
+        android:localeConfig="@xml/${localeConfig}"
         android:theme="@style/Theme.Supernova">
         <!-- Keeps the chosen interface language on Android 12 and older. -->
         <service
