@@ -263,6 +263,8 @@ data class LauncherPrefs(
     val drawerFoldersFirst: Boolean = true,
     // Auto-generate FOLDER groups from on-device app categories.
     val smartFolders: Boolean = true,
+    // New installs go into the user's own folders by what those hold.
+    val autoSortNewApps: Boolean = false,
     // Smart folders the user deleted, or a fresh install left out as too big,
     // by name: regenerating on an install leaves them out. Turning Smart
     // Folders on again clears it.
@@ -592,7 +594,11 @@ data class DrawerGroup(
     // share one. A group stored before ids existed has its name as its id,
     // which is what tabs and the default tab already hold for it; a new
     // group gets a fresh one (newId).
-    val id: String = name
+    val id: String = name,
+    // The folder lists its apps in the order of `members` (set by moving an
+    // app within it) instead of the drawer's order. Stored in the smart
+    // segment as "manual", so older builds read the group as a plain one.
+    val manualOrder: Boolean = false
 ) {
     val hasCustomIcon: Boolean get() = iconName != null || !iconBase64.isNullOrEmpty()
 
@@ -621,7 +627,7 @@ data class DrawerGroup(
     // other than the name comes last; an entry without one has its name as
     // its id, so groups stored before ids keep the identity tabs hold them by.
     fun encode(): String {
-        val base = "$name|${members.joinToString(",")}|$order|${type.name}|${if (smart) SMART_MARKER else ""}"
+        val base = "$name|${members.joinToString(",")}|$order|${type.name}|${if (smart) SMART_MARKER else if (manualOrder) MANUAL_MARKER else ""}"
         val keep = when (keepInMain) {
             null -> ""
             true -> KEEP_MARKER
@@ -640,6 +646,7 @@ data class DrawerGroup(
 
     companion object {
         const val SMART_MARKER = "smart"
+        private const val MANUAL_MARKER = "manual"
         private const val KEEP_FIELD = 5
         private const val KEEP_MARKER = "keep"
         private const val MOVE_MARKER = "move"
@@ -679,7 +686,8 @@ data class DrawerGroup(
                 iconName = parts.getOrNull(ICON_NAME_FIELD)?.ifEmpty { null },
                 iconBase64 = parts.getOrNull(ICON_PHOTO_FIELD)?.ifEmpty { null },
                 iconRaw = parts.getOrNull(ICON_RAW_FIELD) == RAW_MARKER,
-                id = parts.getOrNull(ID_FIELD)?.takeIf { it.isNotBlank() } ?: name
+                id = parts.getOrNull(ID_FIELD)?.takeIf { it.isNotBlank() } ?: name,
+                manualOrder = parts.getOrNull(4) == MANUAL_MARKER
             )
         }
     }

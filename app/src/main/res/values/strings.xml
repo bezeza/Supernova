@@ -539,6 +539,9 @@
     <string name="contact_message">Message</string>
     <string name="search_contact_cards">Contact card view</string>
     <string name="about">About</string>
+    <string name="language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_summary">Language of the launcher\'s interface</string>
     <string name="section_about_subtitle">Version, what\'s new and reporting an issue</string>
     <string name="about_version">Version</string>
     <string name="about_license">Open-source license</string>
@@ -1155,4 +1158,21 @@
     <string name="a11y_taller">Make taller</string>
     <string name="a11y_shorter">Make shorter</string>
     <string name="a11y_no_room">No free spot there</string>
+    <string name="move_to_folder">Move to folder…</string>
+    <string name="auto_sort_new_apps">Auto-sort new apps</string>
+    <string name="auto_sort_new_apps_summary">New installs go into your own folders, by what those hold</string>
+    <string name="auto_sort_now">Sort loose apps now</string>
+    <string name="auto_sort_now_summary">Puts apps in no folder into the folders that fit them</string>
+    <plurals name="auto_sort_done">
+        <item quantity="one">%d app moved into folders</item>
+        <item quantity="other">%d apps moved into folders</item>
+    </plurals>
+    <string name="move_to_start">To the start</string>
+    <string name="move_to_end">To the end</string>
+    <string name="folder_order_changed">Order changed</string>
+    <string name="reset_folder_order">Reset order</string>
+    <string name="suggest_folder">%1$s fits the folder %2$s</string>
+    <string name="suggest_folder_action">Put it there</string>
+    <string name="merge_folder">Merge into…</string>
+    <string name="merge_folder_title">Merge %1$s into</string>
 </resources>
