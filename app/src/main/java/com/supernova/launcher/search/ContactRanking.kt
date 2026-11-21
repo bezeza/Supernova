@@ -52,7 +52,7 @@ object ContactRanking {
         return if (folded.equals(query, ignoreCase = true)) {
             RANK_EXACT
         } else {
-            AppMatcher.match(folded, query)?.let { it.tier + 1 } ?: RANK_OTHER
+            AppQuery.match(folded, query)?.let { it.tier + 1 } ?: RANK_OTHER
         }
     }
 

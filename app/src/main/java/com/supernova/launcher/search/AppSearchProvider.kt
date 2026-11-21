@@ -17,7 +17,7 @@ class AppSearchProvider(
         if (trimmed.isEmpty()) return emptyList()
         val counts = launchCounts()
         return apps()
-            .mapNotNull { app -> AppMatcher.match(app.label, trimmed)?.let { app to it } }
+            .mapNotNull { app -> AppQuery.match(app.label, trimmed)?.let { app to it } }
             // How well the name matches comes first, so a typo-tolerant hit
             // never outranks a real prefix however often it is launched.
             .sortedWith(

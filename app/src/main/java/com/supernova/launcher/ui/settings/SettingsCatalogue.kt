@@ -126,7 +126,15 @@ object SettingsCatalogue {
         // Opens a section by title (a built-in card's own settings page,
         // the Desktop search bar page).
         val openSection: (Int) -> Unit = {}
-    )
+    ) {
+        // This fork's hooks. Kept out of the constructor so its signature
+        // stays the one upstream's detekt baseline knows.
+        // About > Language: pick the interface language (per-app locale).
+        var pickLanguage: () -> Unit = {}
+
+        // Drawer: put the apps that sit in no folder into the folders that fit.
+        var autoSortNow: () -> Unit = {}
+    }
 
     // Builds the rows whose tap offers one value out of a list. The pick
     // itself is the activity's (Actions.pickChoice), shown as a menu under
@@ -1855,6 +1863,11 @@ object SettingsCatalogue {
         SettingsSection(
             R.string.about,
             listOf(
+                SettingItem.Row(
+                    R.string.language,
+                    subtitle = { com.supernova.launcher.ui.AppLanguage.currentLabel(context) },
+                    onClick = actions.pickLanguage
+                ),
                 SettingItem.Row(
                     R.string.about_version,
                     subtitle = { SupernovaApp.versionLabel(context) },

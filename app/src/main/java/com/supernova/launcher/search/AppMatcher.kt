@@ -20,7 +20,7 @@ object AppMatcher {
     // One typo off a word start.
     const val TIER_TYPO = 4
 
-    fun matches(label: String, query: String): Boolean = match(label, query) != null
+    fun matches(label: String, query: String): Boolean = AppQuery.match(label, query) != null
 
     // A filtered list (drawer, Select apps): typo matches only when nothing
     // matches better, so "calc" lists Calculator without Calendar.
@@ -31,7 +31,7 @@ object AppMatcher {
     // app): an item ranks by its best-matching name.
     fun <T> filterAny(items: List<T>, query: String, labels: (T) -> List<String>): List<T> {
         val found = items.mapNotNull { item ->
-            labels(item).mapNotNull { match(it, query)?.tier }.minOrNull()?.let { item to it }
+            labels(item).mapNotNull { AppQuery.match(it, query)?.tier }.minOrNull()?.let { item to it }
         }
         val exact = found.filter { it.second < TIER_TYPO }
         return (exact.ifEmpty { found }).map { it.first }

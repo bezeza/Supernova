@@ -62,6 +62,7 @@ import com.supernova.launcher.ui.dp
 import com.supernova.launcher.ui.followLauncherAnimations
 import com.supernova.launcher.ui.settings.ColorSheet
 import com.supernova.launcher.ui.settings.EnumLabels
+import com.supernova.launcher.ui.settings.ForkSettings
 import com.supernova.launcher.ui.settings.PreviewController
 import com.supernova.launcher.ui.settings.PreviewKind
 import com.supernova.launcher.ui.settings.SettingItem
@@ -617,8 +618,20 @@ class SettingsActivity : AppCompatActivity() {
                 )
             },
             openSection = { title -> navigateTo(title, 0) }
-        )
-        sections = SettingsCatalogue.sections(context = this, viewModel = viewModel, actions = actions)
+        ).apply {
+            pickLanguage = { com.supernova.launcher.ui.AppLanguage.showPicker(this@SettingsActivity) }
+            autoSortNow = {
+                lifecycleScope.launch {
+                    val moved = viewModel.autoSortUnplaced()
+                    android.widget.Toast.makeText(
+                        this@SettingsActivity,
+                        resources.getQuantityString(R.plurals.auto_sort_done, moved, moved),
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+        sections = ForkSettings.sections(context = this, viewModel = viewModel, actions = actions)
         styleSection = SettingsCatalogue.styleSection(context = this, viewModel = viewModel, actions = actions)
         renderedFeedCards = viewModel.state.value.model.feedCards
         // A recreate (a theme or accent change) stays on the same page. The
@@ -714,7 +727,7 @@ class SettingsActivity : AppCompatActivity() {
                     if (state.model.feedCards != renderedFeedCards) {
                         renderedFeedCards = state.model.feedCards
                         val shownTitle = currentSection?.title
-                        sections = SettingsCatalogue.sections(
+                        sections = ForkSettings.sections(
                             context = this@SettingsActivity, viewModel = viewModel, actions = actions
                         )
                         if (shownTitle != null) {

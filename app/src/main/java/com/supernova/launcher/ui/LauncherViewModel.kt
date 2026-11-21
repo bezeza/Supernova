@@ -26,6 +26,7 @@ import com.supernova.launcher.data.DrawerGroupType
 import com.supernova.launcher.data.DrawerTarget
 import com.supernova.launcher.data.FolderMove
 import com.supernova.launcher.data.FolderToDrawer
+import com.supernova.launcher.data.FolderAutoSort
 import com.supernova.launcher.data.GroupPick
 import com.supernova.launcher.data.HiddenLabels
 import com.supernova.launcher.data.IconPack
@@ -336,6 +337,12 @@ class LauncherViewModel(
                     // New installs slot into their smart folder while enabled.
                     if (state.value.prefs.smartFolders) {
                         viewModelScope.launch { regenerateSmartFolders() }
+                    }
+                    // ...and, when asked, into the user's own folders.
+                    if (state.value.prefs.autoSortNewApps) {
+                        viewModelScope.launch { autoSortUnplaced() }
+                    } else {
+                        viewModelScope.launch { suggestFolderFor(change.packageName) }
                     }
                 }
                 is AppChange.Updated -> {
@@ -1352,6 +1359,136 @@ class LauncherViewModel(
         }
     }
 
+    // An app moved into a drawer folder from its own menu: out of every other
+    // folder (a move, not a second copy), into this one. A smart folder that
+    // changes this way is the user's now, or the next regeneration undoes it.
+    fun moveAppToFolder(app: LaunchableApp, folderId: String) {
+        val key = hiddenKey(app)
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { groups ->
+                groups.map { group ->
+                    when {
+                        group.type != DrawerGroupType.FOLDER -> group
+                        group.id == folderId -> group.copy(members = group.members + key, smart = false)
+                        key in group.members -> group.copy(members = group.members - key, smart = false)
+                        else -> group
+                    }
+                }
+            }
+        }
+    }
+
+    // Apps in no drawer folder, put into the user's folders by what those
+    // folders already hold (FolderAutoSort). Returns how many moved. Only
+    // folders the user owns take apps: a smart folder is regenerated from
+    // categories and would drop them again.
+    // A new app and the folder that fits it, waiting for the home screen to
+    // offer it (the screen may not be on top when the install lands).
+    data class FolderSuggestion(val app: LaunchableApp, val folderId: String, val folderName: String)
+
+    private val _folderSuggestion = MutableStateFlow<FolderSuggestion?>(null)
+    val folderSuggestion: StateFlow<FolderSuggestion?> = _folderSuggestion
+
+    fun clearFolderSuggestion() { _folderSuggestion.value = null }
+
+    // The apps in no folder and where FolderAutoSort would put each: key to
+    // folder id, plus the apps by key.
+    private suspend fun unplacedPlan(): Pair<Map<String, String>, Map<String, LaunchableApp>> {
+        val hidden = state.value.prefs.hiddenApps
+        val apps = withContext(Dispatchers.Default) {
+            catalog.listLaunchableApps().filterNot { it.privateSpace || hiddenKey(it) in hidden }
+        }
+        val byKey = apps.associateBy { hiddenKey(it) }
+        val folders = drawerFolderGroups()
+        val owned = folders.filter { !it.smart }
+        if (owned.isEmpty()) return emptyMap<String, String>() to byKey
+        val placedKeys = folders.flatMap { it.members }.toSet()
+        val placed = owned.flatMap { f ->
+            f.members.mapNotNull { key -> byKey[key]?.let { FolderAutoSort.Placed(f.id, it.packageName, it.label) } }
+        }
+        val candidates = apps.filter { hiddenKey(it) !in placedKeys }
+            .map { FolderAutoSort.Candidate(hiddenKey(it), it.packageName, it.label) }
+        return FolderAutoSort.suggest(placed, candidates) to byKey
+    }
+
+    suspend fun autoSortUnplaced(): Int {
+        val plan = unplacedPlan().first
+        if (plan.isEmpty()) return 0
+        preferences.updateDrawerGroups { groups ->
+            groups.map { g ->
+                val add = plan.filterValues { it == g.id }.keys
+                if (add.isEmpty()) g else g.copy(members = g.members + add)
+            }
+        }
+        return plan.size
+    }
+
+    // A fresh install with a confident fit gets offered its folder.
+    private suspend fun suggestFolderFor(packageName: String) {
+        val (plan, byKey) = unplacedPlan()
+        val entry = plan.entries.firstOrNull { byKey[it.key]?.packageName == packageName }
+        val app = entry?.let { byKey[it.key] }
+        val folder = entry?.let { e -> drawerFolderGroups().firstOrNull { it.id == e.value } }
+        if (app != null && folder != null) _folderSuggestion.value = FolderSuggestion(app, folder.id, folder.name)
+    }
+
+    // One folder poured into another: the target keeps its own apps first,
+    // the source's follow, and the source goes.
+    fun mergeFolderInto(sourceId: String, targetId: String) {
+        if (sourceId == targetId) return
+        viewModelScope.launch {
+            var dismissed: String? = null
+            preferences.updateDrawerGroups { groups ->
+                val source = groups.firstOrNull { it.id == sourceId } ?: return@updateDrawerGroups groups
+                if (source.smart) dismissed = source.name
+                val moved = source.members.filter { it != targetId }
+                val merged = groups.map { g ->
+                    if (g.id == targetId) g.copy(members = (g.members + moved).toCollection(LinkedHashSet())) else g
+                }
+                TabFolders.forgotten(merged.filterNot { it.id == sourceId }, sourceId)
+            }
+            dismissed?.let { preferences.dismissSmartGroup(it) }
+        }
+    }
+
+    // Back to the folder's own order (the drawer's), dropping a hand-set one.
+    fun resetFolderOrder(folderId: String) {
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { groups ->
+                groups.map { g -> if (g.id == folderId) g.copy(manualOrder = false) else g }
+            }
+        }
+    }
+
+    enum class InFolderMove { START, UP, DOWN, END }
+
+    // Moves an app within a drawer folder. The folder takes the order it
+    // shows now as its own (members in that order), then the app moves; from
+    // then on the folder keeps it, and a new app lands at the end.
+    fun moveAppInFolder(folderId: String, app: LaunchableApp, move: InFolderMove) {
+        viewModelScope.launch {
+            preferences.updateDrawerGroups { groups ->
+                groups.map { g ->
+                    if (g.id != folderId) return@map g
+                    val shown = appsInGroup(g).map { hiddenKey(it) }.toMutableList()
+                    val at = shown.indexOf(hiddenKey(app))
+                    if (at < 0) return@map g
+                    val to = when (move) {
+                        InFolderMove.START -> 0
+                        InFolderMove.UP -> maxOf(at - 1, 0)
+                        InFolderMove.DOWN -> minOf(at + 1, shown.lastIndex)
+                        InFolderMove.END -> shown.lastIndex
+                    }
+                    shown.add(to, shown.removeAt(at))
+                    // Members that are not apps shown here (folders held, apps
+                    // hidden now) keep their place after the shown ones.
+                    val rest = g.members.filter { it !in shown }
+                    g.copy(members = (shown + rest).toCollection(LinkedHashSet()), manualOrder = true, smart = false)
+                }
+            }
+        }
+    }
+
     // A drag on the Drawer groups page: one type's groups (their ids) in a
     // new order.
     fun setGroupOrder(type: DrawerGroupType, ids: List<String>) {
@@ -1382,7 +1519,14 @@ class LauncherViewModel(
     fun appsInGroup(group: DrawerGroup?): List<LaunchableApp> {
         if (group == null) return visibleApps()
         val (visible, keys) = visibleAppKeys()
-        return visible.filterIndexed { index, _ -> keys[index] in group.members }
+        val inGroup = visible.filterIndexed { index, _ -> keys[index] in group.members }
+        return if (group.manualOrder) inMembersOrder(group, inGroup) else inGroup
+    }
+
+    // A folder whose apps were moved by hand lists them in members' order.
+    private fun inMembersOrder(group: DrawerGroup, apps: List<LaunchableApp>): List<LaunchableApp> {
+        val rank = group.members.withIndex().associate { it.value to it.index }
+        return apps.sortedBy { rank[hiddenKey(it)] ?: Int.MAX_VALUE }
     }
 
     // A group's Select apps rows: [apps], and first the drawer folders it
