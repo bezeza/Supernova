@@ -14,7 +14,9 @@ class DockPagesTest {
 
     @Test
     fun pageAtUndoesPosition() {
-        for (pages in 1..5) {
+        // Every count the dock setting allows has to page, the main page
+        // included: it sits in the middle and a flick walks the places.
+        for (pages in 1..com.supernova.launcher.data.Pref.DOCK_PAGES_MAX) {
             for (page in 0 until pages) {
                 assertEquals(page, DockPages.pageAt(DockPages.position(page, pages), pages))
             }
