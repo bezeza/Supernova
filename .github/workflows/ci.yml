@@ -43,3 +43,18 @@ jobs:
           path: |
             **/build/reports/
             **/build/test-results/
+
+      # No keystore in CI. app/build.gradle.kts leaves release unsigned when
+      # local/keystore.properties is absent, so R8 and resource shrinking run
+      # here without signing secrets.
+      - name: Release build
+        run: ./gradlew --no-daemon assembleRelease
+
+      - name: Upload release APK and R8 mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          if-no-files-found: error
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/mapping/release/mapping.txt
