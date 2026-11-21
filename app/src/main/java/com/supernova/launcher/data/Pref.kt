@@ -214,6 +214,7 @@ object Pref {
     val drawerAutoClose = bool("drawer_auto_close")
     val drawerFoldersFirst = bool("drawer_folders_first")
     val smartFolders = bool("smart_folders")
+    val autoSortNewApps = bool("auto_sort_new_apps")
     val smartFoldersDismissed = textSet("smart_folders_dismissed")
     val drawerIconScale = float("drawer_icon_scale", ICON_SCALE_MIN..ICON_SCALE_MAX)
     val drawerPaddingH = int("drawer_padding_h", 0..DESKTOP_PADDING_MAX)

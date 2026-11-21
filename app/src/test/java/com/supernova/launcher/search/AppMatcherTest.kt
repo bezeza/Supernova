@@ -11,9 +11,9 @@ import org.junit.Test
 class AppMatcherTest {
 
     private fun ranges(label: String, query: String): List<IntRange>? =
-        AppMatcher.match(label, query)?.ranges
+        AppQuery.match(label, query)?.ranges
 
-    private fun tier(label: String, query: String): Int? = AppMatcher.match(label, query)?.tier
+    private fun tier(label: String, query: String): Int? = AppQuery.match(label, query)?.tier
 
     @Test
     fun prefixOfTheLabelIsTheBestTier() {
@@ -57,11 +57,11 @@ class AppMatcherTest {
 
     @Test
     fun typosNeedThreeLettersAndTwoAreTooMany() {
-        assertNull(AppMatcher.match("Olauncher", "pl"))
+        assertNull(AppQuery.match("Olauncher", "pl"))
         // Dropping a letter from a three-letter query would leave two.
-        assertNull(AppMatcher.match("Zeta Launcher", "pla"))
-        assertNull(AppMatcher.match("Olauncher", "xya"))
-        assertNull(AppMatcher.match("Chrome", "xyz"))
+        assertNull(AppQuery.match("Zeta Launcher", "pla"))
+        assertNull(AppQuery.match("Olauncher", "xya"))
+        assertNull(AppQuery.match("Chrome", "xyz"))
     }
 
     @Test
@@ -74,7 +74,7 @@ class AppMatcherTest {
     @Test
     fun caseAndWhitespaceDoNotMatter() {
         assertTrue(AppMatcher.matches("Play Store", "  PLA "))
-        assertNull(AppMatcher.match("Play Store", "   "))
+        assertNull(AppQuery.match("Play Store", "   "))
     }
 
     @Test
@@ -93,5 +93,35 @@ class AppMatcherTest {
             results.map { it.app.label }
         )
         assertEquals(listOf(0 until 1, 4 until 6), results.last().highlight)
+    }
+
+    @Test
+    fun aQueryTypedInTheWrongLayoutIsRetriedAsTheOtherOne() {
+        assertTrue(AppMatcher.matches("Viber", "мшиук"))
+        assertTrue(AppMatcher.matches("Телеграм", "ntktuhfv"))
+        assertNull(AppQuery.match("Viber", "ntktuhfv"))
+        assertEquals(0 until 3, AppQuery.match("Viber", "мші")!!.ranges.single())
+    }
+
+    @Test
+    fun aSpokenNameFindsTheLatinBrand() {
+        assertTrue(AppMatcher.matches("Viber", "вайбер"))
+        assertTrue(AppMatcher.matches("Viber", "вибер"))
+        assertTrue(AppMatcher.matches("WhatsApp", "ватсап"))
+        assertTrue(AppMatcher.matches("Telegram", "телеграм"))
+        assertTrue(AppMatcher.matches("Instagram", "инста"))
+    }
+
+    @Test
+    fun aRenamedCyrillicAppIsFoundByItsLatinName() {
+        assertTrue(AppMatcher.matches("Вайбер", "viber"))
+        assertTrue(AppMatcher.matches("Телеграм", "telegram"))
+        assertNull(AppQuery.match("Вайбер", "calc"))
+    }
+
+    @Test
+    fun transliterationDoesNotInventMatches() {
+        assertNull(AppQuery.match("Calculator", "вайбер"))
+        assertNull(AppQuery.match("Camera", "телеграм"))
     }
 }

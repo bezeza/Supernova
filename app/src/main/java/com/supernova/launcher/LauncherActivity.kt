@@ -66,6 +66,7 @@ import com.supernova.launcher.ui.WorkspaceCanvas
 import com.supernova.launcher.data.AppOverride
 import com.supernova.launcher.data.ContainerType
 import com.supernova.launcher.data.DrawerGroup
+import com.supernova.launcher.data.DrawerGroupType
 import com.supernova.launcher.data.DrawerTarget
 import com.supernova.launcher.data.FolderToDrawer
 import com.supernova.launcher.data.ItemType
@@ -707,6 +708,7 @@ class LauncherActivity :
         maybeShowOnboarding()
         widgets.sweepOrphanIds()
         observeBadges()
+        observeFolderSuggestions()
         restoreDockPage()
 
         // Wallpaper-derived palettes go stale without any prefs emission, so
@@ -795,6 +797,23 @@ class LauncherActivity :
         lastWallpaperPages = -1
         binding.workspacePager.post {
             updateWallpaperOffset(binding.workspacePager.currentItem.toFloat())
+        }
+    }
+
+    // A new install that fits one of the user's folders: offer it.
+    private fun observeFolderSuggestions() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.folderSuggestion.collect { s ->
+                    if (s == null) return@collect
+                    viewModel.clearFolderSuggestion()
+                    val text = getString(R.string.suggest_folder, s.app.label, s.folderName)
+                    Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.suggest_folder_action) { viewModel.moveAppToFolder(s.app, s.folderId) }
+                        .apply { view.elevation = dp(OVER_OVERLAYS_ELEVATION_DP) }
+                        .show()
+                }
+            }
         }
     }
 
@@ -3294,6 +3313,80 @@ class LauncherActivity :
     // after Hide, which takes the app out of it, and after a shortcut the
     // menu opens on a locked desktop if the Close folder when launching
     // setting is on, as after the card's own launches.
+    private fun pickFolderFor(app: LaunchableApp) {
+        val folders = viewModel.drawerFolderGroups()
+        val key = viewModel.hiddenKey(app)
+        val current = folders.indexOfFirst { key in it.members }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.move_to_folder)
+            .setSingleChoiceItems(folders.map { it.name }.toTypedArray(), current) { dialog, which ->
+                viewModel.moveAppToFolder(app, folders[which].id)
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    // A hook for rows this fork adds to the next drawer item menu (the ones
+    // for an app in an open folder), set around the call that builds it.
+    private var itemMenuHook: ((SupernovaPopupMenu) -> Unit)? = null
+
+    // The menu of an app in an open drawer folder: its usual rows, led by the
+    // ones that move it within the folder. The card closes; the folder shows
+    // the new order when it opens again.
+    private fun showFolderItemMenu(
+        anchor: View,
+        app: LaunchableApp,
+        source: android.widget.PopupWindow?,
+        folder: DrawerGroup
+    ): SupernovaPopupMenu {
+        itemMenuHook = { addInFolderMoveRows(it, app, source, folder) }
+        try {
+            return showDrawerItemMenu(anchor, app, source)
+        } finally {
+            itemMenuHook = null
+        }
+    }
+
+    private fun addInFolderMoveRows(
+        menu: SupernovaPopupMenu,
+        app: LaunchableApp,
+        source: android.widget.PopupWindow?,
+        folder: DrawerGroup
+    ) {
+        val shown = viewModel.appsInGroup(folder)
+        val at = shown.indexOfFirst {
+            it.packageName == app.packageName && it.className == app.className && it.userSerial == app.userSerial
+        }
+        fun row(label: Int, icon: Int, move: LauncherViewModel.InFolderMove) = menu.addRow(getString(label), icon) {
+            viewModel.moveAppInFolder(folder.id, app, move)
+            source?.dismiss()
+            android.widget.Toast.makeText(this, R.string.folder_order_changed, android.widget.Toast.LENGTH_SHORT).show()
+        }
+        if (at > 0) {
+            row(R.string.move_to_start, R.drawable.ic_menu_to_front, LauncherViewModel.InFolderMove.START)
+            row(R.string.move_up, R.drawable.ic_menu_to_front, LauncherViewModel.InFolderMove.UP)
+        }
+        if (at in 0 until shown.lastIndex) {
+            row(R.string.move_down, R.drawable.ic_menu_to_back, LauncherViewModel.InFolderMove.DOWN)
+            row(R.string.move_to_end, R.drawable.ic_menu_to_back, LauncherViewModel.InFolderMove.END)
+        }
+    }
+
+    // Into one of the drawer folders, out of the others: no trip through the
+    // folder's Select apps for one app. Not for a private space app.
+    private fun addMoveToFolderRow(
+        menu: SupernovaPopupMenu,
+        app: LaunchableApp,
+        source: android.widget.PopupWindow?
+    ) {
+        if (app.privateSpace || viewModel.drawerFolderGroups().isEmpty()) return
+        menu.addRow(getString(R.string.move_to_folder), R.drawable.ic_menu_select_apps) {
+            source?.dismiss()
+            pickFolderFor(app)
+        }
+    }
+
     private fun showDrawerItemMenu(
         anchor: View,
         app: LaunchableApp,
@@ -3301,6 +3394,7 @@ class LauncherActivity :
     ): SupernovaPopupMenu {
         val menu = newItemPopup(forItem = true)
         addNotificationRows(menu, app.packageName, app.userSerial)
+        itemMenuHook?.invoke(menu)
         val extras = PopupRows.decode(
             viewModel.state.value.prefs.popupItemsDrawer, PopupRows.drawerDefaults
         )
@@ -3319,6 +3413,7 @@ class LauncherActivity :
                 }
             }
         }
+        addMoveToFolderRow(menu, app, source)
         menu.addRow(getString(R.string.app_info), R.drawable.ic_menu_info) {
             viewModel.appCatalog().openAppInfo(app.packageName, app.className, app.userSerial)
         }
@@ -3433,6 +3528,44 @@ class LauncherActivity :
         // A drawer folder lists its apps in the drawer's order, so it has no
         // order of its own to Sort.
         menu.addRow(getString(R.string.select_apps), R.drawable.ic_menu_select_apps) { showDrawerGroupChecklist(group) }
+        // Folders sit in the drawer in their stored order, the one the Drawer
+        // groups page drags. Move up / down swaps with the neighbour folder,
+        // so the order can be changed from the drawer itself.
+        if (group.type == DrawerGroupType.FOLDER) {
+            val folders = viewModel.drawerFolderGroups()
+            val index = folders.indexOfFirst { it.id == group.id }
+            if (index > 0) {
+                menu.addRow(getString(R.string.move_up), R.drawable.ic_menu_to_front) {
+                    viewModel.moveGroup(group.id, -1)
+                }
+            }
+            if (index in 0 until folders.lastIndex) {
+                menu.addRow(getString(R.string.move_down), R.drawable.ic_menu_to_back) {
+                    viewModel.moveGroup(group.id, 1)
+                }
+            }
+        }
+        if (group.type == DrawerGroupType.FOLDER) {
+            val others = viewModel.drawerFolderGroups().filter { it.id != group.id }
+            if (others.isNotEmpty()) {
+                menu.addRow(getString(R.string.merge_folder), R.drawable.ic_menu_select_apps) {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle(getString(R.string.merge_folder_title, group.name))
+                        .setItems(others.map { it.name }.toTypedArray()) { _, which ->
+                            viewModel.mergeFolderInto(group.id, others[which].id)
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                }
+            }
+        }
+        // A hand-set order goes back to the drawer's own.
+        if (group.type == DrawerGroupType.FOLDER && group.manualOrder) {
+            menu.addRow(getString(R.string.reset_folder_order), R.drawable.ic_menu_edit) {
+                viewModel.resetFolderOrder(group.id)
+                Toast.makeText(this, R.string.folder_order_changed, Toast.LENGTH_SHORT).show()
+            }
+        }
         // Its page in Settings > Drawer groups: name, icon, tab or folder,
         // apps, and Delete.
         menu.addRow(getString(R.string.edit), R.drawable.ic_menu_edit) { openDrawerGroupSettings(group.id) }
@@ -4429,7 +4562,7 @@ class LauncherActivity :
                 }
                 item.toLaunchableApp()?.let { app ->
                     drag.arm(memberView, DragPayload.DrawerApp(app), window = popup) {
-                        showDrawerItemMenu(memberView, app, source = popup).also { memberMenu = it }
+                        showFolderItemMenu(memberView, app, popup, group).also { memberMenu = it }
                     }
                 }
             }

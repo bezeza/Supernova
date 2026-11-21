@@ -82,7 +82,7 @@ class SettingsSearchIndex internal constructor(val entries: List<Entry>) {
         // the ones a setting hides, to name that setting (#126, #133).
         fun build(context: Context, viewModel: LauncherViewModel): SettingsSearchIndex {
             val actions = SettingsCatalogue.Actions()
-            val sections = SettingsCatalogue.sections(context, viewModel, actions) +
+            val sections = ForkSettings.sections(context, viewModel, actions) +
                 SettingsCatalogue.styleSection(context, viewModel, actions)
             val entries = buildList {
                 for (section in sections) {
