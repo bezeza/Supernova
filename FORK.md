@@ -101,20 +101,21 @@ PR маленькі: одна тема на один PR. Перед PR:
 
 ## Відомі проблеми
 
-Факти на 2026-11-21.
+Факти на 2026-11-22.
 
-- **CI ще не в `main`, він їде в [PR #2](https://github.com/bezeza/Supernova/pull/2).** PR відкритий проти `main`, `mergeable_state: clean`, перевірка `build` на `7c2b9f5` — `success` (2026-11-21, близько семи хвилин). PR додає workflow, Dependabot і `distributionSha256Sum`. На `main` у `.github` досі лише `FUNDING.yml` і `ISSUE_TEMPLATE`, а в `gradle-wrapper.properties` контрольної суми немає. Ці файли не копіюють в інші гілки: їхній дім — PR #2, доки його не змерджено. Окремий `build-apk.yml` лежить ще й на `ccr-c6390468-djw86f` і теж не в `main`.
-- **П’ять помилок lint на гілці перекладів.** Опис [PR #1](https://github.com/bezeza/Supernova/pull/1) фіксує, що `./gradlew lintDebug` падає з 5 помилками, і що вони вже були на базі `translations-uk-ru-odesa`, а не від комітів PR. Цей документ lint не перезапускав. На кінці гілки `e620219` джерела тих самих класів проблем на місці: `android:localeConfig` у маніфесті (API 33, `minSdk` 28), `app_name` і `app_label` є лише в `values/strings.xml` і відсутні в `values-uk`, `values-ru` та `values-b+ru+Cyrl+UA+odesa`, `language_summary` є в усіх чотирьох `strings.xml` і ніде більше не згадується. Lint на тій гілці з `warningsAsErrors` і `abortOnError`.
-- **Перекладів у `main` немає.** Локалі й `xml/locales_config.xml` існують лише на гілці перекладів і на гілках, які її містять.
+- **`main` більше не чисте дзеркало upstream.** У ньому вже власні коміти: CI ([PR #2](https://github.com/bezeza/Supernova/pull/2)), ці нотатки ([PR #3](https://github.com/bezeza/Supernova/pull/3)), переклади й фічі гілки перекладів ([PR #5](https://github.com/bezeza/Supernova/pull/5)). Тож `git merge --ff-only upstream/main` з розділу про синк більше не пройде, поки upstream не зрушить далі; підтягувати його доведеться звичайним merge з розв'язанням конфліктів. Розділи вище описують стан до цих PR і ще не переписані.
 - **Той самий `applicationId`, що в upstream:** `com.supernova.launcher` (`app/build.gradle.kts`). Debug-збірка додає суфікс `.debug`, тож debug ставиться поруч. Release-ідентифікатор збігається з F-Droid/upstream збіркою.
 - **`runBlocking` в `ApplyIconPackActivity`.** Рядок 41 на `main`: `ThemeEngine.applyAccent(this, runBlocking { preferences.flow.first() }.accentColor)` на головному потоці в `onCreate`.
+- **Фічі форка лежать поза пакетом `fork`.** Код із PR #5 (`search/AppQuery.kt`, `ui/settings/ForkSettings.kt`, `data/FolderAutoSort.kt`, меню папок у `LauncherActivity`) з'явився до правила про `com.supernova.launcher.fork`. Новий код пишуть через `ForkHooks` ([PR #4](https://github.com/bezeza/Supernova/pull/4), відкритий).
+- **Перевірки.** На `main` проходить `./gradlew testDebugUnitTest detekt lintDebug assembleDebug` без змін baseline. Нові файли форка пройшли detekt без baseline; не додавайте записів у `detekt-baseline.xml` і `lint-baseline.xml`, а виправляйте код. Release-збірка (R8) збирається; на пристрої нічого з фіч форка не запускалось.
+- **«Скинути порядок папки» дублюється.** На `main` вона вже є з PR #5 (простий варіант). Коміт `443a1d8` з [PR #1](https://github.com/bezeza/Supernova/pull/1) (живе оновлення картки, Undo) з нею конфліктує у 7 файлах і змінює `detekt-baseline.xml`; рішення за власником.
 
 ## Що лишилось
 
-- Перенести в `main` переклади й фічі з `translations-uk-ru-odesa`. Гілка розійшлась на v0.2.4 (+12 / −74), fast-forward до v0.2.8 неможливий.
-- Довести [PR #1](https://github.com/bezeza/Supernova/pull/1): док до 9 сторінок і скидання ручного порядку. PR відкритий, база в GitHub досі записана як `translations-uk-ru-odesa`, але кінці гілок уже різні.
+- [PR #9](https://github.com/bezeza/Supernova/pull/9): док до 9 сторінок (перша половина PR #1, перенесена на `main`). Чекає на мердж.
+- Вирішити долю PR #1: його «скидання порядку» вже частково на `main`, див. вище.
 - Прибрати `runBlocking` в `ApplyIconPackActivity`.
 - Дати форку власний `applicationId`, щоб release не збігався з upstream.
-- Прибрати зайві гілки. `dev` уже повністю входить у `main`. `feature/more-dock-pages-and-reset-folder-order` — префікс гілки перекладів. Назва `ccr-*` у репозиторії не розшифрована.
+- Прибрати зайві гілки. `dev` повністю входить у `main`. `feature/more-dock-pages-and-reset-folder-order` і `translations-uk-ru-odesa` тепер у `main` через PR #5 (squash). Назва `ccr-*` у репозиторії не розшифрована. Видаляти гілки лише після підтвердження власника.
 
 Заплановане місце для нового коду форка — пакет `com.supernova.launcher.fork` і один виклик `ForkHooks.attach(this)`, описані вище. Поки виклику в `LauncherActivity` немає, поведінка лаунчера на `main` дорівнює upstream.
