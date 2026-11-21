@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.supernova.launcher.data.Pref
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import com.supernova.launcher.ui.theme.ThemeEngine
 import com.supernova.launcher.ui.theme.AccentColor
 
@@ -37,9 +36,16 @@ class ApplyIconPackActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // The accent overlay is what sets colorAccent, which the dialog's
         // colours resolve through: without it MaterialAlertDialogBuilder
-        // found no theme colours and this screen crashed on open.
-        ThemeEngine.applyAccent(this, runBlocking { preferences.flow.first() }.accentColor)
+        // found no theme colours and this screen crashed on open. The accent
+        // is read off the main thread, and the overlay goes on before the
+        // dialog is built.
+        lifecycleScope.launch {
+            ThemeEngine.applyAccent(this@ApplyIconPackActivity, preferences.flow.first().accentColor)
+            confirmApply()
+        }
+    }
 
+    private fun confirmApply() {
         val requested = requestedPack()
         if (requested == null) {
             Toast.makeText(this, R.string.icon_pack_apply_unknown, Toast.LENGTH_SHORT).show()
