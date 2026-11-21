@@ -1,3 +1,7 @@
+## Про цей форк
+
+Це форк [tanujnotes/Supernova](https://github.com/tanujnotes/Supernova). `main` уже підтягнутий fast-forward до upstream v0.2.8. Правила, фічі гілки перекладів, карта гілок і що лишилось — у [FORK.md](FORK.md).
+
 # Supernova Launcher 📱
 
 #### Infinitely Customizable Android Homescreen.
