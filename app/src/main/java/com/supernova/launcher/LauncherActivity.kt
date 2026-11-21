@@ -724,6 +724,7 @@ class LauncherActivity :
             android.content.IntentFilter(Intent.ACTION_SCREEN_OFF),
             androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
         )
+        com.supernova.launcher.fork.ForkHooks.attach(this)
     }
 
     // Short-and-wide window. Read from the live configuration rather than
