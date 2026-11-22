@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.supernova.launcher.LauncherActivity
 import com.supernova.launcher.data.AppCatalog
 import com.supernova.launcher.data.LaunchableApp
+import com.supernova.launcher.ui.AppDrawerAdapter
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
 
@@ -37,8 +38,9 @@ object ForkHooks {
         container: FrameLayout,
         catalog: AppCatalog,
         decorateIcon: (Drawable?, LaunchableApp) -> Drawable?,
-        actions: CategoriesActions
-    ): CategoriesController = CategoriesController(container, catalog, decorateIcon, actions)
+        actions: CategoriesActions,
+        screenAdapter: AppDrawerAdapter
+    ): CategoriesController = CategoriesController(container, catalog, decorateIcon, actions, screenAdapter)
 
     private val observer = object : DefaultLifecycleObserver {
         /** Fork work that should run each time the launcher becomes visible plugs in here. */

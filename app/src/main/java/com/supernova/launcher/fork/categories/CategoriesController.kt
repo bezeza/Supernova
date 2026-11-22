@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.AppCatalog
+import com.supernova.launcher.data.DrawerGroup
 import com.supernova.launcher.data.LaunchableApp
+import com.supernova.launcher.ui.AppDrawerAdapter
 
 // The Categories drawer: a list of its own that sits over the drawer's usual
 // one while the style is on, the All tab is showing and nothing is searched.
@@ -19,7 +21,9 @@ class CategoriesController(
     container: FrameLayout,
     catalog: AppCatalog,
     decorateIcon: (Drawable?, LaunchableApp) -> Drawable?,
-    actions: CategoriesActions
+    actions: CategoriesActions,
+    // The drawer's own kind of adapter, for the apps of a category opened on its own screen.
+    screenAdapter: AppDrawerAdapter
 ) {
 
     private val rows = CategoriesAdapter(CategoryIcons(catalog, decorateIcon), actions)
@@ -47,6 +51,10 @@ class CategoriesController(
         }
     }
 
+    private val state = CategoryScreenState()
+    private val screen = CategoryScreen(container, screenAdapter) { closeScreen() }
+    private var textColor = 0
+
     init {
         container.addView(
             recycler,
@@ -59,11 +67,33 @@ class CategoriesController(
 
     fun setVisible(show: Boolean) {
         recycler.visibility = if (show) View.VISIBLE else View.GONE
+        // The tiles going away (search, a tab, another style) takes the screen with them.
+        if (!show) closeScreen(animate = false)
+    }
+
+    // A tile opened: the category's apps on a screen of their own.
+    fun openScreen(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook) {
+        state.open(group.id)
+        screen.show(group, apps, look, textColor, animate = true)
+    }
+
+    // True when a screen was open and is closed now: the Back that did it is spent.
+    fun closeScreen(animate: Boolean = true): Boolean {
+        val wasOpen = state.close()
+        screen.hide(animate && wasOpen)
+        return wasOpen
     }
 
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setTextColor(data.textColor)
+        textColor = data.textColor
+        screen.setTextColor(data.textColor)
+        if (state.isOpen) {
+            val open = data.categories.firstOrNull { it.group.id == state.openId }
+            if (open != null && state.sync(data.categories.map { it.group.id })) screen.update(open.apps)
+            else closeScreen(animate = false)
+        }
         val context = recycler.context
         val list = ArrayList<CategoryRow>()
         val recent = if (showRecent) {
@@ -83,7 +113,10 @@ class CategoriesController(
     }
 
     // A badge or an icon moved: the rows rebind, the list itself is unchanged.
-    fun rebind() = rows.notifyItemRangeChanged(0, rows.itemCount)
+    fun rebind() {
+        rows.notifyItemRangeChanged(0, rows.itemCount)
+        if (state.isOpen) screen.rebind()
+    }
 
     private companion object {
         const val MIN_TILES = 2

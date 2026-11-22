@@ -29,6 +29,7 @@ import com.supernova.launcher.fork.ForkHooks
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesData
 import com.supernova.launcher.fork.categories.CategoryEntry
+import com.supernova.launcher.fork.categories.ScreenLook
 import com.supernova.launcher.ui.theme.Styles
 import com.supernova.launcher.ui.theme.SurfaceId
 import kotlin.math.roundToInt
@@ -82,9 +83,13 @@ class DrawerController(
 
     // Fork: the Categories style's own list. Everything it does lives in
     // fork/categories; the hooks in this file are marked "Fork:".
+    // A tap on a tile opens the category on a screen of its own, which draws
+    // its apps with a second adapter of the drawer's kind.
+    private val categoryAdapter = newCellAdapter()
     private val categories = ForkHooks.categories(
         binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
-        CategoriesActions(onAppClick, onAppLongPress, onFolderClick, onFolderLongPress)
+        CategoriesActions(onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress),
+        categoryAdapter
     )
     private var categoriesStyle = false
 
@@ -1215,7 +1220,9 @@ class DrawerController(
     // Back with a query in the field: the query goes, and its watcher
     // brings the full list back. True when there was one.
     fun clearQuery(): Boolean {
-        if (binding.drawerSearch.text.isNullOrEmpty()) return false
+        // Fork: Back leaves a category's screen first.
+        val screenClosed = categories.closeScreen()
+        if (screenClosed || binding.drawerSearch.text.isNullOrEmpty()) return screenClosed
         binding.drawerSearch.text?.clear()
         // From the top, as the drawer opened: the results' scroll carried over.
         binding.drawerRecycler.scrollToPosition(0)
@@ -1225,6 +1232,7 @@ class DrawerController(
     // Clears the query once the sheet is off screen, so the next open starts
     // on the full list.
     private fun resetSearch() {
+        categories.closeScreen(animate = false) // Fork
         // The All tab's hidden-apps peek ends with the drawer, as a query does.
         showHiddenApps(false)
         // Only the drawer's own keyboard. The window has one IME, and when
@@ -1830,6 +1838,26 @@ class DrawerController(
                 textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text
             ),
             showRecent = prefs.categoriesShowRecent
+        )
+    }
+
+    // Fork: a category's own screen, set up as the drawer's grid is.
+    @Suppress("UNUSED_PARAMETER")
+    private fun openCategoryScreen(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
+        val prefs = viewModel.state.value.prefs
+        val recycler = binding.drawerRecycler
+        categoryAdapter.displayMode = adapter.displayMode
+        categoryAdapter.tileWidthPx = adapter.tileWidthPx
+        categoryAdapter.tileHeightPx = adapter.tileHeightPx
+        categoryAdapter.tileContentPx = adapter.tileContentPx
+        categoryAdapter.tileCompactPx = adapter.tileCompactPx
+        lastDisplay?.let { categoryAdapter.setDisplay(it.first, it.second, it.third) }
+        categories.openScreen(
+            group, apps,
+            ScreenLook(
+                columnCount(prefs), recycler.paddingLeft, recycler.paddingTop,
+                recycler.paddingRight, recycler.paddingBottom
+            )
         )
     }
 
