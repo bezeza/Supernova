@@ -35,10 +35,10 @@ object ForkSettings {
     // Only while the Categories style is picked.
     private fun categoriesRows(viewModel: LauncherViewModel): List<SettingItem> = listOf(
         SettingItem.Toggle(
-            R.string.categories_show_recent,
+            R.string.fork_show_recent_installs,
             get = { it.categoriesShowRecent },
             set = { viewModel.set(Pref.categoriesShowRecent, it) },
-            subtitle = R.string.categories_show_recent_summary
+            subtitle = R.string.fork_show_recent_installs_summary
         ).hiddenWhen {
             SettingItem.HiddenBy(R.string.drawer_style, SettingItem.HiddenBy.Needs.OTHER)
                 .takeIf { _ -> it.drawerStyle != DrawerStyle.CATEGORIES }

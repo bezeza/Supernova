@@ -3,9 +3,14 @@ package com.supernova.launcher.fork.categories
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.text.TextUtils
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import com.supernova.launcher.R
 import com.supernova.launcher.data.LaunchableApp
 
 // The round, translucent card of one category: three large icons (a tap
@@ -19,8 +24,18 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     private val mini = List(CategoryLayout.MINI_SLOTS) { ImageView(context) }
     private val shape = GradientDrawable()
 
+    // Shown in place of the icons while the category holds no app.
+    private val empty = TextView(context).apply {
+        setText(R.string.fork_empty_category)
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, EMPTY_SP)
+        gravity = Gravity.CENTER
+        maxLines = EMPTY_LINES
+        ellipsize = TextUtils.TruncateAt.END
+    }
+
     init {
         addView(corner)
+        addView(empty)
         (large + mini).forEach { view ->
             view.scaleType = ImageView.ScaleType.FIT_CENTER
             addView(view)
@@ -31,6 +46,8 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
 
     fun setCardColor(color: Int) = shape.setColor(color)
 
+    fun setTextColor(color: Int) = empty.setTextColor(color)
+
     fun bind(
         tile: CategoryLayout.Tile<LaunchableApp>,
         icons: CategoryIcons,
@@ -38,6 +55,7 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         open: (View) -> Unit,
         openLongPress: (View) -> Unit
     ) {
+        empty.visibility = if (tile.large.isEmpty()) VISIBLE else GONE
         setOnClickListener(open)
         setOnLongClickListener { openLongPress(it); true }
         corner.setOnClickListener(open)
@@ -80,6 +98,11 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         mini.forEach { it.measure(miniSize, miniSize) }
         val cellSpec = MeasureSpec.makeMeasureSpec(cell, MeasureSpec.EXACTLY)
         corner.measure(cellSpec, cellSpec)
+        val inner = side - 2 * padding(side)
+        empty.measure(
+            MeasureSpec.makeMeasureSpec(inner, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(inner, MeasureSpec.AT_MOST)
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -92,6 +115,7 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         val cornerX = pad + cell
         val cornerY = pad + cell
         corner.layout(cornerX, cornerY, cornerX + cell, cornerY + cell)
+        centre(empty, pad, pad, side - 2 * pad)
         val half = cell / 2
         mini.forEachIndexed { index, view ->
             centre(view, cornerX + (index % 2) * half, cornerY + (index / 2) * half, half)
@@ -112,5 +136,7 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         private const val CORNER_DP = 24f
         private const val PADDING_SHARE = 0.07f
         private const val ICON_FILL = 0.8f
+        private const val EMPTY_SP = 11f
+        private const val EMPTY_LINES = 4
     }
 }

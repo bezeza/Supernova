@@ -88,19 +88,35 @@ internal class CategoriesAdapter(
 
     private fun cardColor(): Int = (textColor and COLOR_MASK) or (CARD_ALPHA shl ALPHA_SHIFT)
 
-    private fun label(context: Context, sizeSp: Float, centred: Boolean): TextView = TextView(context).apply {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp)
-        maxLines = 1
-        ellipsize = android.text.TextUtils.TruncateAt.END
-        if (centred) gravity = Gravity.CENTER_HORIZONTAL
-    }
+    private fun label(context: Context, sizeSp: Float, centred: Boolean, lines: Int = 1): TextView =
+        TextView(context).apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp)
+            maxLines = lines
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            if (centred) gravity = Gravity.CENTER_HORIZONTAL
+        }
 
     private fun dp(context: Context, value: Float): Int =
         (value * context.resources.displayMetrics.density).toInt()
 
+    // The category's own icon before its name, in the drawer's text colour.
+    private fun showGlyph(title: TextView, name: String) {
+        val context = title.context
+        val glyph = CategoryGlyphs.forName(context, name)
+        if (glyph == null) {
+            title.setCompoundDrawablesRelative(null, null, null, null)
+            return
+        }
+        val size = dp(context, GLYPH_DP)
+        glyph.setTint(textColor)
+        glyph.setBounds(0, 0, size, size)
+        title.setCompoundDrawablesRelative(glyph, null, null, null)
+        title.compoundDrawablePadding = dp(context, GLYPH_GAP_DP)
+    }
+
     private inner class TileHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
         private val card = CategoryTileCard(context)
-        private val title = label(context, TILE_LABEL_SP, centred = true)
+        private val title = label(context, TILE_LABEL_SP, centred = true, lines = TITLE_LINES)
 
         init {
             val column = itemView as LinearLayout
@@ -123,6 +139,8 @@ internal class CategoriesAdapter(
             card.setCardColor(cardColor())
             title.text = entry.group.name
             title.setTextColor(textColor)
+            card.setTextColor(textColor)
+            showGlyph(title, entry.group.name)
             itemView.contentDescription = itemView.context.getString(R.string.folder_desc, entry.group.name)
             card.bind(
                 row.layout, icons, actions,
@@ -134,7 +152,7 @@ internal class CategoriesAdapter(
 
     private inner class RecentHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
         private val shape = GradientDrawable()
-        private val title = label(context, TILE_LABEL_SP, centred = false)
+        private val title = label(context, TILE_LABEL_SP, centred = false, lines = TITLE_LINES)
         private val row = LinearLayout(context)
         private val slots = List(CategoryLayout.RECENT_LIMIT) { ImageView(context) }
 
@@ -149,7 +167,7 @@ internal class CategoriesAdapter(
             shape.cornerRadius = context.resources.displayMetrics.density * RECENT_CORNER_DP
             column.background = shape
             column.setPadding(inner, inner, inner, inner)
-            title.text = context.getString(R.string.categories_recent_title)
+            title.text = context.getString(R.string.fork_recent_installs_title)
             column.addView(title)
             row.orientation = LinearLayout.HORIZONTAL
             val iconSize = dp(context, RECENT_ICON_DP)
@@ -248,6 +266,9 @@ internal class CategoriesAdapter(
         const val ALPHA_SHIFT = 24
         const val CARD_ALPHA = 0x26
         const val TILE_LABEL_SP = 12f
+        const val TITLE_LINES = 2
+        const val GLYPH_DP = 16f
+        const val GLYPH_GAP_DP = 4f
         const val LOOSE_LABEL_SP = 11f
         const val HEADER_SP = 13f
         const val TILE_MARGIN_DP = 6f

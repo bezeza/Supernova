@@ -2,9 +2,10 @@
 <!-- Strings of the fork's own features, kept out of strings.xml so upstream syncs and the
      locale generator never touch them. -->
 <resources>
-    <string name="style_categories">Categories</string>
-    <string name="categories_show_recent">Show recently installed</string>
-    <string name="categories_show_recent_summary">A row of the newest apps over the categories</string>
-    <string name="categories_recent_title">Recently installed</string>
-    <string name="categories_other_title">Other apps</string>
+    <string name="fork_drawer_style_categories">Categories</string>
+    <string name="fork_show_recent_installs">Show new apps</string>
+    <string name="fork_show_recent_installs_summary">Row of new apps at the top of the drawer</string>
+    <string name="fork_recent_installs_title">Recently installed</string>
+    <string name="fork_empty_category">No apps in this category yet</string>
+    <string name="fork_other_apps">Other apps</string>
 </resources>

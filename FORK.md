@@ -95,7 +95,9 @@ git push origin main
 
 **Як вбудовано.** Категорії малюють окремий `RecyclerView` у `drawerListContainer`, поверх звичайного списку. Він видимий, лише коли стиль Категорії, відкрита вкладка «Усі» і поле пошуку порожнє. Пошук і вкладки лишаються звичайними списками меню. Для решти коду `DrawerController` стиль Категорії це `VERTICAL_GRID` (`currentStyle`), тож розкладка, колонки, швидка прокрутка й тло працюють як раніше.
 
-**Файли форку:** `fork/categories/` (`CategoryLayout` розкладка 3+4 і «нещодавні», `CategoriesController`, `CategoriesAdapter`, `CategoryTileCard`, `CategoryIcons`, `CategoriesPreview`, `CategoriesModels`), `fork/ForkHooks.kt`, `ui/settings/ForkSettings.kt` (перемикач), `res/values*/strings_fork.xml` (en, uk, ru, одеська; генератор `gen_locale.py` їх не чіпає). Тести: `fork/categories/CategoryLayoutTest`.
+**Файли форку:** `fork/categories/` (`CategoryLayout` розкладка 3+4 і «нещодавні», `CategoriesController`, `CategoriesAdapter`, `CategoryTileCard`, `CategoryIcons`, `CategoryGlyphs`, `CategoriesPreview`, `CategoriesModels`), `fork/ForkHooks.kt`, `ui/settings/ForkSettings.kt` (перемикач), `res/values*/strings_fork.xml` (en, uk, ru, одеська; генератор `gen_locale.py` їх не чіпає). Тести: `fork/categories/CategoryLayoutTest`, `CategoryGlyphsTest`.
+
+**Іконки категорій.** П'ятнадцять затверджених категорій (Соцмережі, Месенджери, Банки й фінанси, Держпослуги, Покупки, Доставка і пошта, Транспорт, Кіно і відео, Музика і аудіо, Фото і монтаж, Ігри, Робота і пошта, Інструменти, Системні, Інше) мають значок: `res/drawable/ic_fork_cat_*.xml` (groups, chat, account_balance, badge, shopping_bag, local_shipping, directions_car, movie, music_note, photo_library, sports_esports, work, build, settings, apps). Це [Material Symbols Outlined](https://github.com/google/material-design-icons) (Google, ліцензія Apache 2.0), 24 dp. Значок шукається за назвою категорії (`CategoryGlyphs`), білий, фарбується кодом з кольору меню. Показується дрібним значком перед назвою плитки й у вкладці з такою назвою (якщо в неї немає свого значка й вона не збігається з розумною категорією). Теку з іншою назвою значок не отримує.
 
 **Файли автора, зачеплені гачками.** Тут чекати конфліктів при синхронізації:
 
@@ -106,6 +108,7 @@ git push origin main
 | `data/Models.kt`, `data/Pref.kt` | прапор `categoriesShowRecent` / `categories_show_recent` |
 | `ui/settings/EnumLabels.kt` | підпис `style_categories` для `DrawerStyle.CATEGORIES` |
 | `ui/settings/preview/SettingsPreviewView.kt` | гілка `else if` у `buildDrawer`: прев'ю двох плиток |
+| `ui/TabIcons.kt` | `groupGlyph`: перед буквою вкладка пробує значок категорії (`CategoryGlyphs`) |
 
 ## Правила форка
 

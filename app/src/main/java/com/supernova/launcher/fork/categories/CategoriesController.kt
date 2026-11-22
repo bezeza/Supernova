@@ -72,10 +72,10 @@ class CategoriesController(
             emptyList()
         }
         if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent))
-        data.categories.filter { it.apps.isNotEmpty() }.mapTo(list) { CategoryRow.Tile(it) }
+        data.categories.mapTo(list) { CategoryRow.Tile(it) }
         if (data.loose.isNotEmpty()) {
             if (data.categories.isNotEmpty()) {
-                list.add(CategoryRow.Header(context.getString(R.string.categories_other_title)))
+                list.add(CategoryRow.Header(context.getString(R.string.fork_other_apps)))
             }
             data.loose.mapTo(list) { CategoryRow.Loose(it) }
         }

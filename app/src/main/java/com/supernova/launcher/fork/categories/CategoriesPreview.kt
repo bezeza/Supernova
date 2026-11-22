@@ -42,7 +42,7 @@ object CategoriesPreview {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ))
             column.addView(TextView(context).apply {
-                text = context.getString(R.string.style_categories)
+                text = context.getString(R.string.fork_drawer_style_categories)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, LABEL_SP)
                 setTextColor(textColor)
                 gravity = Gravity.CENTER_HORIZONTAL
