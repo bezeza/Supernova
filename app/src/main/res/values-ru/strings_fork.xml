@@ -16,4 +16,14 @@
     <string name="fork_pick_large_hint">Выберите большую иконку %1$d из %2$d</string>
     <string name="fork_tap_large_icon">Тап по большой иконке</string>
     <string name="fork_tap_large_icon_summary">Включено: запускает приложение, как в iOS. Выключено: любое касание плитки открывает категорию</string>
+    <string name="fork_sort_inside">Сортировка внутри: %1$s</string>
+    <string name="fork_hide_category">Скрыть категорию</string>
+    <string name="fork_folder_menu">Меню папки…</string>
+    <string name="fork_sort_drawer">Как в меню</string>
+    <string name="fork_sort_manual">Вручную</string>
+    <string name="fork_sort_alpha">По алфавиту</string>
+    <string name="fork_sort_frequency">По частоте запуска</string>
+    <string name="fork_hidden_categories">Скрытые категории: %1$d</string>
+    <string name="fork_show_again">Показать снова</string>
+    <string name="fork_recent_count">Сколько новых приложений</string>
 </resources>

@@ -39,6 +39,21 @@ object ForkSettings {
             R.string.fork_show_recent_installs, R.string.fork_show_recent_installs_summary,
             { it.categoriesShowRecent }
         ) { viewModel.set(Pref.categoriesShowRecent, it) },
+        SettingItem.Slider(
+            R.string.fork_recent_count,
+            min = 2, max = 8,
+            get = { it.categoriesRecentCount },
+            set = { viewModel.set(Pref.categoriesRecentCount, it) },
+            display = { it.toString() }
+        ).hiddenWhen {
+            when {
+                it.drawerStyle != DrawerStyle.CATEGORIES ->
+                    SettingItem.HiddenBy(R.string.drawer_style, SettingItem.HiddenBy.Needs.OTHER)
+                !it.categoriesShowRecent ->
+                    SettingItem.HiddenBy(R.string.fork_show_recent_installs, SettingItem.HiddenBy.Needs.ON)
+                else -> null
+            }
+        },
         categoriesToggle(
             R.string.fork_show_category_icons, R.string.fork_show_category_icons_summary,
             { it.categoriesShowIcons }

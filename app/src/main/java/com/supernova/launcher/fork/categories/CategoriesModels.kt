@@ -26,7 +26,16 @@ class CategoriesData(
     val categories: List<CategoryEntry>,
     val loose: List<LaunchableApp>,
     val recent: List<LaunchableApp>,
-    val look: TileLook
+    val look: TileLook,
+    val settings: CategorySettings = CategorySettings()
+)
+
+// Each category's own settings by folder id, the categories taken off the
+// tiles, and how many newest installs the row on top shows.
+class CategorySettings(
+    val options: Map<String, CategoryOptions> = emptyMap(),
+    val hidden: List<HiddenCategory> = emptyList(),
+    val recentCount: Int = CategoryLayout.RECENT_DEFAULT
 )
 
 // What a tap or a hold on a tile does. The drawer owns these: they launch an
@@ -38,7 +47,9 @@ class CategoriesActions(
     val onCategoryLongPress: (View, DrawerGroup, List<LaunchableApp>) -> Unit,
     // The apps tapped as the category's large icons, in the order tapped: the
     // folder takes them as its first apps.
-    val onPlaceLarge: (DrawerGroup, List<LaunchableApp>) -> Unit
+    val onPlaceLarge: (DrawerGroup, List<LaunchableApp>) -> Unit,
+    // A category's settings changed: its folder id and the change.
+    val onOptions: (String, (CategoryOptions) -> CategoryOptions) -> Unit
 )
 
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

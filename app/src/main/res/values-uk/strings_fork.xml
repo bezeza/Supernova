@@ -16,4 +16,14 @@
     <string name="fork_pick_large_hint">Оберіть велику іконку %1$d з %2$d</string>
     <string name="fork_tap_large_icon">Тап по великій іконці</string>
     <string name="fork_tap_large_icon_summary">Увімкнено: запускає застосунок, як в iOS. Вимкнено: будь-який тап по плитці відкриває категорію</string>
+    <string name="fork_sort_inside">Сортування всередині: %1$s</string>
+    <string name="fork_hide_category">Приховати категорію</string>
+    <string name="fork_folder_menu">Меню папки…</string>
+    <string name="fork_sort_drawer">Як у меню</string>
+    <string name="fork_sort_manual">Вручну</string>
+    <string name="fork_sort_alpha">За абеткою</string>
+    <string name="fork_sort_frequency">За частотою запуску</string>
+    <string name="fork_hidden_categories">Приховані категорії: %1$d</string>
+    <string name="fork_show_again">Показати знову</string>
+    <string name="fork_recent_count">Скільки нових застосунків</string>
 </resources>

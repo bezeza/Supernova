@@ -18,6 +18,7 @@ import com.supernova.launcher.ui.DrawerTabBar
 import com.supernova.launcher.ui.DrawerTabContent
 import com.supernova.launcher.ui.DrawerTabStyle
 import com.supernova.launcher.ui.DrawerTransition
+import com.supernova.launcher.fork.categories.CategoryLayout
 import com.supernova.launcher.ui.FolderMode
 import com.supernova.launcher.ui.FolderPreviewStyle
 import com.supernova.launcher.ui.FolderScroll
@@ -219,6 +220,8 @@ object Pref {
     val categoriesShowRecent = bool("categories_show_recent")
     val categoriesShowIcons = bool("categories_show_icons")
     val categoriesLaunchLarge = bool("categories_launch_large")
+    val categoriesRecentCount = int("categories_recent_count", CategoryLayout.RECENT_MIN..CategoryLayout.RECENT_MAX)
+    val categoriesOptions = text("categories_options")
     val categoriesSearchBottom = bool("categories_search_bottom")
     val smartFoldersDismissed = textSet("smart_folders_dismissed")
     val drawerIconScale = float("drawer_icon_scale", ICON_SCALE_MIN..ICON_SCALE_MAX)

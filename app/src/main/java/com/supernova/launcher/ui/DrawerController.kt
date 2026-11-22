@@ -29,6 +29,13 @@ import com.supernova.launcher.fork.ForkHooks
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
 import com.supernova.launcher.fork.categories.CategoriesData
+import com.supernova.launcher.fork.categories.CategoryOptions
+import com.supernova.launcher.fork.categories.CategorySettings
+import com.supernova.launcher.fork.categories.CategoryOptionsStore
+import com.supernova.launcher.fork.categories.CategoryOrder
+import com.supernova.launcher.fork.categories.CategorySort
+import com.supernova.launcher.fork.categories.HiddenCategory
+import com.supernova.launcher.fork.categories.Orderings
 import com.supernova.launcher.fork.categories.CategoryEntry
 import com.supernova.launcher.fork.categories.ScreenLook
 import com.supernova.launcher.fork.categories.TileLook
@@ -91,7 +98,8 @@ class DrawerController(
     private val categories: CategoriesController = ForkHooks.categories(
         binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
         CategoriesActions(
-            onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress, ::placeCategoryLarge
+            onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress, ::placeCategoryLarge,
+            ::changeCategoryOptions
         ),
         categoryAdapter
     )
@@ -1843,9 +1851,26 @@ class DrawerController(
         apps: List<LaunchableApp>
     ) {
         if (!categoriesStyle || tab != null) return
+        val options = CategoryOptionsStore.decode(prefs.categoriesOptions)
+        val usage = AppUsage(viewModel.launchCounts(), emptyList(), viewModel::hiddenKey)
+        val orderings = Orderings<LaunchableApp>(
+            alphabetical = { DrawerOrder.sorted(it, DrawerSort.ALPHA, usage) },
+            byUse = { DrawerOrder.sorted(it, DrawerSort.MOST_USED, usage) },
+            keyOf = viewModel::hiddenKey
+        )
+        val (hiddenFolders, shownFolders) = folders.partition { options[it.group.id]?.hidden == true }
         categories.submit(
             CategoriesData(
-                categories = folders.map { CategoryEntry(it.group, it.members) },
+                categories = shownFolders.map { entry ->
+                    val sort = options[entry.group.id]?.sort ?: CategorySort.DRAWER
+                    val members = entry.group.members.toList()
+                    CategoryEntry(entry.group, CategoryOrder.apply(entry.members, sort, members, orderings))
+                },
+                settings = CategorySettings(
+                    options,
+                    hiddenFolders.map { HiddenCategory(it.group.id, it.group.name) },
+                    prefs.categoriesRecentCount
+                ),
                 loose = apps,
                 recent = appsForTab(null),
                 look = TileLook(
@@ -1868,6 +1893,16 @@ class DrawerController(
     // Fork: the apps chosen as large icons become the folder's first apps, in the order chosen.
     private fun placeCategoryLarge(group: DrawerGroup, picked: List<LaunchableApp>) {
         picked.asReversed().forEach { viewModel.moveAppInFolder(group.id, it, LauncherViewModel.InFolderMove.START) }
+        // The choice is a manual order: a sort of its own would undo it.
+        changeCategoryOptions(group.id) { it.copy(sort = CategorySort.MANUAL) }
+    }
+
+    // Fork: one category's own options, stored by its folder id; the categories that are gone are dropped.
+    private fun changeCategoryOptions(id: String, change: (CategoryOptions) -> CategoryOptions) {
+        val raw = viewModel.state.value.prefs.categoriesOptions
+        val existing = viewModel.drawerGroups().map { it.id }
+        val updated = CategoryOptionsStore.update(raw, id, existing, change)
+        viewModel.set(com.supernova.launcher.data.Pref.categoriesOptions, updated)
     }
 
     // Fork: a category's own screen, set up as the drawer's grid is.

@@ -18,8 +18,8 @@ import com.supernova.launcher.data.LaunchableApp
 // The rows of the Categories drawer. A row's key says which row it is, its
 // content whether it changed, so a new list only rebinds what moved.
 internal sealed class CategoryRow(val key: String, val content: String) {
-    class Recent(val apps: List<LaunchableApp>) :
-        CategoryRow("recent", apps.joinToString(",") { appKey(it) })
+    class Recent(val apps: List<LaunchableApp>, val slots: Int) :
+        CategoryRow("recent", slots.toString() + ":" + apps.joinToString(",") { appKey(it) })
 
     class Tile(val entry: CategoryEntry) : CategoryRow(
         "tile/${entry.group.id}",
@@ -31,12 +31,17 @@ internal sealed class CategoryRow(val key: String, val content: String) {
     class Header(val text: String) : CategoryRow("header", text)
 
     class Loose(val app: LaunchableApp) : CategoryRow("app/${appKey(app)}", appKey(app))
+
+    // The way back for categories taken off the tiles.
+    class Hidden(val categories: List<HiddenCategory>) :
+        CategoryRow("hidden", categories.joinToString(",") { it.id })
 }
 
 // Four columns: a tile takes two, a full-width row all four, a loose app one.
 internal class CategoriesAdapter(
     private val icons: CategoryIcons,
-    private val actions: CategoriesActions
+    private val actions: CategoriesActions,
+    private val onShowHidden: (Context, List<HiddenCategory>) -> Unit
 ) : ListAdapter<CategoryRow, RecyclerView.ViewHolder>(Diff) {
 
     private var look = TileLook(textColor = 0)
@@ -60,6 +65,7 @@ internal class CategoriesAdapter(
         is CategoryRow.Tile -> TYPE_TILE
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
+        is CategoryRow.Hidden -> TYPE_HIDDEN
     }
 
     // A tile is two spans wide, a loose app one, anything else the whole row.
@@ -75,6 +81,7 @@ internal class CategoriesAdapter(
             TYPE_RECENT -> RecentHolder(context)
             TYPE_TILE -> TileHolder(context)
             TYPE_HEADER -> HeaderHolder(context)
+            TYPE_HIDDEN -> HiddenHolder(context)
             else -> LooseHolder(context)
         }
     }
@@ -85,6 +92,7 @@ internal class CategoriesAdapter(
             is CategoryRow.Tile -> (holder as TileHolder).bind(row)
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
+            is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
         }
     }
 
@@ -158,7 +166,7 @@ internal class CategoriesAdapter(
         private val shape = GradientDrawable()
         private val title = label(context, TILE_LABEL_SP, centred = false, lines = TITLE_LINES)
         private val row = LinearLayout(context)
-        private val slots = List(CategoryLayout.RECENT_LIMIT) { ImageView(context) }
+        private val slots = List(CategoryLayout.RECENT_MAX) { ImageView(context) }
 
         init {
             val column = itemView as LinearLayout
@@ -188,7 +196,12 @@ internal class CategoriesAdapter(
             title.setTextColor(textColor)
             slots.forEachIndexed { index, slot ->
                 val app = item.apps.getOrNull(index)
-                slot.visibility = if (app == null) View.INVISIBLE else View.VISIBLE
+                // Slots past the chosen count are not in the row at all.
+                slot.visibility = when {
+                    index >= item.slots -> View.GONE
+                    app == null -> View.INVISIBLE
+                    else -> View.VISIBLE
+                }
                 if (app == null) {
                     icons.clear(slot)
                     slot.setOnClickListener(null)
@@ -254,6 +267,26 @@ internal class CategoriesAdapter(
         }
     }
 
+    private inner class HiddenHolder(context: Context) : RecyclerView.ViewHolder(TextView(context)) {
+        private val text = itemView as TextView
+
+        init {
+            text.layoutParams = RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            text.setTextSize(TypedValue.COMPLEX_UNIT_SP, HEADER_SP)
+            text.gravity = Gravity.CENTER
+            val pad = dp(context, HEADER_PADDING_DP)
+            text.setPadding(pad, pad, pad, pad)
+        }
+
+        fun bind(row: CategoryRow.Hidden) {
+            text.text = text.context.getString(R.string.fork_hidden_categories, row.categories.size)
+            text.setTextColor(textColor)
+            text.setOnClickListener { onShowHidden(it.context, row.categories) }
+        }
+    }
+
     private object Diff : DiffUtil.ItemCallback<CategoryRow>() {
         override fun areItemsTheSame(old: CategoryRow, new: CategoryRow) = old.key == new.key
 
@@ -265,6 +298,7 @@ internal class CategoriesAdapter(
         const val TYPE_TILE = 1
         const val TYPE_HEADER = 2
         const val TYPE_LOOSE = 3
+        const val TYPE_HIDDEN = 4
         const val SPAN_TILE = 2
         const val TILE_LABEL_SP = 12f
         const val TITLE_LINES = 2
