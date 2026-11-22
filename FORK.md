@@ -132,7 +132,7 @@ PR маленькі: одна тема на один PR. Перед PR:
 ## Відомі проблеми
 Факти на 2026-11-22.
 
-- **Одеську локаль прибрано з `main` (2026-11-22)**: теку `values-b+ru+Cyrl+UA+odesa`, `tools/make_odesa.py`, `tools/odesa*.txt`, пункт у виборі мови (`AppLanguage`) і запис у `locales_config.xml`. Хто мав її обраною, бачить російську. Відновити можна з історії git (коміт перед цією зміною) або з гілки `translations-uk-ru-odesa`.
+- **Одеську локаль прибрано з `main` (2026-11-22)**: теку `values-b+ru+Cyrl+UA+odesa`, `tools/make_odesa.py`, `tools/odesa*.txt`, пункт у виборі мови (`AppLanguage`) і запис у `locales_config.xml`. Хто мав її обраною, при запуску отримує українську: `AppLanguage.migrateRemoved()`, один виклик у `SupernovaApp.onCreate`. У бекапі налаштувань мови немає (вона зберігається як локаль застосунку), тож старі бекапи цього не зачіпають. Відновити можна з історії git (коміт перед цією зміною) або з гілки `translations-uk-ru-odesa`.
 
 - **`main` більше не чисте дзеркало upstream.** У ньому вже власні коміти: CI ([PR #2](https://github.com/bezeza/Supernova/pull/2)), ці нотатки ([PR #3](https://github.com/bezeza/Supernova/pull/3)), переклади й фічі гілки перекладів ([PR #5](https://github.com/bezeza/Supernova/pull/5)). Тож `git merge --ff-only upstream/main` з розділу про синк більше не пройде, поки upstream не зрушить далі; підтягувати його доведеться звичайним merge з розв'язанням конфліктів. Розділи вище описують стан до цих PR і ще не переписані.
 - **Той самий `applicationId`, що в upstream:** `com.supernova.launcher` (`app/build.gradle.kts`). Debug-збірка додає суфікс `.debug`, тож debug ставиться поруч. Release-ідентифікатор збігається з F-Droid/upstream збіркою.
