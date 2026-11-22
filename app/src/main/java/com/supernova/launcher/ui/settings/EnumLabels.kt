@@ -271,6 +271,7 @@ object EnumLabels {
         DrawerStyle.VERTICAL_GRID -> R.string.style_vertical_grid
         DrawerStyle.PAGED_GRID -> R.string.style_paged_grid
         DrawerStyle.VERTICAL_LIST -> R.string.style_vertical_list
+        DrawerStyle.CATEGORIES -> R.string.style_categories
     }
 
     @StringRes

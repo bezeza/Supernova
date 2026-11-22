@@ -1,8 +1,14 @@
 package com.supernova.launcher.fork
 
+import android.graphics.drawable.Drawable
+import android.widget.FrameLayout
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.supernova.launcher.LauncherActivity
+import com.supernova.launcher.data.AppCatalog
+import com.supernova.launcher.data.LaunchableApp
+import com.supernova.launcher.fork.categories.CategoriesActions
+import com.supernova.launcher.fork.categories.CategoriesController
 
 /**
  * The fork's only entry point inside [LauncherActivity].
@@ -22,6 +28,17 @@ object ForkHooks {
     fun attach(activity: LauncherActivity) {
         activity.lifecycle.addObserver(observer)
     }
+
+    /**
+     * The Categories drawer's list, added to the drawer's list [container].
+     * DrawerController builds it once and feeds it; see fork/categories.
+     */
+    fun categories(
+        container: FrameLayout,
+        catalog: AppCatalog,
+        decorateIcon: (Drawable?, LaunchableApp) -> Drawable?,
+        actions: CategoriesActions
+    ): CategoriesController = CategoriesController(container, catalog, decorateIcon, actions)
 
     private val observer = object : DefaultLifecycleObserver {
         /** Fork work that should run each time the launcher becomes visible plugs in here. */

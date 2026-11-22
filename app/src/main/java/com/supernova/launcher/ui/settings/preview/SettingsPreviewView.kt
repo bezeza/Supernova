@@ -14,6 +14,7 @@ import com.supernova.launcher.R
 import com.supernova.launcher.data.LaunchableApp
 import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.data.Pref
+import com.supernova.launcher.fork.categories.CategoriesPreview
 import com.supernova.launcher.ui.BadgeLook
 import com.supernova.launcher.ui.DockBgStyle
 import com.supernova.launcher.ui.DockPages
@@ -1198,6 +1199,8 @@ class SettingsPreviewView @JvmOverloads constructor(
             apps.take(DRAWER_LIST_ROWS).forEach { (app, icon) ->
                 items.addView(drawerListRow(icon, app.label), matchWidth())
             }
+        } else if (prefs.drawerStyle == com.supernova.launcher.ui.DrawerStyle.CATEGORIES) { // Fork
+            items.addView(CategoriesPreview.row(context, apps.map { it.second }, resolved.text), matchWidth())
         } else {
             val row = newRow()
             apps.take(columns).forEach { (app, icon) ->

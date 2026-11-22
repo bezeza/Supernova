@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings of the fork's own features, kept out of strings.xml so upstream syncs and the
+     locale generator never touch them. -->
+<resources>
+    <string name="style_categories">Категории</string>
+    <string name="categories_show_recent">Показывать недавно установленные</string>
+    <string name="categories_show_recent_summary">Строка новейших приложений над категориями</string>
+    <string name="categories_recent_title">Недавно установленные</string>
+    <string name="categories_other_title">Другие приложения</string>
+</resources>

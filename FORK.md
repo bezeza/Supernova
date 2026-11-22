@@ -85,6 +85,28 @@ git push origin main
 - Док до 7 сторінок: `Pref.DOCK_PAGES_MAX = 7`. [PR #1](https://github.com/bezeza/Supernova/pull/1) піднімає стелю до 9 (`DOCK_PAGES_MAX = 9` на `443a1d8`). Цей коміт у кінець гілки перекладів не входить: там окремий коміт `48b7eef` («Dock up to 7 pages…»).
 - README гілки пише «Smaller release build (R8 and resource shrinking)». Виміру «5 МБ замість 28 МБ» у git немає. На `main` v0.2.8 `isMinifyEnabled` і `isShrinkResources` уже увімкнені; diff `app/build.gradle.kts` проти цієї гілки — лише `versionCode` / `versionName`. Профіль `-Pslim` (en/ru, `armeabi-v7a` + `arm64-v8a`, xxhdpi) є на `ccr-c6390468-djw86f`, не на гілці перекладів.
 
+## Стиль меню «Категорії»
+
+Налаштування → Меню → Стиль меню → **Категорії** (як App Library в iOS і HyperOS). За замовчуванням лишається `VERTICAL_GRID`.
+
+**Вигляд.** Плитки-категорії по 2 в ряд (на широкому екрані, в ландшафті чи на планшеті, більше: плитка не ширша за 200 dp), кругле напівпрозоре тло, підпис під плиткою. У плитці 3 великі іконки (тап запускає застосунок) і кут із 4 мініатюрами (тап відкриває категорію через наявний `FolderPopup`). Довге натискання на плитку дає меню папки, на іконку меню застосунку. Бейджі сповіщень лишаються на великих іконках (на мініатюрах їх нема: надто дрібні). Зверху необов'язковий рядок «Нещодавно встановлені» (4 іконки, за `installTime`), перемикач у налаштуваннях.
+
+**Дані.** Категорії це наявні FOLDER-групи (розумні й користувацькі), у тому ж порядку, що й плитки папок у звичайному меню. Порядок застосунків у плитці дає `viewModel.drawerFolderApps`, тобто поточне `DrawerSort` (або ручний порядок папки). Застосунки поза папками (без `keepInMain` це решта) йдуть нижче під заголовком «Інші застосунки» сіткою на 4 колонки, щоб жоден застосунок не зник із меню.
+
+**Як вбудовано.** Категорії малюють окремий `RecyclerView` у `drawerListContainer`, поверх звичайного списку. Він видимий, лише коли стиль Категорії, відкрита вкладка «Усі» і поле пошуку порожнє. Пошук і вкладки лишаються звичайними списками меню. Для решти коду `DrawerController` стиль Категорії це `VERTICAL_GRID` (`currentStyle`), тож розкладка, колонки, швидка прокрутка й тло працюють як раніше.
+
+**Файли форку:** `fork/categories/` (`CategoryLayout` розкладка 3+4 і «нещодавні», `CategoriesController`, `CategoriesAdapter`, `CategoryTileCard`, `CategoryIcons`, `CategoriesPreview`, `CategoriesModels`), `fork/ForkHooks.kt`, `ui/settings/ForkSettings.kt` (перемикач), `res/values*/strings_fork.xml` (en, uk, ru, одеська; генератор `gen_locale.py` їх не чіпає). Тести: `fork/categories/CategoryLayoutTest`.
+
+**Файли автора, зачеплені гачками.** Тут чекати конфліктів при синхронізації:
+
+| Файл | Що змінено |
+|---|---|
+| `ui/DrawerConfig.kt` | `CATEGORIES` доданий у **кінець** `DrawerStyle` (старі бекапи читаються). Не переставляти |
+| `ui/DrawerController.kt` | імпорти `fork.*`; поле `categories` і `categoriesStyle` після `val adapter`; у `applyStyle` `currentStyle` для Категорій дорівнює `VERTICAL_GRID`; гілка `when (currentStyle)` розширена до `VERTICAL_GRID, CATEGORIES`; `applyListVisibility` (видимість списку); виклики `applyListVisibility()` у обробнику тексту пошуку й у скиданні пошуку; блок `categories.submit` в кінці `submit()`; `categories.rebind()` у `notifyContentChanged()` і при зміні іконок в `onState`. Усі місця позначені `Fork` |
+| `data/Models.kt`, `data/Pref.kt` | прапор `categoriesShowRecent` / `categories_show_recent` |
+| `ui/settings/EnumLabels.kt` | підпис `style_categories` для `DrawerStyle.CATEGORIES` |
+| `ui/settings/preview/SettingsPreviewView.kt` | гілка `else if` у `buildDrawer`: прев'ю двох плиток |
+
 ## Правила форка
 
 Код фіч форка живе в пакеті `com.supernova.launcher.fork`. Цього пакета в дереві ще немає.

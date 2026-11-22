@@ -25,6 +25,10 @@ import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.runLogged
 import com.supernova.launcher.search.AppSearchProvider
 import com.supernova.launcher.databinding.ActivityLauncherBinding
+import com.supernova.launcher.fork.ForkHooks
+import com.supernova.launcher.fork.categories.CategoriesActions
+import com.supernova.launcher.fork.categories.CategoriesData
+import com.supernova.launcher.fork.categories.CategoryEntry
 import com.supernova.launcher.ui.theme.Styles
 import com.supernova.launcher.ui.theme.SurfaceId
 import kotlin.math.roundToInt
@@ -75,6 +79,14 @@ class DrawerController(
     private object PrivateTab
 
     val adapter = newCellAdapter()
+
+    // Fork: the Categories style's own list. Everything it does lives in
+    // fork/categories; the hooks in this file are marked "Fork:".
+    private val categories = ForkHooks.categories(
+        binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
+        CategoriesActions(onAppClick, onAppLongPress, onFolderClick, onFolderLongPress)
+    )
+    private var categoriesStyle = false
 
     // A group tab held and moved along the bar: the group tabs in a new order.
     // The selected tab's indicator colour, which a tab drag hides meanwhile.
@@ -420,8 +432,10 @@ class DrawerController(
         // A paged drawer with nothing to page (an empty tab, no matches)
         // shows the flat list, where the empty state and the search rows live.
         val pagedEmpty = paged && adapter.items().isEmpty()
-        binding.drawerRecycler.visibility =
-            if (searchingExternally || (paged && !pagedEmpty)) View.GONE else View.VISIBLE
+        val categoriesShown = categoriesShown() // Fork
+        categories.setVisible(categoriesShown)
+        val flatHidden = categoriesShown || (paged && !pagedEmpty)
+        binding.drawerRecycler.visibility = if (searchingExternally || flatHidden) View.GONE else View.VISIBLE
         binding.drawerPager.visibility =
             if (!searchingExternally && paged && !pagedEmpty) View.VISIBLE else View.GONE
     }
@@ -611,6 +625,7 @@ class DrawerController(
                 adapter.filter(query)
                 syncPages()
             }
+            applyListVisibility()
             updateFastScrollerVisibility()
             updateFrequentRow()
         }
@@ -1225,6 +1240,7 @@ class DrawerController(
         showSearchResults(false)
         adapter.filter("")
         syncPages()
+        applyListVisibility()
         updateFastScrollerVisibility()
         updateFrequentRow()
     }
@@ -1513,7 +1529,10 @@ class DrawerController(
             submit()
             // The app list is unchanged when only an override moved, so DiffUtil
             // won't rebind; force it so the re-rendered icons show immediately.
-            if (iconsChanged) adapter.notifyDataSetChanged()
+            if (iconsChanged) {
+                adapter.notifyDataSetChanged()
+                categories.rebind() // Fork
+            }
             syncPages()
         } else {
             needsRefresh = true
@@ -1598,6 +1617,7 @@ class DrawerController(
 
     fun notifyContentChanged() {
         adapter.notifyDataSetChanged()
+        categories.rebind() // Fork
         syncPages()
         // The recents row's icons carry badges too, and its key can't see a
         // count move.
@@ -1783,6 +1803,8 @@ class DrawerController(
             if (section) viewModel.privateApps() else emptyList()
         )
         adapter.submit(apps, folders, prefs.drawerFoldersFirst, listOrder(prefs), replace)
+        submitCategories(prefs, tab, folders, apps) // Fork
+        applyListVisibility()
         revealPrivateSectionIfDue()
         // The first apps make a tile measurable.
         if (adapter.tileHeightPx == 0) refreshGridRows(prefs)
@@ -1791,6 +1813,29 @@ class DrawerController(
         syncPages()
         updateFrequentRow()
     }
+
+    // Fork: the Categories list, from the same folders and apps as the grid.
+    private fun submitCategories(
+        prefs: LauncherPrefs,
+        tab: Any?,
+        folders: List<AppDrawerAdapter.FolderEntry>,
+        apps: List<LaunchableApp>
+    ) {
+        if (!categoriesStyle || tab != null) return
+        categories.submit(
+            CategoriesData(
+                categories = folders.map { CategoryEntry(it.group, it.members) },
+                loose = apps,
+                recent = appsForTab(null),
+                textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text
+            ),
+            showRecent = prefs.categoriesShowRecent
+        )
+    }
+
+    // Fork: the Categories list covers the grid on the All tab, unsearched.
+    private fun categoriesShown(): Boolean = categoriesStyle && selectedTab == null &&
+        !searchingExternally && binding.drawerSearch.text.isNullOrEmpty()
 
     private fun listOrder(prefs: LauncherPrefs): AppDrawerAdapter.Order =
         when (prefs.drawerSort) {
@@ -2273,11 +2318,14 @@ class DrawerController(
 
         applyInsetPadding()
 
-        currentStyle = prefs.drawerStyle
+        // Fork: Categories lays the usual grid out for search and tabs, and
+        // draws its own list over it on the All tab.
+        categoriesStyle = prefs.drawerStyle == DrawerStyle.CATEGORIES
+        currentStyle = if (categoriesStyle) DrawerStyle.VERTICAL_GRID else prefs.drawerStyle
         val recycler = binding.drawerRecycler
 
         when (currentStyle) {
-            DrawerStyle.VERTICAL_GRID -> {
+            DrawerStyle.VERTICAL_GRID, DrawerStyle.CATEGORIES -> {
                 adapter.displayMode = AppDrawerAdapter.DisplayMode.TILE
                 val columns = columnCount(prefs)
                 adapter.tileWidthPx = gridWidthPx() / columns
