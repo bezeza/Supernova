@@ -44,6 +44,10 @@ object ForkSettings {
             { it.categoriesShowIcons }
         ) { viewModel.set(Pref.categoriesShowIcons, it) },
         categoriesToggle(
+            R.string.fork_tap_large_icon, R.string.fork_tap_large_icon_summary,
+            { it.categoriesLaunchLarge }
+        ) { viewModel.set(Pref.categoriesLaunchLarge, it) },
+        categoriesToggle(
             R.string.fork_search_at_bottom, R.string.fork_search_at_bottom_summary,
             { it.categoriesSearchBottom }
         ) { viewModel.set(Pref.categoriesSearchBottom, it) }

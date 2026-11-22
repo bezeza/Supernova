@@ -31,6 +31,7 @@ import com.supernova.launcher.fork.categories.CategoriesController
 import com.supernova.launcher.fork.categories.CategoriesData
 import com.supernova.launcher.fork.categories.CategoryEntry
 import com.supernova.launcher.fork.categories.ScreenLook
+import com.supernova.launcher.fork.categories.TileLook
 import com.supernova.launcher.ui.theme.Styles
 import com.supernova.launcher.ui.theme.SurfaceId
 import kotlin.math.roundToInt
@@ -1847,10 +1848,13 @@ class DrawerController(
                 categories = folders.map { CategoryEntry(it.group, it.members) },
                 loose = apps,
                 recent = appsForTab(null),
-                textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text,
-                backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
-                    .styleFor(SurfaceId.DRAWER).alpha ?: prefs.drawerBgOpacity,
-                showIcons = prefs.categoriesShowIcons
+                look = TileLook(
+                    textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text,
+                    backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
+                        .styleFor(SurfaceId.DRAWER).alpha ?: prefs.drawerBgOpacity,
+                    showIcons = prefs.categoriesShowIcons,
+                    launchFromIcons = prefs.categoriesLaunchLarge
+                )
             ),
             showRecent = prefs.categoriesShowRecent
         )

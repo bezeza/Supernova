@@ -122,8 +122,8 @@ class CategoriesController(
 
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
-        rows.setLook(data.textColor, data.backdrop, data.showIcons)
-        screen.setLook(data.textColor, data.showIcons)
+        rows.setLook(data.look)
+        screen.setLook(data.look.textColor, data.look.showIcons)
         if (state.isOpen) {
             val open = data.categories.firstOrNull { it.group.id == state.openId }
             if (open != null && state.sync(data.categories.map { it.group.id })) screen.update(open.apps)

@@ -14,4 +14,6 @@
     <string name="fork_search_at_bottom_summary">Рядок пошуку внизу меню, лише у стилі «Категорії»</string>
     <string name="fork_pick_large">Вибрати великі іконки</string>
     <string name="fork_pick_large_hint">Оберіть велику іконку %1$d з %2$d</string>
+    <string name="fork_tap_large_icon">Тап по великій іконці</string>
+    <string name="fork_tap_large_icon_summary">Увімкнено: запускає застосунок, як в iOS. Вимкнено: будь-який тап по плитці відкриває категорію</string>
 </resources>

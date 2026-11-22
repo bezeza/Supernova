@@ -39,20 +39,17 @@ internal class CategoriesAdapter(
     private val actions: CategoriesActions
 ) : ListAdapter<CategoryRow, RecyclerView.ViewHolder>(Diff) {
 
-    private var textColor = 0
-    private var backdrop = 1f
-    private var showIcons = false
+    private var look = TileLook(textColor = 0)
+    private val textColor: Int get() = look.textColor
 
     init {
         setHasStableIds(true)
     }
 
-    // The colours or the icon switch moved: the rows redraw.
-    fun setLook(textColor: Int, backdrop: Float, showIcons: Boolean) {
-        if (textColor == this.textColor && backdrop == this.backdrop && showIcons == this.showIcons) return
-        this.textColor = textColor
-        this.backdrop = backdrop
-        this.showIcons = showIcons
+    // The colours or a switch moved: the rows redraw.
+    fun setLook(look: TileLook) {
+        if (look == this.look) return
+        this.look = look
         notifyItemRangeChanged(0, itemCount)
     }
 
@@ -91,7 +88,7 @@ internal class CategoriesAdapter(
         }
     }
 
-    private fun cardColor(): Int = CategoryTint.cardColor(textColor, backdrop)
+    private fun cardColor(): Int = CategoryTint.cardColor(textColor, look.backdrop)
 
     private fun label(context: Context, sizeSp: Float, centred: Boolean, lines: Int = 1): TextView =
         TextView(context).apply {
@@ -107,7 +104,7 @@ internal class CategoriesAdapter(
     // The category's own icon before its name, in the drawer's text colour.
     private fun showGlyph(title: TextView, name: String) {
         val context = title.context
-        val glyph = if (showIcons) CategoryGlyphs.forName(context, name) else null
+        val glyph = if (look.showIcons) CategoryGlyphs.forName(context, name) else null
         if (glyph == null) {
             title.setCompoundDrawablesRelative(null, null, null, null)
             return
@@ -149,7 +146,8 @@ internal class CategoriesAdapter(
             itemView.contentDescription = itemView.context.getString(R.string.folder_desc, entry.group.name)
             val open = { view: View -> actions.onCategory(view, entry.group, entry.apps) }
             val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
-            card.bind(row.layout, icons, open = open, openLongPress = openLongPress)
+            card.launchFromIcons = look.launchFromIcons
+            card.bind(row.layout, icons, actions, open = open, openLongPress = openLongPress)
             // The name under the tile opens it too.
             itemView.setOnClickListener(open)
             itemView.setOnLongClickListener { openLongPress(it); true }

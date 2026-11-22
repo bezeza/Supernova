@@ -218,6 +218,7 @@ object Pref {
     val autoSortNewApps = bool("auto_sort_new_apps")
     val categoriesShowRecent = bool("categories_show_recent")
     val categoriesShowIcons = bool("categories_show_icons")
+    val categoriesLaunchLarge = bool("categories_launch_large")
     val categoriesSearchBottom = bool("categories_search_bottom")
     val smartFoldersDismissed = textSet("smart_folders_dismissed")
     val drawerIconScale = float("drawer_icon_scale", ICON_SCALE_MIN..ICON_SCALE_MAX)

@@ -34,15 +34,19 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     }
 
     init {
-        addView(corner)
         addView(empty)
         (large + mini).forEach { view ->
             view.scaleType = ImageView.ScaleType.FIT_CENTER
             addView(view)
         }
+        // Last, so over the large icons beside it: its target is bigger than its cell.
+        addView(corner)
         shape.cornerRadius = resources.displayMetrics.density * CORNER_DP
         background = shape
     }
+
+    // True: a tap on a large icon launches the app, as in iOS. False: every tap opens the category.
+    var launchFromIcons = true
 
     fun setCardColor(color: Int) = shape.setColor(color)
 
@@ -51,6 +55,7 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     fun bind(
         tile: CategoryLayout.Tile<LaunchableApp>,
         icons: CategoryIcons,
+        actions: CategoriesActions,
         open: (View) -> Unit,
         openLongPress: (View) -> Unit
     ) {
@@ -70,11 +75,16 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
             } else {
                 icons.bind(view, app)
                 view.contentDescription = app.label
-                // Not tappable themselves: a tap anywhere on the tile opens the
-                // category, and apps launch from its screen.
-                view.setOnClickListener(null)
-                view.setOnLongClickListener(null)
-                view.isClickable = false
+                if (launchFromIcons) {
+                    view.setOnClickListener { actions.onApp(it, app) }
+                    view.setOnLongClickListener { actions.onAppLongPress(it, app); true }
+                } else {
+                    // Not tappable themselves: a tap anywhere on the tile opens
+                    // the category, and apps launch from its screen.
+                    view.setOnClickListener(null)
+                    view.setOnLongClickListener(null)
+                    view.isClickable = false
+                }
             }
         }
         mini.forEachIndexed { index, view ->
@@ -98,8 +108,11 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         large.forEach { it.measure(largeSize, largeSize) }
         val miniSize = MeasureSpec.makeMeasureSpec((cell / 2 * ICON_FILL).toInt(), MeasureSpec.EXACTLY)
         mini.forEach { it.measure(miniSize, miniSize) }
-        val cellSpec = MeasureSpec.makeMeasureSpec(cell, MeasureSpec.EXACTLY)
-        corner.measure(cellSpec, cellSpec)
+        val target = TileGeometry.cornerTarget(side, padding(side), cell)
+        corner.measure(
+            MeasureSpec.makeMeasureSpec(target.width, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(target.height, MeasureSpec.EXACTLY)
+        )
         val inner = side - 2 * padding(side)
         empty.measure(
             MeasureSpec.makeMeasureSpec(inner, MeasureSpec.EXACTLY),
@@ -116,7 +129,8 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         }
         val cornerX = pad + cell
         val cornerY = pad + cell
-        corner.layout(cornerX, cornerY, cornerX + cell, cornerY + cell)
+        val target = TileGeometry.cornerTarget(side, pad, cell)
+        corner.layout(target.left, target.top, target.right, target.bottom)
         centre(empty, pad, pad, side - 2 * pad)
         val half = cell / 2
         mini.forEachIndexed { index, view ->
