@@ -6,7 +6,9 @@ import com.supernova.launcher.data.SettingEnumSerializer
 enum class DrawerStyle {
     VERTICAL_GRID,
     PAGED_GRID,
-    VERTICAL_LIST;
+    VERTICAL_LIST,
+    // Fork: appended last, so a backup from before it still reads.
+    CATEGORIES;
 
     // Its name in the store and in a backup, read back leniently.
     object Names : SettingEnumSerializer<DrawerStyle>("DrawerStyle", entries, VERTICAL_GRID)

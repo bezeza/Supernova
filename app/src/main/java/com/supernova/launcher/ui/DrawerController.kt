@@ -25,6 +25,13 @@ import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.runLogged
 import com.supernova.launcher.search.AppSearchProvider
 import com.supernova.launcher.databinding.ActivityLauncherBinding
+import com.supernova.launcher.fork.ForkHooks
+import com.supernova.launcher.fork.categories.CategoriesActions
+import com.supernova.launcher.fork.categories.CategoriesController
+import com.supernova.launcher.fork.categories.CategoriesData
+import com.supernova.launcher.fork.categories.CategoryEntry
+import com.supernova.launcher.fork.categories.ScreenLook
+import com.supernova.launcher.fork.categories.TileLook
 import com.supernova.launcher.ui.theme.Styles
 import com.supernova.launcher.ui.theme.SurfaceId
 import kotlin.math.roundToInt
@@ -76,6 +83,20 @@ class DrawerController(
 
     val adapter = newCellAdapter()
 
+    // Fork: the Categories style's own list. Everything it does lives in
+    // fork/categories; the hooks in this file are marked "Fork:".
+    // A tap on a tile opens the category on a screen of its own, which draws
+    // its apps with a second adapter of the drawer's kind.
+    private val categoryAdapter: AppDrawerAdapter = newCellAdapter { view, app -> onCategoryAppClick(view, app) }
+    private val categories: CategoriesController = ForkHooks.categories(
+        binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
+        CategoriesActions(
+            onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress, ::placeCategoryLarge
+        ),
+        categoryAdapter
+    )
+    private var categoriesStyle = false
+
     // A group tab held and moved along the bar: the group tabs in a new order.
     // The selected tab's indicator colour, which a tab drag hides meanwhile.
     private var tabIndicatorColor = 0
@@ -83,11 +104,14 @@ class DrawerController(
         viewModel.setGroupOrder(com.supernova.launcher.data.DrawerGroupType.TAB, names)
     }
 
-    private fun newCellAdapter(): AppDrawerAdapter = AppDrawerAdapter(
+    private fun newCellAdapter(
+        // Fork: a category's screen intercepts taps.
+        onCellClick: (View, LaunchableApp) -> Unit = { view, app -> onAppClick(view, app) }
+    ): AppDrawerAdapter = AppDrawerAdapter(
         appCatalog = viewModel.appCatalog(),
         decorateIcon = decorateIcon,
         decorateFolderIcon = { icon, folder -> decorateFolderIcon(icon, folder.members) },
-        onClick = { view, app -> onAppClick(view, app) },
+        onClick = onCellClick,
         onLongPress = onAppLongPress,
         onWebSearch = { onWebSearch(binding.drawerSearch.text?.toString().orEmpty().trim()) },
         onChip = { chip, query -> onChipSearch(chip, query) },
@@ -199,25 +223,31 @@ class DrawerController(
     // A sideways swipe on the list moves to the neighbouring group tab (not
     // for the paged grid, which uses horizontal scroll for its pages).
     private fun attachTabSwipe() {
-        binding.drawerRecycler.addOnItemTouchListener(
-            TabSwipeDrag(
-                binding.drawerListContainer,
-                swipeable = ::tabSwipeable,
-                hasTab = { delta -> adjacentTab(delta) != null },
-                onCommit = { delta, remaining, velocity ->
-                    dragSettle = remaining to velocity
-                    selectAdjacentTab(delta)
-                    // No change after all (the bar changed under the finger).
-                    if (dragSettle != null) {
-                        dragSettle = null
-                        slideInTab(0)
-                    }
-                },
-                animate = { Animations.enabled(viewModel.state.value.prefs) },
-                onMoving = { moving -> showFastScroller(!moving) }
-            )
+        binding.drawerRecycler.addOnItemTouchListener(newTabSwipe { delta -> adjacentTab(delta) != null })
+        // Fork: the Categories tiles swipe between tabs too, and so does a
+        // category's screen, forward only: a swipe right there is its Back.
+        categories.addTabSwipe(
+            newTabSwipe { delta -> adjacentTab(delta) != null },
+            newTabSwipe { delta -> delta > 0 && adjacentTab(delta) != null }
         )
     }
+
+    private fun newTabSwipe(hasTab: (Int) -> Boolean) = TabSwipeDrag(
+        binding.drawerListContainer,
+        swipeable = ::tabSwipeable,
+        hasTab = hasTab,
+        onCommit = { delta, remaining, velocity ->
+            dragSettle = remaining to velocity
+            selectAdjacentTab(delta)
+            // No change after all (the bar changed under the finger).
+            if (dragSettle != null) {
+                dragSettle = null
+                slideInTab(0)
+            }
+        },
+        animate = { Animations.enabled(viewModel.state.value.prefs) },
+        onMoving = { moving -> showFastScroller(!moving) }
+    )
 
     // The tab that way from the selected one, or null at an end with Loop
     // tabs off.
@@ -420,8 +450,10 @@ class DrawerController(
         // A paged drawer with nothing to page (an empty tab, no matches)
         // shows the flat list, where the empty state and the search rows live.
         val pagedEmpty = paged && adapter.items().isEmpty()
-        binding.drawerRecycler.visibility =
-            if (searchingExternally || (paged && !pagedEmpty)) View.GONE else View.VISIBLE
+        val categoriesShown = categoriesShown() // Fork
+        categories.setVisible(categoriesShown)
+        val flatHidden = categoriesShown || (paged && !pagedEmpty)
+        binding.drawerRecycler.visibility = if (searchingExternally || flatHidden) View.GONE else View.VISIBLE
         binding.drawerPager.visibility =
             if (!searchingExternally && paged && !pagedEmpty) View.VISIBLE else View.GONE
     }
@@ -611,6 +643,7 @@ class DrawerController(
                 adapter.filter(query)
                 syncPages()
             }
+            applyListVisibility()
             updateFastScrollerVisibility()
             updateFrequentRow()
         }
@@ -1200,7 +1233,9 @@ class DrawerController(
     // Back with a query in the field: the query goes, and its watcher
     // brings the full list back. True when there was one.
     fun clearQuery(): Boolean {
-        if (binding.drawerSearch.text.isNullOrEmpty()) return false
+        // Fork: Back leaves a category's screen first.
+        val screenClosed = categories.back()
+        if (screenClosed || binding.drawerSearch.text.isNullOrEmpty()) return screenClosed
         binding.drawerSearch.text?.clear()
         // From the top, as the drawer opened: the results' scroll carried over.
         binding.drawerRecycler.scrollToPosition(0)
@@ -1210,6 +1245,7 @@ class DrawerController(
     // Clears the query once the sheet is off screen, so the next open starts
     // on the full list.
     private fun resetSearch() {
+        categories.closeScreen(animate = false) // Fork
         // The All tab's hidden-apps peek ends with the drawer, as a query does.
         showHiddenApps(false)
         // Only the drawer's own keyboard. The window has one IME, and when
@@ -1225,6 +1261,7 @@ class DrawerController(
         showSearchResults(false)
         adapter.filter("")
         syncPages()
+        applyListVisibility()
         updateFastScrollerVisibility()
         updateFrequentRow()
     }
@@ -1513,7 +1550,10 @@ class DrawerController(
             submit()
             // The app list is unchanged when only an override moved, so DiffUtil
             // won't rebind; force it so the re-rendered icons show immediately.
-            if (iconsChanged) adapter.notifyDataSetChanged()
+            if (iconsChanged) {
+                adapter.notifyDataSetChanged()
+                categories.rebind() // Fork
+            }
             syncPages()
         } else {
             needsRefresh = true
@@ -1598,6 +1638,7 @@ class DrawerController(
 
     fun notifyContentChanged() {
         adapter.notifyDataSetChanged()
+        categories.rebind() // Fork
         syncPages()
         // The recents row's icons carry badges too, and its key can't see a
         // count move.
@@ -1783,6 +1824,8 @@ class DrawerController(
             if (section) viewModel.privateApps() else emptyList()
         )
         adapter.submit(apps, folders, prefs.drawerFoldersFirst, listOrder(prefs), replace)
+        submitCategories(prefs, tab, folders, apps) // Fork
+        applyListVisibility()
         revealPrivateSectionIfDue()
         // The first apps make a tile measurable.
         if (adapter.tileHeightPx == 0) refreshGridRows(prefs)
@@ -1791,6 +1834,65 @@ class DrawerController(
         syncPages()
         updateFrequentRow()
     }
+
+    // Fork: the Categories list, from the same folders and apps as the grid.
+    private fun submitCategories(
+        prefs: LauncherPrefs,
+        tab: Any?,
+        folders: List<AppDrawerAdapter.FolderEntry>,
+        apps: List<LaunchableApp>
+    ) {
+        if (!categoriesStyle || tab != null) return
+        categories.submit(
+            CategoriesData(
+                categories = folders.map { CategoryEntry(it.group, it.members) },
+                loose = apps,
+                recent = appsForTab(null),
+                look = TileLook(
+                    textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text,
+                    backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
+                        .styleFor(SurfaceId.DRAWER).alpha ?: prefs.drawerBgOpacity,
+                    showIcons = prefs.categoriesShowIcons,
+                    launchFromIcons = prefs.categoriesLaunchLarge
+                )
+            ),
+            showRecent = prefs.categoriesShowRecent
+        )
+    }
+
+    // Fork: an app tapped on a category's screen launches, unless its large icons are being chosen.
+    private fun onCategoryAppClick(view: View, app: LaunchableApp) {
+        categories.onScreenAppClick({ onAppClick(view, app) }, app)
+    }
+
+    // Fork: the apps chosen as large icons become the folder's first apps, in the order chosen.
+    private fun placeCategoryLarge(group: DrawerGroup, picked: List<LaunchableApp>) {
+        picked.asReversed().forEach { viewModel.moveAppInFolder(group.id, it, LauncherViewModel.InFolderMove.START) }
+    }
+
+    // Fork: a category's own screen, set up as the drawer's grid is.
+    @Suppress("UNUSED_PARAMETER")
+    private fun openCategoryScreen(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
+        val prefs = viewModel.state.value.prefs
+        val recycler = binding.drawerRecycler
+        categoryAdapter.displayMode = adapter.displayMode
+        categoryAdapter.tileWidthPx = adapter.tileWidthPx
+        categoryAdapter.tileHeightPx = adapter.tileHeightPx
+        categoryAdapter.tileContentPx = adapter.tileContentPx
+        categoryAdapter.tileCompactPx = adapter.tileCompactPx
+        lastDisplay?.let { categoryAdapter.setDisplay(it.first, it.second, it.third) }
+        categories.openScreen(
+            group, apps,
+            ScreenLook(
+                columnCount(prefs), recycler.paddingLeft, recycler.paddingTop,
+                recycler.paddingRight, recycler.paddingBottom
+            )
+        )
+    }
+
+    // Fork: the Categories list covers the grid on the All tab, unsearched.
+    private fun categoriesShown(): Boolean = categoriesStyle && selectedTab == null &&
+        !searchingExternally && binding.drawerSearch.text.isNullOrEmpty()
 
     private fun listOrder(prefs: LauncherPrefs): AppDrawerAdapter.Order =
         when (prefs.drawerSort) {
@@ -2089,6 +2191,7 @@ class DrawerController(
     private fun applyStyle(prefs: LauncherPrefs) {
         val key = listOf(
             prefs.drawerStyle, prefs.drawerColumns, prefs.drawerRows,
+            prefs.categoriesSearchBottom, // Fork
             prefs.drawerBgOpacity,
             prefs.drawerFastScroller, prefs.drawerBgColor,
             prefs.styleConfig, prefs.paletteSource, prefs.paletteSeed,
@@ -2115,7 +2218,10 @@ class DrawerController(
         val searchConfig = SearchBarConfig.decode(prefs.searchBarConfig).drawer
         val barPlacement = DrawerBarPlacement.fromConfig(searchConfig)
         searchFieldVisible = barPlacement != DrawerBarPlacement.HIDDEN
-        searchAtBottom = barPlacement == DrawerBarPlacement.BOTTOM
+        // Fork: Categories can put the search row at the bottom on its own switch.
+        searchAtBottom = barPlacement == DrawerBarPlacement.BOTTOM ||
+            (barPlacement != DrawerBarPlacement.HIDDEN && prefs.drawerStyle == DrawerStyle.CATEGORIES &&
+                prefs.categoriesSearchBottom)
         if (!searchAtBottom) searchRowLifted = false
         searchGlobalOnTap = searchConfig.globalOnTap
         binding.drawerSearchField.visibility = if (searchFieldVisible) View.VISIBLE else View.GONE
@@ -2273,11 +2379,14 @@ class DrawerController(
 
         applyInsetPadding()
 
-        currentStyle = prefs.drawerStyle
+        // Fork: Categories lays the usual grid out for search and tabs, and
+        // draws its own list over it on the All tab.
+        categoriesStyle = prefs.drawerStyle == DrawerStyle.CATEGORIES
+        currentStyle = if (categoriesStyle) DrawerStyle.VERTICAL_GRID else prefs.drawerStyle
         val recycler = binding.drawerRecycler
 
         when (currentStyle) {
-            DrawerStyle.VERTICAL_GRID -> {
+            DrawerStyle.VERTICAL_GRID, DrawerStyle.CATEGORIES -> {
                 adapter.displayMode = AppDrawerAdapter.DisplayMode.TILE
                 val columns = columnCount(prefs)
                 adapter.tileWidthPx = gridWidthPx() / columns

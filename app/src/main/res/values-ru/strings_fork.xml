@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings of the fork's own features, kept out of strings.xml so upstream syncs and the
+     locale generator never touch them. -->
+<resources>
+    <string name="fork_drawer_style_categories">Категории</string>
+    <string name="fork_show_recent_installs">Показывать новые приложения</string>
+    <string name="fork_show_recent_installs_summary">Строка новых приложений вверху меню</string>
+    <string name="fork_recent_installs_title">Недавно установленные</string>
+    <string name="fork_empty_category">В этой категории пока нет приложений</string>
+    <string name="fork_other_apps">Другие приложения</string>
+    <string name="fork_show_category_icons">Показывать значки категорий</string>
+    <string name="fork_show_category_icons_summary">Значок перед названием категории на плитке и на её экране</string>
+    <string name="fork_search_at_bottom">Поиск внизу</string>
+    <string name="fork_search_at_bottom_summary">Строка поиска внизу меню, только в стиле «Категории»</string>
+    <string name="fork_pick_large">Выбрать большие иконки</string>
+    <string name="fork_pick_large_hint">Выберите большую иконку %1$d из %2$d</string>
+    <string name="fork_tap_large_icon">Тап по большой иконке</string>
+    <string name="fork_tap_large_icon_summary">Включено: запускает приложение, как в iOS. Выключено: любое касание плитки открывает категорию</string>
+</resources>

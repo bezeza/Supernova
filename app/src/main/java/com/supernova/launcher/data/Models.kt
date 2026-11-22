@@ -265,6 +265,12 @@ data class LauncherPrefs(
     val smartFolders: Boolean = true,
     // New installs go into the user's own folders by what those hold.
     val autoSortNewApps: Boolean = false,
+    // Fork: the Categories drawer's row of the newest installs.
+    val categoriesShowRecent: Boolean = true,
+    // Fork: the category icon before a tile's name, and the search row at the bottom.
+    val categoriesShowIcons: Boolean = false,
+    val categoriesLaunchLarge: Boolean = true,
+    val categoriesSearchBottom: Boolean = false,
     // Smart folders the user deleted, or a fresh install left out as too big,
     // by name: regenerating on an install leaves them out. Turning Smart
     // Folders on again clears it.

@@ -2,7 +2,9 @@ package com.supernova.launcher.ui.settings
 
 import android.content.Context
 import com.supernova.launcher.R
+import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.data.Pref
+import com.supernova.launcher.ui.DrawerStyle
 import com.supernova.launcher.ui.LauncherViewModel
 
 // The settings rows this fork adds. They are slipped into the catalogue's
@@ -19,11 +21,47 @@ object ForkSettings {
         SettingsCatalogue.sections(context, viewModel, actions).map { section ->
             if (section.title == R.string.settings_section_drawer) {
                 val extra = autoSortRows(context, viewModel, actions)
-                SettingsSection(section.title, afterSmartFolders(section.items, extra))
+                val withStyleRows = afterDrawerStyle(section.items, categoriesRows(viewModel))
+                SettingsSection(section.title, afterSmartFolders(withStyleRows, extra))
             } else {
                 section
             }
         }
+
+    private fun afterDrawerStyle(items: List<SettingItem>, extra: List<SettingItem>): List<SettingItem> {
+        val at = items.indexOfFirst { it.title == R.string.drawer_style }
+        return if (at < 0) items else items.take(at + 1) + extra + items.drop(at + 1)
+    }
+
+    // Only while the Categories style is picked.
+    private fun categoriesRows(viewModel: LauncherViewModel): List<SettingItem> = listOf(
+        categoriesToggle(
+            R.string.fork_show_recent_installs, R.string.fork_show_recent_installs_summary,
+            { it.categoriesShowRecent }
+        ) { viewModel.set(Pref.categoriesShowRecent, it) },
+        categoriesToggle(
+            R.string.fork_show_category_icons, R.string.fork_show_category_icons_summary,
+            { it.categoriesShowIcons }
+        ) { viewModel.set(Pref.categoriesShowIcons, it) },
+        categoriesToggle(
+            R.string.fork_tap_large_icon, R.string.fork_tap_large_icon_summary,
+            { it.categoriesLaunchLarge }
+        ) { viewModel.set(Pref.categoriesLaunchLarge, it) },
+        categoriesToggle(
+            R.string.fork_search_at_bottom, R.string.fork_search_at_bottom_summary,
+            { it.categoriesSearchBottom }
+        ) { viewModel.set(Pref.categoriesSearchBottom, it) }
+    )
+
+    private fun categoriesToggle(
+        title: Int,
+        summary: Int,
+        get: (LauncherPrefs) -> Boolean,
+        set: (Boolean) -> Unit
+    ): SettingItem = SettingItem.Toggle(title, get = get, set = set, subtitle = summary).hiddenWhen {
+        SettingItem.HiddenBy(R.string.drawer_style, SettingItem.HiddenBy.Needs.OTHER)
+            .takeIf { _ -> it.drawerStyle != DrawerStyle.CATEGORIES }
+    }
 
     private fun afterSmartFolders(items: List<SettingItem>, extra: List<SettingItem>): List<SettingItem> {
         val at = items.indexOfFirst { it.title == R.string.smart_folders }

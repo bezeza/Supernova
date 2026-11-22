@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings of the fork's own features, kept out of strings.xml so upstream syncs and the
+     locale generator never touch them. -->
+<resources>
+    <string name="fork_drawer_style_categories">Категорії</string>
+    <string name="fork_show_recent_installs">Показувати нові застосунки</string>
+    <string name="fork_show_recent_installs_summary">Рядок нових застосунків угорі меню</string>
+    <string name="fork_recent_installs_title">Нещодавно встановлені</string>
+    <string name="fork_empty_category">У цій категорії ще немає застосунків</string>
+    <string name="fork_other_apps">Інші застосунки</string>
+    <string name="fork_show_category_icons">Показувати значки категорій</string>
+    <string name="fork_show_category_icons_summary">Значок перед назвою категорії на плитці й на її екрані</string>
+    <string name="fork_search_at_bottom">Пошук унизу</string>
+    <string name="fork_search_at_bottom_summary">Рядок пошуку внизу меню, лише у стилі «Категорії»</string>
+    <string name="fork_pick_large">Вибрати великі іконки</string>
+    <string name="fork_pick_large_hint">Оберіть велику іконку %1$d з %2$d</string>
+    <string name="fork_tap_large_icon">Тап по великій іконці</string>
+    <string name="fork_tap_large_icon_summary">Увімкнено: запускає застосунок, як в iOS. Вимкнено: будь-який тап по плитці відкриває категорію</string>
+</resources>

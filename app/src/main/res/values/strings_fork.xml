@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings of the fork's own features, kept out of strings.xml so upstream syncs and the
+     locale generator never touch them. -->
+<resources>
+    <string name="fork_drawer_style_categories">Categories</string>
+    <string name="fork_show_recent_installs">Show new apps</string>
+    <string name="fork_show_recent_installs_summary">Row of new apps at the top of the drawer</string>
+    <string name="fork_recent_installs_title">Recently installed</string>
+    <string name="fork_empty_category">No apps in this category yet</string>
+    <string name="fork_other_apps">Other apps</string>
+    <string name="fork_show_category_icons">Show category icons</string>
+    <string name="fork_show_category_icons_summary">Icon before the category name on its tile and screen</string>
+    <string name="fork_search_at_bottom">Search at the bottom</string>
+    <string name="fork_search_at_bottom_summary">Search row at the bottom of the drawer, in the Categories style only</string>
+    <string name="fork_pick_large">Choose large icons</string>
+    <string name="fork_pick_large_hint">Choose large icon %1$d of %2$d</string>
+    <string name="fork_tap_large_icon">Tap on a large icon</string>
+    <string name="fork_tap_large_icon_summary">On: launches the app, as in iOS. Off: any tap on the tile opens the category</string>
+</resources>

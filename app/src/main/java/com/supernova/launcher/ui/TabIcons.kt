@@ -41,6 +41,7 @@ object TabIcons {
     fun groupGlyph(context: Context, name: String): Drawable {
         val category = categoryFor(name) { context.getString(EnumLabels.of(it)) }
         return category?.let { glyph(context, glyphOf(it)) }
+            ?: com.supernova.launcher.fork.categories.CategoryGlyphs.forName(context, name) // Fork
             ?: LetterGlyph(initialOf(name), context.resources.displayMetrics.density)
     }
 
