@@ -105,7 +105,6 @@ PR маленькі: одна тема на один PR. Перед PR:
 
 - **`main` більше не чисте дзеркало upstream.** У ньому вже власні коміти: CI ([PR #2](https://github.com/bezeza/Supernova/pull/2)), ці нотатки ([PR #3](https://github.com/bezeza/Supernova/pull/3)), переклади й фічі гілки перекладів ([PR #5](https://github.com/bezeza/Supernova/pull/5)). Тож `git merge --ff-only upstream/main` з розділу про синк більше не пройде, поки upstream не зрушить далі; підтягувати його доведеться звичайним merge з розв'язанням конфліктів. Розділи вище описують стан до цих PR і ще не переписані.
 - **Той самий `applicationId`, що в upstream:** `com.supernova.launcher` (`app/build.gradle.kts`). Debug-збірка додає суфікс `.debug`, тож debug ставиться поруч. Release-ідентифікатор збігається з F-Droid/upstream збіркою.
-- **`runBlocking` в `ApplyIconPackActivity`.** Рядок 41 на `main`: `ThemeEngine.applyAccent(this, runBlocking { preferences.flow.first() }.accentColor)` на головному потоці в `onCreate`.
 - **Фічі форка лежать поза пакетом `fork`.** Код із PR #5 (`search/AppQuery.kt`, `ui/settings/ForkSettings.kt`, `data/FolderAutoSort.kt`, меню папок у `LauncherActivity`) з'явився до правила про `com.supernova.launcher.fork`. Новий код пишуть через `ForkHooks` ([PR #4](https://github.com/bezeza/Supernova/pull/4), відкритий).
 - **Перевірки.** На `main` проходить `./gradlew testDebugUnitTest detekt lintDebug assembleDebug` без змін baseline. Нові файли форка пройшли detekt без baseline; не додавайте записів у `detekt-baseline.xml` і `lint-baseline.xml`, а виправляйте код. Release-збірка (R8) збирається; на пристрої нічого з фіч форка не запускалось.
 - **«Скинути порядок папки» дублюється.** На `main` вона вже є з PR #5 (простий варіант). Коміт `443a1d8` з [PR #1](https://github.com/bezeza/Supernova/pull/1) (живе оновлення картки, Undo) з нею конфліктує у 7 файлах і змінює `detekt-baseline.xml`; рішення за власником.
@@ -114,7 +113,6 @@ PR маленькі: одна тема на один PR. Перед PR:
 
 - [PR #9](https://github.com/bezeza/Supernova/pull/9): док до 9 сторінок (перша половина PR #1, перенесена на `main`). Чекає на мердж.
 - Вирішити долю PR #1: його «скидання порядку» вже частково на `main`, див. вище.
-- Прибрати `runBlocking` в `ApplyIconPackActivity`.
 - Дати форку власний `applicationId`, щоб release не збігався з upstream.
 - Прибрати зайві гілки. `dev` повністю входить у `main`. `feature/more-dock-pages-and-reset-folder-order` і `translations-uk-ru-odesa` тепер у `main` через PR #5 (squash). Назва `ccr-*` у репозиторії не розшифрована. Видаляти гілки лише після підтвердження власника.
 
