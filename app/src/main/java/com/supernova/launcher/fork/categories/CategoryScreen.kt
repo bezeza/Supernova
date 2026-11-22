@@ -42,7 +42,8 @@ internal class CategoryScreen(
         it.onPick = { startPicking() }
     }
 
-    private val grid = RecyclerView(context).apply {
+    // The apps' grid; the controller hangs the drawer's tab swipe on it.
+    val grid = RecyclerView(context).apply {
         val manager = GridLayoutManager(context, 1)
         manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int = cells.spanSizeAt(position, manager.spanCount)

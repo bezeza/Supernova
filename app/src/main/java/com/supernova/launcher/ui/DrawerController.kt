@@ -222,25 +222,31 @@ class DrawerController(
     // A sideways swipe on the list moves to the neighbouring group tab (not
     // for the paged grid, which uses horizontal scroll for its pages).
     private fun attachTabSwipe() {
-        binding.drawerRecycler.addOnItemTouchListener(
-            TabSwipeDrag(
-                binding.drawerListContainer,
-                swipeable = ::tabSwipeable,
-                hasTab = { delta -> adjacentTab(delta) != null },
-                onCommit = { delta, remaining, velocity ->
-                    dragSettle = remaining to velocity
-                    selectAdjacentTab(delta)
-                    // No change after all (the bar changed under the finger).
-                    if (dragSettle != null) {
-                        dragSettle = null
-                        slideInTab(0)
-                    }
-                },
-                animate = { Animations.enabled(viewModel.state.value.prefs) },
-                onMoving = { moving -> showFastScroller(!moving) }
-            )
+        binding.drawerRecycler.addOnItemTouchListener(newTabSwipe { delta -> adjacentTab(delta) != null })
+        // Fork: the Categories tiles swipe between tabs too, and so does a
+        // category's screen, forward only: a swipe right there is its Back.
+        categories.addTabSwipe(
+            newTabSwipe { delta -> adjacentTab(delta) != null },
+            newTabSwipe { delta -> delta > 0 && adjacentTab(delta) != null }
         )
     }
+
+    private fun newTabSwipe(hasTab: (Int) -> Boolean) = TabSwipeDrag(
+        binding.drawerListContainer,
+        swipeable = ::tabSwipeable,
+        hasTab = hasTab,
+        onCommit = { delta, remaining, velocity ->
+            dragSettle = remaining to velocity
+            selectAdjacentTab(delta)
+            // No change after all (the bar changed under the finger).
+            if (dragSettle != null) {
+                dragSettle = null
+                slideInTab(0)
+            }
+        },
+        animate = { Animations.enabled(viewModel.state.value.prefs) },
+        onMoving = { moving -> showFastScroller(!moving) }
+    )
 
     // The tab that way from the selected one, or null at an end with Loop
     // tabs off.

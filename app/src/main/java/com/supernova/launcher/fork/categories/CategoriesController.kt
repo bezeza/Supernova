@@ -63,6 +63,12 @@ class CategoriesController(
         )
     }
 
+    // The drawer's swipe to the neighbouring tab, on the tiles and on a category's screen.
+    fun addTabSwipe(onTiles: RecyclerView.OnItemTouchListener, onScreen: RecyclerView.OnItemTouchListener) {
+        recycler.addOnItemTouchListener(onTiles)
+        screen.grid.addOnItemTouchListener(onScreen)
+    }
+
     // Whether the drawer wants the tiles on screen, open category or not.
     private var wanted = false
 
