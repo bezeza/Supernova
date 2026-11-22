@@ -1835,7 +1835,10 @@ class DrawerController(
                 categories = folders.map { CategoryEntry(it.group, it.members) },
                 loose = apps,
                 recent = appsForTab(null),
-                textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text
+                textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text,
+                backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
+                    .styleFor(SurfaceId.DRAWER).alpha ?: prefs.drawerBgOpacity,
+                showIcons = prefs.categoriesShowIcons
             ),
             showRecent = prefs.categoriesShowRecent
         )
@@ -2162,6 +2165,7 @@ class DrawerController(
     private fun applyStyle(prefs: LauncherPrefs) {
         val key = listOf(
             prefs.drawerStyle, prefs.drawerColumns, prefs.drawerRows,
+            prefs.categoriesSearchBottom, // Fork
             prefs.drawerBgOpacity,
             prefs.drawerFastScroller, prefs.drawerBgColor,
             prefs.styleConfig, prefs.paletteSource, prefs.paletteSeed,
@@ -2188,7 +2192,10 @@ class DrawerController(
         val searchConfig = SearchBarConfig.decode(prefs.searchBarConfig).drawer
         val barPlacement = DrawerBarPlacement.fromConfig(searchConfig)
         searchFieldVisible = barPlacement != DrawerBarPlacement.HIDDEN
-        searchAtBottom = barPlacement == DrawerBarPlacement.BOTTOM
+        // Fork: Categories can put the search row at the bottom on its own switch.
+        searchAtBottom = barPlacement == DrawerBarPlacement.BOTTOM ||
+            (barPlacement != DrawerBarPlacement.HIDDEN && prefs.drawerStyle == DrawerStyle.CATEGORIES &&
+                prefs.categoriesSearchBottom)
         if (!searchAtBottom) searchRowLifted = false
         searchGlobalOnTap = searchConfig.globalOnTap
         binding.drawerSearchField.visibility = if (searchFieldVisible) View.VISIBLE else View.GONE

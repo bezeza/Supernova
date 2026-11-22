@@ -38,6 +38,9 @@ internal class CategoryScreen(
 
     private val context = container.context
     private val density = context.resources.displayMetrics.density
+    private var showIcon = false
+    private var shownName: String? = null
+    private var textColor = 0
 
     private val backButton = ImageButton(context).apply {
         setImageResource(R.drawable.ic_back)
@@ -117,6 +120,7 @@ internal class CategoryScreen(
     fun show(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook, textColor: Int, animate: Boolean) {
         setTextColor(textColor)
         title.text = group.name
+        shownName = group.name
         showGlyph(group.name, textColor)
         (grid.layoutManager as GridLayoutManager).spanCount = look.columns.coerceAtLeast(1)
         grid.setPadding(look.left, look.top, look.right, look.bottom)
@@ -153,13 +157,21 @@ internal class CategoryScreen(
 
     fun rebind() = cells.notifyItemRangeChanged(0, cells.itemCount)
 
+    // Off by default: the name stands alone, as on a tile.
+    fun setShowIcon(show: Boolean) {
+        if (show == showIcon) return
+        showIcon = show
+        if (shownName != null) showGlyph(shownName.orEmpty(), textColor)
+    }
+
     fun setTextColor(color: Int) {
+        textColor = color
         title.setTextColor(color)
         backButton.imageTintList = ColorStateList.valueOf(color)
     }
 
     private fun showGlyph(name: String, color: Int) {
-        val glyph = CategoryGlyphs.forName(context, name)
+        val glyph = if (showIcon) CategoryGlyphs.forName(context, name) else null
         if (glyph == null) {
             title.setCompoundDrawablesRelative(null, null, null, null)
             return

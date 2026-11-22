@@ -8,4 +8,8 @@
     <string name="fork_recent_installs_title">Нещодавно встановлені</string>
     <string name="fork_empty_category">У цій категорії ще немає застосунків</string>
     <string name="fork_other_apps">Інші застосунки</string>
+    <string name="fork_show_category_icons">Показувати значки категорій</string>
+    <string name="fork_show_category_icons_summary">Значок перед назвою категорії на плитці й на її екрані</string>
+    <string name="fork_search_at_bottom">Пошук унизу</string>
+    <string name="fork_search_at_bottom_summary">Рядок пошуку внизу меню, лише у стилі «Категорії»</string>
 </resources>

@@ -14,9 +14,6 @@ import com.supernova.launcher.R
 // drawn from the sample icons, in the drawer's colours. Inert.
 object CategoriesPreview {
 
-    private const val CARD_ALPHA = 0x26
-    private const val COLOR_MASK = 0xFFFFFF
-    private const val ALPHA_SHIFT = 24
     private const val MARGIN_DP = 6f
     private const val LABEL_SP = 12f
     private const val TILES = 2
@@ -31,7 +28,7 @@ object CategoriesPreview {
                 setPadding(margin, margin, margin, margin)
             }
             val card = CategoryTileCard(context)
-            card.setCardColor((textColor and COLOR_MASK) or (CARD_ALPHA shl ALPHA_SHIFT))
+            card.setCardColor(CategoryTint.cardColor(textColor, 1f))
             // The icons repeat when the sample has fewer than a tile holds.
             val picked = List(perTile) { icons.getOrNull((index * perTile + it) % icons.size.coerceAtLeast(1)) }
             card.showPreview(

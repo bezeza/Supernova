@@ -40,14 +40,19 @@ internal class CategoriesAdapter(
 ) : ListAdapter<CategoryRow, RecyclerView.ViewHolder>(Diff) {
 
     private var textColor = 0
+    private var backdrop = 1f
+    private var showIcons = false
 
     init {
         setHasStableIds(true)
     }
 
-    fun setTextColor(color: Int) {
-        if (color == textColor) return
-        textColor = color
+    // The colours or the icon switch moved: the rows redraw.
+    fun setLook(textColor: Int, backdrop: Float, showIcons: Boolean) {
+        if (textColor == this.textColor && backdrop == this.backdrop && showIcons == this.showIcons) return
+        this.textColor = textColor
+        this.backdrop = backdrop
+        this.showIcons = showIcons
         notifyItemRangeChanged(0, itemCount)
     }
 
@@ -86,7 +91,7 @@ internal class CategoriesAdapter(
         }
     }
 
-    private fun cardColor(): Int = (textColor and COLOR_MASK) or (CARD_ALPHA shl ALPHA_SHIFT)
+    private fun cardColor(): Int = CategoryTint.cardColor(textColor, backdrop)
 
     private fun label(context: Context, sizeSp: Float, centred: Boolean, lines: Int = 1): TextView =
         TextView(context).apply {
@@ -102,7 +107,7 @@ internal class CategoriesAdapter(
     // The category's own icon before its name, in the drawer's text colour.
     private fun showGlyph(title: TextView, name: String) {
         val context = title.context
-        val glyph = CategoryGlyphs.forName(context, name)
+        val glyph = if (showIcons) CategoryGlyphs.forName(context, name) else null
         if (glyph == null) {
             title.setCompoundDrawablesRelative(null, null, null, null)
             return
@@ -262,9 +267,6 @@ internal class CategoriesAdapter(
         const val TYPE_HEADER = 2
         const val TYPE_LOOSE = 3
         const val SPAN_TILE = 2
-        const val COLOR_MASK = 0xFFFFFF
-        const val ALPHA_SHIFT = 24
-        const val CARD_ALPHA = 0x26
         const val TILE_LABEL_SP = 12f
         const val TITLE_LINES = 2
         const val GLYPH_DP = 16f

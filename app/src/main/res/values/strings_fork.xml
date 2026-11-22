@@ -8,4 +8,8 @@
     <string name="fork_recent_installs_title">Recently installed</string>
     <string name="fork_empty_category">No apps in this category yet</string>
     <string name="fork_other_apps">Other apps</string>
+    <string name="fork_show_category_icons">Show category icons</string>
+    <string name="fork_show_category_icons_summary">Icon before the category name on its tile and screen</string>
+    <string name="fork_search_at_bottom">Search at the bottom</string>
+    <string name="fork_search_at_bottom_summary">Search row at the bottom of the drawer, in the Categories style only</string>
 </resources>

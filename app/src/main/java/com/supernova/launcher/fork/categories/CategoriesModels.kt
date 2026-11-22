@@ -15,7 +15,11 @@ class CategoriesData(
     val categories: List<CategoryEntry>,
     val loose: List<LaunchableApp>,
     val recent: List<LaunchableApp>,
-    val textColor: Int
+    val textColor: Int,
+    // The drawer background's opacity: the tiles' fill follows it (CategoryTint).
+    val backdrop: Float = 1f,
+    // The category's icon before its name, a setting that is off unless chosen.
+    val showIcons: Boolean = false
 )
 
 // What a tap or a hold on a tile does. The drawer owns these: they launch an
