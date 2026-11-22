@@ -12,6 +12,8 @@
 
 ## Як синкати `main` (лише fast-forward)
 
+> **Застаріло.** `main` уже має власні коміти, тож fast-forward не проходить. Чинна процедура: розділ «Синхронізація з оригіналом (upstream)» нижче.
+
 Перевірено 2026-11-21: `git ls-remote` для `refs/heads/main` у `tanujnotes/Supernova` і `bezeza/Supernova` дає один SHA, `5b63c43b9e0f61a3efd9755bd2f1f1a92a091294`.
 
 ```bash
@@ -25,6 +27,36 @@ git push origin main
 `--ff-only` проходить, лише поки в `origin/main` немає комітів, яких немає в upstream. Якщо команда відмовляється, `main` уже не чисте дзеркало: його не переписують force-push-ем і не ребейзять «щоб наздогнати». Тоді рішення за власником репозиторію.
 
 Інші гілки цим кроком не оновлюються. Вони розійшлися з upstream ще на v0.2.4 або v0.2.6 (див. карту нижче) і самі по собі fast-forward до сьогоднішнього `main` не лягають.
+
+## Синхронізація з оригіналом (upstream)
+
+Тут і далі `origin` — це `bezeza/Supernova`, `upstream` — `tanujnotes/Supernova`.
+
+1. **Синхронізуємо регулярно, бажано щотижня.** Чим рідше, тим більше конфліктів: на `LauncherActivity.kt` upstream робить по 10–15 комітів у піковий день.
+2. **Fast-forward більше не працює**, бо `main` має власні коміти. Кнопку «Sync fork» на GitHub не використовуємо, якщо вона пропонує discard commits: вона знищила б наші зміни.
+3. **Кроки:**
+
+   ```bash
+   git remote add upstream https://github.com/tanujnotes/Supernova.git   # один раз
+   git fetch upstream
+   git checkout -b sync/upstream-YYYY-MM-DD origin/main
+   git merge upstream/main
+   ```
+
+   Конфлікти розв'язуємо так: **логіка береться з upstream, наші зміни (переклади, `ForkHooks`, CI, docs) зберігаємо.** Найімовірніші місця конфліктів: `LauncherActivity.kt`, `values*/strings.xml`, `build.gradle` (`build.gradle.kts`).
+4. **Нові рядки з upstream `values/strings.xml` перекладаємо** через `tools/gen_locale.py`. Джерела перекладів лежать у `tools/uk.txt`, `tools/ru.txt` і `tools/odesa_overrides.txt` (формат `ім'я|текст`, множини в чотирьох формах). Новий рядок спершу додаємо туди, а не лише в XML, потім:
+
+   ```bash
+   python3 tools/make_odesa.py                                    # збирає tools/odesa.txt з ru.txt і odesa_overrides.txt
+   python3 tools/gen_locale.py x tools/uk.txt values-uk
+   python3 tools/gen_locale.py x tools/ru.txt values-ru
+   python3 tools/gen_locale.py x tools/odesa.txt "values-b+ru+Cyrl+UA+odesa"
+   ```
+
+   Скрипт повідомляє про відсутні й зайві рядки та про розбіжності плейсхолдерів (`theme_schedule_range` і `notification_access_restricted` дають відомі хибні попередження про `\u` — їх можна ігнорувати).
+5. **Пушимо гілку й відкриваємо PR у `bezeza/Supernova`** (НЕ в `tanujnotes`). Чекаємо, поки CI (lint, detekt, assembleRelease) стане зеленим. Локально перед пушем: `./gradlew testDebugUnitTest detekt lintDebug assembleDebug`.
+6. **Мерджимо лише після OK власника.** Перед мерджем вручну перевіряємо головне за [docs/testing/manual-test-plan.md](docs/testing/manual-test-plan.md).
+7. **Нічого не пушимо в upstream `tanujnotes/Supernova`.** Ключі й секрети не комітимо (`keystore.properties`, `*.jks`, `*.keystore` уже в `.gitignore`).
 
 ## Карта гілок
 
