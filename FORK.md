@@ -105,7 +105,8 @@ git push origin main
 |---|---|
 | `ui/DrawerConfig.kt` | `CATEGORIES` доданий у **кінець** `DrawerStyle` (старі бекапи читаються). Не переставляти |
 | `ui/DrawerController.kt` | імпорти `fork.*`; поле `categories` і `categoriesStyle` після `val adapter`; у `applyStyle` `currentStyle` для Категорій дорівнює `VERTICAL_GRID`; гілка `when (currentStyle)` розширена до `VERTICAL_GRID, CATEGORIES`; `applyListVisibility` (видимість списку); виклики `applyListVisibility()` у обробнику тексту пошуку й у скиданні пошуку; блок `categories.submit` в кінці `submit()`; `categories.rebind()` у `notifyContentChanged()` і при зміні іконок в `onState`. Усі місця позначені `Fork` |
-| `data/Models.kt`, `data/Pref.kt` | прапор `categoriesShowRecent` / `categories_show_recent` |
+| `data/Models.kt` | поле `LauncherPrefs.categoriesShowRecent` (за замовчуванням `true`), після `autoSortNewApps` |
+| `data/Pref.kt` | запис `val categoriesShowRecent = bool("categories_show_recent")`, після `autoSortNewApps` |
 | `ui/settings/EnumLabels.kt` | підпис `style_categories` для `DrawerStyle.CATEGORIES` |
 | `ui/settings/preview/SettingsPreviewView.kt` | гілка `else if` у `buildDrawer`: прев'ю двох плиток |
 | `ui/TabIcons.kt` | `groupGlyph`: перед буквою вкладка пробує значок категорії (`CategoryGlyphs`) |
