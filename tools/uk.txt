@@ -478,7 +478,6 @@ about_whats_new_title|Що нового в %1$s
 about_whats_new_none|У цій збірці немає приміток до випуску.
 about_report_issue|Повідомити про помилку
 about_report_issue_summary|Відкриває нове звернення на GitHub
-about_report_issue_body|\n\n---\n%1$s
 about_no_browser|Немає застосунку, що відкриває посилання
 about_source|Вихідний код
 crash_log|Журнал збоїв
