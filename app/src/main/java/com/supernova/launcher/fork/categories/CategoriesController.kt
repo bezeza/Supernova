@@ -21,7 +21,7 @@ class CategoriesController(
     container: FrameLayout,
     catalog: AppCatalog,
     decorateIcon: (Drawable?, LaunchableApp) -> Drawable?,
-    actions: CategoriesActions,
+    private val actions: CategoriesActions,
     // The drawer's own kind of adapter, for the apps of a category opened on its own screen.
     screenAdapter: AppDrawerAdapter
 ) {
@@ -52,8 +52,8 @@ class CategoriesController(
     }
 
     private val state = CategoryScreenState()
-    private val screen = CategoryScreen(container, screenAdapter) { closeScreen() }
-    private var textColor = 0
+    private val screen = CategoryScreen(container, screenAdapter, { back() }) { picked -> placeLarge(picked) }
+    private var openGroup: DrawerGroup? = null
 
     init {
         container.addView(
@@ -87,8 +87,23 @@ class CategoriesController(
     // A tile opened: the category's apps on a screen of their own.
     fun openScreen(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook) {
         state.open(group.id)
+        openGroup = group
         showTiles()
-        screen.show(group, apps, look, textColor, animate = true)
+        screen.show(group, apps, look, animate = true)
+    }
+
+    // Back: choosing large icons stops first, then the screen closes. True
+    // when it did either, so the Back is spent.
+    fun back(): Boolean = screen.cancelPicking() || closeScreen()
+
+    // A tap on an app of the screen: a choice while choosing, else [launch].
+    fun onScreenAppClick(launch: () -> Unit, app: LaunchableApp) {
+        if (!screen.handleTap(app)) launch()
+    }
+
+    private fun placeLarge(picked: List<LaunchableApp>) {
+        val group = openGroup ?: return
+        actions.onPlaceLarge(group, picked)
     }
 
     // True when a screen was open and is closed now: the Back that did it is spent.
@@ -102,9 +117,7 @@ class CategoriesController(
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setLook(data.textColor, data.backdrop, data.showIcons)
-        textColor = data.textColor
-        screen.setTextColor(data.textColor)
-        screen.setShowIcon(data.showIcons)
+        screen.setLook(data.textColor, data.showIcons)
         if (state.isOpen) {
             val open = data.categories.firstOrNull { it.group.id == state.openId }
             if (open != null && state.sync(data.categories.map { it.group.id })) screen.update(open.apps)

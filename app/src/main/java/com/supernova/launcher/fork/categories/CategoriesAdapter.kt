@@ -147,11 +147,12 @@ internal class CategoriesAdapter(
             card.setTextColor(textColor)
             showGlyph(title, entry.group.name)
             itemView.contentDescription = itemView.context.getString(R.string.folder_desc, entry.group.name)
-            card.bind(
-                row.layout, icons, actions,
-                open = { actions.onCategory(it, entry.group, entry.apps) },
-                openLongPress = { actions.onCategoryLongPress(it, entry.group, entry.apps) }
-            )
+            val open = { view: View -> actions.onCategory(view, entry.group, entry.apps) }
+            val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
+            card.bind(row.layout, icons, open = open, openLongPress = openLongPress)
+            // The name under the tile opens it too.
+            itemView.setOnClickListener(open)
+            itemView.setOnLongClickListener { openLongPress(it); true }
         }
     }
 

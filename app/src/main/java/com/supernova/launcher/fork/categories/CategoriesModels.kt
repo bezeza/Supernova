@@ -28,7 +28,10 @@ class CategoriesActions(
     val onApp: (View, LaunchableApp) -> Unit,
     val onAppLongPress: (View, LaunchableApp) -> Unit,
     val onCategory: (View, DrawerGroup, List<LaunchableApp>) -> Unit,
-    val onCategoryLongPress: (View, DrawerGroup, List<LaunchableApp>) -> Unit
+    val onCategoryLongPress: (View, DrawerGroup, List<LaunchableApp>) -> Unit,
+    // The apps tapped as the category's large icons, in the order tapped: the
+    // folder takes them as its first apps.
+    val onPlaceLarge: (DrawerGroup, List<LaunchableApp>) -> Unit
 )
 
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

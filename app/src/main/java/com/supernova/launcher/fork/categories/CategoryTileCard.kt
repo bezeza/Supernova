@@ -51,7 +51,6 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     fun bind(
         tile: CategoryLayout.Tile<LaunchableApp>,
         icons: CategoryIcons,
-        actions: CategoriesActions,
         open: (View) -> Unit,
         openLongPress: (View) -> Unit
     ) {
@@ -71,8 +70,11 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
             } else {
                 icons.bind(view, app)
                 view.contentDescription = app.label
-                view.setOnClickListener { actions.onApp(it, app) }
-                view.setOnLongClickListener { actions.onAppLongPress(it, app); true }
+                // Not tappable themselves: a tap anywhere on the tile opens the
+                // category, and apps launch from its screen.
+                view.setOnClickListener(null)
+                view.setOnLongClickListener(null)
+                view.isClickable = false
             }
         }
         mini.forEachIndexed { index, view ->

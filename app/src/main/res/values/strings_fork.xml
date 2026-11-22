@@ -12,4 +12,6 @@
     <string name="fork_show_category_icons_summary">Icon before the category name on its tile and screen</string>
     <string name="fork_search_at_bottom">Search at the bottom</string>
     <string name="fork_search_at_bottom_summary">Search row at the bottom of the drawer, in the Categories style only</string>
+    <string name="fork_pick_large">Choose large icons</string>
+    <string name="fork_pick_large_hint">Choose large icon %1$d of %2$d</string>
 </resources>

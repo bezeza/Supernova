@@ -27,6 +27,7 @@ import com.supernova.launcher.search.AppSearchProvider
 import com.supernova.launcher.databinding.ActivityLauncherBinding
 import com.supernova.launcher.fork.ForkHooks
 import com.supernova.launcher.fork.categories.CategoriesActions
+import com.supernova.launcher.fork.categories.CategoriesController
 import com.supernova.launcher.fork.categories.CategoriesData
 import com.supernova.launcher.fork.categories.CategoryEntry
 import com.supernova.launcher.fork.categories.ScreenLook
@@ -85,10 +86,12 @@ class DrawerController(
     // fork/categories; the hooks in this file are marked "Fork:".
     // A tap on a tile opens the category on a screen of its own, which draws
     // its apps with a second adapter of the drawer's kind.
-    private val categoryAdapter = newCellAdapter()
-    private val categories = ForkHooks.categories(
+    private val categoryAdapter: AppDrawerAdapter = newCellAdapter { view, app -> onCategoryAppClick(view, app) }
+    private val categories: CategoriesController = ForkHooks.categories(
         binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
-        CategoriesActions(onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress),
+        CategoriesActions(
+            onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress, ::placeCategoryLarge
+        ),
         categoryAdapter
     )
     private var categoriesStyle = false
@@ -100,11 +103,14 @@ class DrawerController(
         viewModel.setGroupOrder(com.supernova.launcher.data.DrawerGroupType.TAB, names)
     }
 
-    private fun newCellAdapter(): AppDrawerAdapter = AppDrawerAdapter(
+    private fun newCellAdapter(
+        // Fork: a category's screen intercepts taps.
+        onCellClick: (View, LaunchableApp) -> Unit = { view, app -> onAppClick(view, app) }
+    ): AppDrawerAdapter = AppDrawerAdapter(
         appCatalog = viewModel.appCatalog(),
         decorateIcon = decorateIcon,
         decorateFolderIcon = { icon, folder -> decorateFolderIcon(icon, folder.members) },
-        onClick = { view, app -> onAppClick(view, app) },
+        onClick = onCellClick,
         onLongPress = onAppLongPress,
         onWebSearch = { onWebSearch(binding.drawerSearch.text?.toString().orEmpty().trim()) },
         onChip = { chip, query -> onChipSearch(chip, query) },
@@ -1221,7 +1227,7 @@ class DrawerController(
     // brings the full list back. True when there was one.
     fun clearQuery(): Boolean {
         // Fork: Back leaves a category's screen first.
-        val screenClosed = categories.closeScreen()
+        val screenClosed = categories.back()
         if (screenClosed || binding.drawerSearch.text.isNullOrEmpty()) return screenClosed
         binding.drawerSearch.text?.clear()
         // From the top, as the drawer opened: the results' scroll carried over.
@@ -1842,6 +1848,16 @@ class DrawerController(
             ),
             showRecent = prefs.categoriesShowRecent
         )
+    }
+
+    // Fork: an app tapped on a category's screen launches, unless its large icons are being chosen.
+    private fun onCategoryAppClick(view: View, app: LaunchableApp) {
+        categories.onScreenAppClick({ onAppClick(view, app) }, app)
+    }
+
+    // Fork: the apps chosen as large icons become the folder's first apps, in the order chosen.
+    private fun placeCategoryLarge(group: DrawerGroup, picked: List<LaunchableApp>) {
+        picked.asReversed().forEach { viewModel.moveAppInFolder(group.id, it, LauncherViewModel.InFolderMove.START) }
     }
 
     // Fork: a category's own screen, set up as the drawer's grid is.
