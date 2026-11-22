@@ -44,13 +44,11 @@ git push origin main
    ```
 
    Конфлікти розв'язуємо так: **логіка береться з upstream, наші зміни (переклади, `ForkHooks`, CI, docs) зберігаємо.** Найімовірніші місця конфліктів: `LauncherActivity.kt`, `values*/strings.xml`, `build.gradle` (`build.gradle.kts`).
-4. **Нові рядки з upstream `values/strings.xml` перекладаємо** через `tools/gen_locale.py`. Джерела перекладів лежать у `tools/uk.txt`, `tools/ru.txt` і `tools/odesa_overrides.txt` (формат `ім'я|текст`, множини в чотирьох формах). Новий рядок спершу додаємо туди, а не лише в XML, потім:
+4. **Нові рядки з upstream `values/strings.xml` перекладаємо** через `tools/gen_locale.py`. Джерела перекладів лежать у `tools/uk.txt` і `tools/ru.txt` (формат `ім'я|текст`, множини в чотирьох формах). Новий рядок спершу додаємо туди, а не лише в XML, потім:
 
    ```bash
-   python3 tools/make_odesa.py                                    # збирає tools/odesa.txt з ru.txt і odesa_overrides.txt
    python3 tools/gen_locale.py x tools/uk.txt values-uk
    python3 tools/gen_locale.py x tools/ru.txt values-ru
-   python3 tools/gen_locale.py x tools/odesa.txt "values-b+ru+Cyrl+UA+odesa"
    ```
 
    Скрипт повідомляє про відсутні й зайві рядки та про розбіжності плейсхолдерів (`theme_schedule_range` і `notification_access_restricted` дають відомі хибні попередження про `\u` — їх можна ігнорувати).
@@ -78,7 +76,7 @@ git push origin main
 
 Цього на `main` (v0.2.8) немає. Перевірено дерево `e620219` і README цієї гілки.
 
-- Переклади інтерфейсу: українська (`values-uk`), російська (`values-ru`), одеський варіант російської (`values-b+ru+Cyrl+UA+odesa`), плюс `xml/locales_config.xml`.
+- Переклади інтерфейсу: українська (`values-uk`), російська (`values-ru`). Одеський варіант російської (`values-b+ru+Cyrl+UA+odesa`) на цій гілці був, з `main` його прибрано 2026-11-22, плюс `xml/locales_config.xml`.
 - Теки шухляди: «Move up» / «Move down», «Move to folder…» (`move_to_folder`), ручний порядок усередині теки (`manualOrder`), «Reset order» (`reset_folder_order`), «Merge into…» (`merge_folder`).
 - Автосортування нових застосунків за вмістом власних тек і підказка покласти щойно встановлене в теку, яка пасує (`suggest_folder`: «%1$s fits the folder %2$s», дія `suggest_folder_action`: «Put it there»).
 - Пошук із чужою розкладкою клавіатури і за вимовленим ім’ям. У `AppMatcher` є пара `"вайбер" to "viber"` (і «вибер», «телеграм» та інші).
@@ -117,15 +115,15 @@ git push origin main
 
 ## Правила форка
 
-Код фіч форка живе в пакеті `com.supernova.launcher.fork`. Цього пакета в дереві ще немає.
+Код фіч форка живе в пакеті `com.supernova.launcher.fork`. Пакет уже є (`fork/ForkHooks.kt`).
 
-Єдина запланована точка входу — останній рядок `LauncherActivity.onCreate`, після реєстрації `screenOffReceiver` (зараз функція закінчується на рядку 727, коміт `5b63c43`):
+Єдина точка входу — останній рядок `LauncherActivity.onCreate`, після реєстрації `screenOffReceiver` (зараз функція закінчується на рядку 727, коміт `5b63c43`):
 
 ```kotlin
 com.supernova.launcher.fork.ForkHooks.attach(this)
 ```
 
-Виклик іде ще з `onCreate`, тобто до стану `STARTED`, тож з `attach` можна і підписатися на lifecycle, і викликати `registerForActivityResult`. Далі форк слухає `onStart` / `onResume` / `onDestroy` і `viewModel.state` сам. Окремі рядки в ці методи не додають. **Зараз ні пакета, ні виклику в коді немає** — це план, не наявна реалізація.
+Виклик іде ще з `onCreate`, тобто до стану `STARTED`, тож з `attach` можна і підписатися на lifecycle, і викликати `registerForActivityResult`. Далі форк слухає `onStart` / `onResume` / `onDestroy` і `viewModel.state` сам. Окремі рядки в ці методи не додають. Пакет і виклик уже в коді.
 
 Другий і третій гачки — лише якщо без них фічу не зробити, і лише одним рядком на початку функції, делегатом у `fork`:
 
@@ -162,21 +160,22 @@ PR маленькі: одна тема на один PR. Перед PR:
 На `main` ці команди — поріг. На `translations-uk-ru-odesa` `lintDebug` зараз не зелений (див. нижче), тож PR з тієї гілки цей пункт не закриє, доки lint не полагоджено.
 
 ## Відомі проблеми
-
 Факти на 2026-11-22.
+
+- **Одеську локаль прибрано з `main` (2026-11-22)**: теку `values-b+ru+Cyrl+UA+odesa`, `tools/make_odesa.py`, `tools/odesa*.txt`, пункт у виборі мови (`AppLanguage`) і запис у `locales_config.xml`. Хто мав її обраною, при запуску отримує українську: `AppLanguage.migrateRemoved()`, один виклик у `SupernovaApp.onCreate`. У бекапі налаштувань мови немає (вона зберігається як локаль застосунку), тож старі бекапи цього не зачіпають. Відновити можна з історії git (коміт перед цією зміною) або з гілки `translations-uk-ru-odesa`.
 
 - **`main` більше не чисте дзеркало upstream.** У ньому вже власні коміти: CI ([PR #2](https://github.com/bezeza/Supernova/pull/2)), ці нотатки ([PR #3](https://github.com/bezeza/Supernova/pull/3)), переклади й фічі гілки перекладів ([PR #5](https://github.com/bezeza/Supernova/pull/5)). Тож `git merge --ff-only upstream/main` з розділу про синк більше не пройде, поки upstream не зрушить далі; підтягувати його доведеться звичайним merge з розв'язанням конфліктів. Розділи вище описують стан до цих PR і ще не переписані.
 - **Той самий `applicationId`, що в upstream:** `com.supernova.launcher` (`app/build.gradle.kts`). Debug-збірка додає суфікс `.debug`, тож debug ставиться поруч. Release-ідентифікатор збігається з F-Droid/upstream збіркою.
-- **Фічі форка лежать поза пакетом `fork`.** Код із PR #5 (`search/AppQuery.kt`, `ui/settings/ForkSettings.kt`, `data/FolderAutoSort.kt`, меню папок у `LauncherActivity`) з'явився до правила про `com.supernova.launcher.fork`. Новий код пишуть через `ForkHooks` ([PR #4](https://github.com/bezeza/Supernova/pull/4), відкритий).
+- **Фічі форка лежать поза пакетом `fork`.** Код із PR #5 (`search/AppQuery.kt`, `ui/settings/ForkSettings.kt`, `data/FolderAutoSort.kt`, меню папок у `LauncherActivity`) з'явився до правила про `com.supernova.launcher.fork`. Новий код пишуть через `ForkHooks` ([PR #4](https://github.com/bezeza/Supernova/pull/4), злито).
 - **Перевірки.** На `main` проходить `./gradlew testDebugUnitTest detekt lintDebug assembleDebug` без змін baseline. Нові файли форка пройшли detekt без baseline; не додавайте записів у `detekt-baseline.xml` і `lint-baseline.xml`, а виправляйте код. Release-збірка (R8) збирається; на пристрої нічого з фіч форка не запускалось.
 - **«Скинути порядок папки» дублюється.** На `main` вона вже є з PR #5 (простий варіант). Коміт `443a1d8` з [PR #1](https://github.com/bezeza/Supernova/pull/1) (живе оновлення картки, Undo) з нею конфліктує у 7 файлах і змінює `detekt-baseline.xml`; рішення за власником.
 
 ## Що лишилось
 
 - **Розширені налаштування категорій (окремим PR після #15, нічого не зроблено).** Розмір плитки для кожної категорії окремо, наприклад одна велика на всю ширину, решта менші. Попередня чернетка: малий (1 колонка, можливо без кутика), звичайний (2 колонки, як зараз), великий (на всю ширину, більше іконок видно). Зберігати за id папки в налаштуванні форка (не в `DrawerGroup`, щоб не чіпати формат груп і бекап). Де обирати, ще не вирішено: меню в шапці екрана категорії або окрема сторінка в налаштуваннях меню. Для папок в інших стилях меню (розмір значка, кількість іконок усередині) подібне робити окремо й пізніше: це інший код (`FolderIconDrawable`) і більший ризик конфліктів з upstream. Червоні крапки сповіщень на плитках теж окремим PR.
-- [PR #9](https://github.com/bezeza/Supernova/pull/9): док до 9 сторінок (перша половина PR #1, перенесена на `main`). Чекає на мердж.
+- Док до 9 сторінок уже на `main`: [PR #9](https://github.com/bezeza/Supernova/pull/9), коміт `03b78a6` (`DOCK_PAGES_MAX = 9`). Це була перша половина PR #1.
 - Вирішити долю PR #1: його «скидання порядку» вже частково на `main`, див. вище.
 - Дати форку власний `applicationId`, щоб release не збігався з upstream.
 - Прибрати зайві гілки. `dev` повністю входить у `main`. `feature/more-dock-pages-and-reset-folder-order` і `translations-uk-ru-odesa` тепер у `main` через PR #5 (squash). Назва `ccr-*` у репозиторії не розшифрована. Видаляти гілки лише після підтвердження власника.
 
-Заплановане місце для нового коду форка — пакет `com.supernova.launcher.fork` і один виклик `ForkHooks.attach(this)`, описані вище. Поки виклику в `LauncherActivity` немає, поведінка лаунчера на `main` дорівнює upstream.
+Заплановане місце для нового коду форка — пакет `com.supernova.launcher.fork` і один виклик `ForkHooks.attach(this)`, описані вище. Виклик `ForkHooks.attach(this)` уже стоїть наприкінці `LauncherActivity.onCreate`.

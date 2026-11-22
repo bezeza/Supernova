@@ -23,6 +23,7 @@ class SupernovaApp : Application() {
         installCrashHandler()
         Diagnostics.install(this)
         com.supernova.launcher.data.StoreRecovery.install(this)
+        com.supernova.launcher.ui.AppLanguage.migrateRemoved()
         applyStoredTheme()
         followLauncherAnimations()
     }
