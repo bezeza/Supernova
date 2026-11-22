@@ -44,13 +44,11 @@ git push origin main
    ```
 
    Конфлікти розв'язуємо так: **логіка береться з upstream, наші зміни (переклади, `ForkHooks`, CI, docs) зберігаємо.** Найімовірніші місця конфліктів: `LauncherActivity.kt`, `values*/strings.xml`, `build.gradle` (`build.gradle.kts`).
-4. **Нові рядки з upstream `values/strings.xml` перекладаємо** через `tools/gen_locale.py`. Джерела перекладів лежать у `tools/uk.txt`, `tools/ru.txt` і `tools/odesa_overrides.txt` (формат `ім'я|текст`, множини в чотирьох формах). Новий рядок спершу додаємо туди, а не лише в XML, потім:
+4. **Нові рядки з upstream `values/strings.xml` перекладаємо** через `tools/gen_locale.py`. Джерела перекладів лежать у `tools/uk.txt` і `tools/ru.txt` (формат `ім'я|текст`, множини в чотирьох формах). Новий рядок спершу додаємо туди, а не лише в XML, потім:
 
    ```bash
-   python3 tools/make_odesa.py                                    # збирає tools/odesa.txt з ru.txt і odesa_overrides.txt
    python3 tools/gen_locale.py x tools/uk.txt values-uk
    python3 tools/gen_locale.py x tools/ru.txt values-ru
-   python3 tools/gen_locale.py x tools/odesa.txt "values-b+ru+Cyrl+UA+odesa"
    ```
 
    Скрипт повідомляє про відсутні й зайві рядки та про розбіжності плейсхолдерів (`theme_schedule_range` і `notification_access_restricted` дають відомі хибні попередження про `\u` — їх можна ігнорувати).
@@ -78,7 +76,7 @@ git push origin main
 
 Цього на `main` (v0.2.8) немає. Перевірено дерево `e620219` і README цієї гілки.
 
-- Переклади інтерфейсу: українська (`values-uk`), російська (`values-ru`), одеський варіант російської (`values-b+ru+Cyrl+UA+odesa`), плюс `xml/locales_config.xml`.
+- Переклади інтерфейсу: українська (`values-uk`), російська (`values-ru`). Одеський варіант російської (`values-b+ru+Cyrl+UA+odesa`) на цій гілці був, з `main` його прибрано 2026-11-22, плюс `xml/locales_config.xml`.
 - Теки шухляди: «Move up» / «Move down», «Move to folder…» (`move_to_folder`), ручний порядок усередині теки (`manualOrder`), «Reset order» (`reset_folder_order`), «Merge into…» (`merge_folder`).
 - Автосортування нових застосунків за вмістом власних тек і підказка покласти щойно встановлене в теку, яка пасує (`suggest_folder`: «%1$s fits the folder %2$s», дія `suggest_folder_action`: «Put it there»).
 - Пошук із чужою розкладкою клавіатури і за вимовленим ім’ям. У `AppMatcher` є пара `"вайбер" to "viber"` (і «вибер», «телеграм» та інші).
@@ -132,8 +130,9 @@ PR маленькі: одна тема на один PR. Перед PR:
 На `main` ці команди — поріг. На `translations-uk-ru-odesa` `lintDebug` зараз не зелений (див. нижче), тож PR з тієї гілки цей пункт не закриє, доки lint не полагоджено.
 
 ## Відомі проблеми
-
 Факти на 2026-11-22.
+
+- **Одеську локаль прибрано з `main` (2026-11-22)**: теку `values-b+ru+Cyrl+UA+odesa`, `tools/make_odesa.py`, `tools/odesa*.txt`, пункт у виборі мови (`AppLanguage`) і запис у `locales_config.xml`. Хто мав її обраною, бачить російську. Відновити можна з історії git (коміт перед цією зміною) або з гілки `translations-uk-ru-odesa`.
 
 - **`main` більше не чисте дзеркало upstream.** У ньому вже власні коміти: CI ([PR #2](https://github.com/bezeza/Supernova/pull/2)), ці нотатки ([PR #3](https://github.com/bezeza/Supernova/pull/3)), переклади й фічі гілки перекладів ([PR #5](https://github.com/bezeza/Supernova/pull/5)). Тож `git merge --ff-only upstream/main` з розділу про синк більше не пройде, поки upstream не зрушить далі; підтягувати його доведеться звичайним merge з розв'язанням конфліктів. Розділи вище описують стан до цих PR і ще не переписані.
 - **Той самий `applicationId`, що в upstream:** `com.supernova.launcher` (`app/build.gradle.kts`). Debug-збірка додає суфікс `.debug`, тож debug ставиться поруч. Release-ідентифікатор збігається з F-Droid/upstream збіркою.

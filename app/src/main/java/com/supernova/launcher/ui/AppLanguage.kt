@@ -17,8 +17,7 @@ object AppLanguage {
     private val choices = listOf(
         "en" to "English",
         "uk" to "Українська",
-        "ru" to "Русский",
-        "ru-Cyrl-UA-odesa" to "Одесский"
+        "ru" to "Русский"
     )
 
     private fun currentTag(): String =
