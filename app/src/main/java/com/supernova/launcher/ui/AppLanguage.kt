@@ -17,9 +17,19 @@ object AppLanguage {
     private val choices = listOf(
         "en" to "English",
         "uk" to "Українська",
-        "ru" to "Русский",
-        "ru-Cyrl-UA-odesa" to "Одесский"
+        "ru" to "Русский"
     )
+
+    // The Odesa variant of Russian is gone. Whoever had it picked gets Ukrainian
+    // instead of the system's guess: null for every other tag.
+    internal fun replacementFor(tag: String): String? =
+        if (tag.contains("odesa", ignoreCase = true)) "uk" else null
+
+    // Once at start: a removed language that is still the app's locale is swapped.
+    fun migrateRemoved() {
+        val replacement = replacementFor(currentTag()) ?: return
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(replacement))
+    }
 
     private fun currentTag(): String =
         AppCompatDelegate.getApplicationLocales().toLanguageTags()
