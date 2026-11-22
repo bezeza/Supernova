@@ -63,23 +63,38 @@ class CategoriesController(
         )
     }
 
-    val isVisible: Boolean get() = recycler.visibility == View.VISIBLE
+    // Whether the drawer wants the tiles on screen, open category or not.
+    private var wanted = false
+
+    val isVisible: Boolean get() = wanted
 
     fun setVisible(show: Boolean) {
-        recycler.visibility = if (show) View.VISIBLE else View.GONE
+        wanted = show
         // The tiles going away (search, a tab, another style) takes the screen with them.
         if (!show) closeScreen(animate = false)
+        showTiles()
+    }
+
+    // Hidden, not gone, under a category's screen: the scroll position stays.
+    private fun showTiles() {
+        recycler.visibility = when {
+            state.tilesShown(wanted) -> View.VISIBLE
+            wanted -> View.INVISIBLE
+            else -> View.GONE
+        }
     }
 
     // A tile opened: the category's apps on a screen of their own.
     fun openScreen(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook) {
         state.open(group.id)
+        showTiles()
         screen.show(group, apps, look, textColor, animate = true)
     }
 
     // True when a screen was open and is closed now: the Back that did it is spent.
     fun closeScreen(animate: Boolean = true): Boolean {
         val wasOpen = state.close()
+        showTiles()
         screen.hide(animate && wasOpen)
         return wasOpen
     }

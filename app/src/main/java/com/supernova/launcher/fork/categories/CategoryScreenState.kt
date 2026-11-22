@@ -24,6 +24,11 @@ internal class CategoryScreenState {
         return wasOpen
     }
 
+    // The tiles show only while the drawer wants them and no category's screen
+    // is over them: the screen has no background of its own, so tiles left
+    // visible would show through it.
+    fun tilesShown(wanted: Boolean): Boolean = wanted && !isOpen
+
     // After the folders changed: a category that is gone (deleted, or the
     // style left) takes its screen with it. True while the screen stays open.
     fun sync(ids: Collection<String>): Boolean {

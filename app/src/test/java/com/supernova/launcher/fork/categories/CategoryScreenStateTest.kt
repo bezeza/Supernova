@@ -56,6 +56,22 @@ class CategoryScreenStateTest {
     }
 
     @Test
+    fun tilesShowWhenWantedAndNoScreenIsOver() {
+        val state = CategoryScreenState()
+        assertTrue(state.tilesShown(true))
+        assertFalse(state.tilesShown(false))
+    }
+
+    @Test
+    fun tilesHideUnderAnOpenScreenAndComeBackWithBack() {
+        val state = CategoryScreenState()
+        state.open("Теми і віджети")
+        assertFalse(state.tilesShown(true))
+        state.close()
+        assertTrue(state.tilesShown(true))
+    }
+
+    @Test
     fun aSwipeRightFarAndQuickGoesBack() {
         assertTrue(BackSwipe.isBack(dx = 300f, dy = 20f, velocityX = 1800f, density = 2f))
     }
