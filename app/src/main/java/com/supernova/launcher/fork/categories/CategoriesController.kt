@@ -147,7 +147,7 @@ class CategoriesController(
             emptyList()
         }
         if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent, slots))
-        data.categories.mapTo(list) { CategoryRow.Tile(it) }
+        data.categories.mapTo(list) { CategoryRow.Tile(it, data.settings.options[it.group.id] ?: CategoryOptions()) }
         if (data.loose.isNotEmpty()) {
             if (data.categories.isNotEmpty()) {
                 list.add(CategoryRow.Header(context.getString(R.string.fork_other_apps)))
@@ -161,6 +161,8 @@ class CategoriesController(
     private fun showOptions(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
         val handlers = OptionsHandlers(
             onSort = { sort -> actions.onOptions(group.id) { it.copy(sort = sort) } },
+            onSize = { size -> actions.onOptions(group.id) { it.copy(size = size) } },
+            onLarge = { count -> actions.onOptions(group.id) { it.copy(large = count) } },
             onHide = { actions.onOptions(group.id) { it.copy(hidden = true) } },
             onFolderMenu = { actions.onCategoryLongPress(view, group, apps) }
         )

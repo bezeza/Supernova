@@ -26,4 +26,11 @@
     <string name="fork_hidden_categories">Hidden categories: %1$d</string>
     <string name="fork_show_again">Show again</string>
     <string name="fork_recent_count">How many new apps</string>
+    <string name="fork_tile_size">Tile size: %1$s</string>
+    <string name="fork_size_normal">Normal</string>
+    <string name="fork_size_wide">Wide, a row across the screen</string>
+    <string name="fork_size_small">Small</string>
+    <string name="fork_large_icons">Large icons: %1$s</string>
+    <string name="fork_large_none">none, all small</string>
+    <string name="fork_more_apps">+%1$d</string>
 </resources>

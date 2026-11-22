@@ -28,7 +28,7 @@ object CategoriesPreview {
                 setPadding(margin, margin, margin, margin)
             }
             val card = CategoryTileCard(context)
-            card.setCardColor(CategoryTint.cardColor(textColor, 1f))
+            card.setColors(CategoryTint.cardColor(textColor, 1f), textColor)
             // The icons repeat when the sample has fewer than a tile holds.
             val picked = List(perTile) { icons.getOrNull((index * perTile + it) % icons.size.coerceAtLeast(1)) }
             card.showPreview(
