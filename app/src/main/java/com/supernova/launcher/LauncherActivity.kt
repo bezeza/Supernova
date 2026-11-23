@@ -3073,7 +3073,7 @@ class LauncherActivity :
                 widgets.restoreBuiltInSearchBar()
             }
         }
-        menu.addRow(getString(R.string.search_bar_settings), R.drawable.ic_tab_settings) {
+        menu.addRow(getString(R.string.search_bar_settings), R.drawable.ic_menu_settings) {
             startActivity(
                 Intent(this, SettingsActivity::class.java)
                     .putExtra(SettingsActivity.EXTRA_OPEN_SEARCH_BAR, true)
@@ -3104,7 +3104,7 @@ class LauncherActivity :
                 if (!text.isNullOrBlank()) drawer.pasteIntoSearch(text)
             }
         }
-        menu.addRow(getString(R.string.search_bar_settings), R.drawable.ic_tab_settings) {
+        menu.addRow(getString(R.string.search_bar_settings), R.drawable.ic_menu_settings) {
             startActivity(
                 Intent(this, SettingsActivity::class.java)
                     .putExtra(SettingsActivity.EXTRA_SECTION_TITLE_RES, R.string.drawer_search_bar)
@@ -3392,7 +3392,7 @@ class LauncherActivity :
         source: android.widget.PopupWindow?
     ) {
         if (app.privateSpace || viewModel.drawerFolderGroups().isEmpty()) return
-        menu.addRow(getString(R.string.move_to_folder), R.drawable.ic_menu_select_apps) {
+        menu.addRow(getString(R.string.move_to_folder), R.drawable.ic_menu_move_to_folder) {
             source?.dismiss()
             pickFolderFor(app)
         }
@@ -3559,7 +3559,7 @@ class LauncherActivity :
         if (group.type == DrawerGroupType.FOLDER) {
             val others = viewModel.drawerFolderGroups().filter { it.id != group.id }
             if (others.isNotEmpty()) {
-                menu.addRow(getString(R.string.merge_folder), R.drawable.ic_menu_select_apps) {
+                menu.addRow(getString(R.string.merge_folder), R.drawable.ic_menu_merge_folder) {
                     MaterialAlertDialogBuilder(this)
                         .setTitle(getString(R.string.merge_folder_title, group.name))
                         .setItems(others.map { it.name }.toTypedArray()) { _, which ->
@@ -3581,7 +3581,7 @@ class LauncherActivity :
         // apps, and Delete.
         menu.addRow(getString(R.string.edit), R.drawable.ic_menu_edit) { openDrawerGroupSettings(group.id) }
         // The Drawer groups list, as a tab's menu has it.
-        menu.addRow(getString(R.string.group_settings), R.drawable.ic_tab_settings) { openDrawerGroupSettings(null) }
+        menu.addRow(getString(R.string.group_settings), R.drawable.ic_menu_settings) { openDrawerGroupSettings(null) }
         menu.show(anchor, menuTouchX)
         return menu
     }
@@ -4673,7 +4673,7 @@ class LauncherActivity :
             }
             menu.addRow(getString(R.string.edit), R.drawable.ic_menu_edit) { openDrawerGroupSettings(group.id) }
         }
-        menu.addRow(getString(R.string.group_settings), R.drawable.ic_tab_settings) { openDrawerGroupSettings(null) }
+        menu.addRow(getString(R.string.group_settings), R.drawable.ic_menu_settings) { openDrawerGroupSettings(null) }
         // Tracked as the item menus are, so back and home close it.
         drag.activeItemPopup = menu
         menu.show(anchor)
