@@ -35,9 +35,9 @@ internal class EditGestures(private val card: ViewGroup) {
     // The widths a tile can be dragged to, asked when a drag of the grip begins.
     var targets: () -> ResizeTargets? = { null }
 
-    // Told how wide the tile is dragged as the finger goes, and once it lets go.
-    var onPreview: (Float) -> Unit = {}
-    var onResize: (Float) -> Unit = {}
+    // Told how wide and how high the tile is dragged as the finger goes, and once it lets go.
+    var onPreview: (Float, Float) -> Unit = { _, _ -> }
+    var onResize: (Float, Float) -> Unit = { _, _ -> }
 
     // A tap on the gear.
     var onGear: () -> Unit = {}
@@ -45,7 +45,10 @@ internal class EditGestures(private val card: ViewGroup) {
     private val outline = GradientDrawable().apply { cornerRadius = density * OUTLINE_CORNER_DP }
     private var color = 0
     private var dragged = 0f
+    private var draggedHeight = 0f
     private var startWidth = 0
+    private var startHeight = 0
+    private var downRawY = 0f
     private var downX = 0f
     private var downY = 0f
     private var downRawX = 0f
@@ -67,7 +70,7 @@ internal class EditGestures(private val card: ViewGroup) {
             MotionEvent.ACTION_DOWN -> down(event)
             MotionEvent.ACTION_MOVE -> {
                 if (!moved && hypot(event.x - downX, event.y - downY) > slop) moved = true
-                if (onGrip && moved) follow(event.rawX - downRawX)
+                if (onGrip && moved) follow(event.rawX - downRawX, event.rawY - downRawY)
             }
             MotionEvent.ACTION_UP -> finish()
             MotionEvent.ACTION_CANCEL -> {
@@ -83,7 +86,9 @@ internal class EditGestures(private val card: ViewGroup) {
         downY = event.y
         // The finger's own distance, not the card's: the card moves and grows as the others make way.
         downRawX = event.rawX
+        downRawY = event.rawY
         startWidth = card.width
+        startHeight = card.height
         moved = false
         tracking = true
         gearHit = marks.onGear(event.x, event.y)
@@ -95,7 +100,7 @@ internal class EditGestures(private val card: ViewGroup) {
     private fun finish() {
         when {
             !tracking -> Unit
-            onGrip && moved -> onResize(dragged)
+            onGrip && moved -> onResize(dragged, draggedHeight)
             !moved && gearHit -> onGear()
         }
         onGrip = false
@@ -108,12 +113,13 @@ internal class EditGestures(private val card: ViewGroup) {
         if (editing) marks.draw(canvas)
     }
 
-    // The outline over the list takes the width the finger gives the tile's edge, at once.
-    private fun follow(dx: Float) {
+    // The outline over the list takes the width and height the finger gives the tile's corner, at once.
+    private fun follow(dx: Float, dy: Float) {
         val target = targets() ?: return
         val list = list() ?: return
         dragged = (startWidth + dx).coerceIn(target.small, target.wide)
-        val height = TileGeometry.outlineHeight(dragged, target.normal)
+        draggedHeight = (startHeight + dy).coerceIn(target.small, target.wide)
+        val height = draggedHeight
         val at = Rect(0, 0, card.width, card.height)
         list.offsetDescendantRectToMyCoords(card, at)
         outline.setColor((color and COLOR_MASK) or (OUTLINE_FILL_ALPHA shl ALPHA_SHIFT))
@@ -125,7 +131,7 @@ internal class EditGestures(private val card: ViewGroup) {
             shown = true
         }
         list.invalidate()
-        onPreview(dragged)
+        onPreview(dragged, draggedHeight)
     }
 
     private fun settle() {

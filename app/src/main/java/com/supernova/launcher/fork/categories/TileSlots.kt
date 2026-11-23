@@ -17,6 +17,10 @@ internal object TileSlots {
     private const val DOUBLE_COLUMNS = 4
     private const val DOUBLE_LARGE = 7
     private const val CORNER_X = 1.5f
+    private const val BIG_LARGE = 15
+    private const val BIG_CORNER = 0.75f
+    private const val EIGHTH = 0.125f
+    private const val TALL_CORNER_X = 0.25f
 
     // [large] 3 / 1 / 0 large icons, the rest of the card small icons.
     fun normal(large: Int): List<Slot> = when (large) {
@@ -34,6 +38,26 @@ internal object TileSlots {
         }
         for (y in 0 until GRID_TWO) {
             for (x in 0 until GRID_TWO) add(Slot(CORNER_X + x * QUARTER, HALF + y * QUARTER, QUARTER, false))
+        }
+    }
+
+    // A tall tile is two normal ones one over the other: two columns of four rows of cells of a quarter of its
+    // height, the last cell a corner of four small icons, so seven large icons.
+    fun tall(): List<Slot> = buildList {
+        for (cell in 0 until DOUBLE_LARGE) {
+            add(Slot((cell % GRID_TWO) * QUARTER, (cell / GRID_TWO) * QUARTER, QUARTER, true))
+        }
+        for (y in 0 until GRID_TWO) {
+            for (x in 0 until GRID_TWO) add(Slot(TALL_CORNER_X + x * EIGHTH, BIG_CORNER + y * EIGHTH, EIGHTH, false))
+        }
+    }
+
+    // A big tile is two double ones one over the other: a square of four by four cells of a quarter, the last
+    // cell a corner of four small icons, so fifteen large icons.
+    fun big(): List<Slot> = buildList {
+        for (cell in 0 until BIG_LARGE) add(Slot((cell % CELLS) * QUARTER, (cell / CELLS) * QUARTER, QUARTER, true))
+        for (y in 0 until GRID_TWO) {
+            for (x in 0 until GRID_TWO) add(Slot(BIG_CORNER + x * EIGHTH, BIG_CORNER + y * EIGHTH, EIGHTH, false))
         }
     }
 

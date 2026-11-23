@@ -29,6 +29,8 @@ internal sealed class CategoryRow(val key: String, val content: String) {
             CategorySize.SMALL -> TileSlots.small()
             CategorySize.NORMAL -> TileSlots.normal(options.large)
             CategorySize.WIDE -> TileSlots.double()
+            CategorySize.LARGE -> TileSlots.big()
+            CategorySize.TALL -> TileSlots.tall()
         }
         val layout = CategoryLayout.tile(entry.apps, slots)
     }
@@ -120,8 +122,8 @@ internal class CategoriesAdapter(
 
     // A corner dragged to another size: the tile takes it at once, so the others make way while the finger is
     // still down, and [save] writes the setting (once, when the finger lets go).
-    private fun resize(id: String, width: Float, target: ResizeTargets?, save: Boolean) {
-        val size = target?.let { TileResize.sizeFor(width, it.small, it.normal, it.wide) }
+    private fun resize(id: String, width: Float, height: Float, target: ResizeTargets?, save: Boolean) {
+        val size = target?.let { TileResize.sizeFor(width, height, it.small, it.normal, it.wide) }
         val at = items.indexOfFirst { it is CategoryRow.Tile && it.entry.group.id == id }
         if (size == null || at < 0) return
         val row = items[at] as CategoryRow.Tile
@@ -168,9 +170,9 @@ internal class CategoriesAdapter(
     // app one, anything else the whole row.
     fun spanAt(position: Int, spanCount: Int): Int = when (val row = getItem(position)) {
         is CategoryRow.Tile -> when (row.options.size) {
-            CategorySize.NORMAL -> SPAN_TILE
+            CategorySize.NORMAL, CategorySize.TALL -> SPAN_TILE
             CategorySize.SMALL -> 1
-            CategorySize.WIDE -> minOf(SPAN_DOUBLE, spanCount)
+            CategorySize.WIDE, CategorySize.LARGE -> minOf(SPAN_DOUBLE, spanCount)
         }
         is CategoryRow.Loose -> 1
         else -> spanCount
@@ -282,8 +284,8 @@ internal class CategoriesAdapter(
             val open = { view: View -> if (!editing) actions.onCategory(view, entry.group, entry.apps) }
             val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
             card.edit.targets = { targets(itemView) }
-            card.edit.onPreview = { width -> resize(entry.group.id, width, targets(itemView), save = false) }
-            card.edit.onResize = { width -> resize(entry.group.id, width, targets(itemView), save = true) }
+            card.edit.onPreview = { w, h -> resize(entry.group.id, w, h, targets(itemView), save = false) }
+            card.edit.onResize = { w, h -> resize(entry.group.id, w, h, targets(itemView), save = true) }
             card.edit.onGear = { editHandlers.onTap(card, entry) }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)

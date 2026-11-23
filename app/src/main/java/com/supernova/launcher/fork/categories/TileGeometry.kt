@@ -25,7 +25,7 @@ internal object TileGeometry {
     // the width less the margin that fell between, halved.
     fun doubleHeight(width: Int, margin: Int): Int = width / 2 - margin
 
-    // The outline that follows a corner being dragged: [width] wide, and square until it is as wide as a
-    // normal tile ([normal]), then as high as that one. Plain arithmetic, so it is testable without a view.
-    fun outlineHeight(width: Float, normal: Float): Float = width.coerceAtMost(normal)
+    // A tall tile is two normal ones one over the other with the margins between them: twice the width and
+    // the margins that fell between.
+    fun tallHeight(width: Int, margin: Int): Int = 2 * width + 2 * margin
 }

@@ -47,4 +47,6 @@
     <string name="fork_look_single">Лише перший застосунок</string>
     <string name="fork_edit_done">Готово</string>
     <string name="fork_edit_hint">Тягніть плитку, щоб перемістити, кутик, щоб змінити розмір, шестерню, щоб відкрити налаштування</string>
+    <string name="fork_size_large">Велика (2×2): завбільшки з чотири плитки</string>
+    <string name="fork_size_tall">Висока (1×2): дві плитки одна над одною</string>
 </resources>

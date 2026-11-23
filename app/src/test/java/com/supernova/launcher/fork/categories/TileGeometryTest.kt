@@ -48,8 +48,8 @@ class TileGeometryTest {
     }
 
     @Test
-    fun theOutlineIsSquareThenAsHighAsANormalTile() {
-        assertEquals(80f, TileGeometry.outlineHeight(80f, 200f), 0.001f)
-        assertEquals(200f, TileGeometry.outlineHeight(300f, 200f), 0.001f)
+    fun aTallTileIsTwoNormalOnesWithTheMarginsBetween() {
+        // Normal 188 wide with margins of 6: two of them and the 12 between make 388, as a double tile is wide.
+        assertEquals(388, TileGeometry.tallHeight(188, 6))
     }
 }

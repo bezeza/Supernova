@@ -122,7 +122,7 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = geometry.height(width)
         setMeasuredDimension(width, height)
-        val ref = geometry.reference(height)
+        val ref = geometry.reference(width, height)
         val largeSlots = slots.filter { it.large }
         val miniSlots = slots.filter { !it.large }
         fun measureIcon(view: View, slot: TileSlots.Slot?) {
@@ -138,7 +138,7 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
             MeasureSpec.makeMeasureSpec(target?.height ?: 0, MeasureSpec.EXACTLY)
         )
         empty.measure(
-            MeasureSpec.makeMeasureSpec(width - 2 * geometry.padding(height), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(width - 2 * geometry.padding(width, height), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(ref, MeasureSpec.AT_MOST)
         )
     }
@@ -146,25 +146,26 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val width = r - l
         val height = b - t
-        val pad = geometry.padding(height)
-        val ref = geometry.reference(height)
+        val pad = geometry.padding(width, height)
+        val ref = geometry.reference(width, height)
         val x0 = geometry.left(width, height)
+        val y0 = geometry.top(width, height)
         val largeSlots = slots.filter { it.large }
         val miniSlots = slots.filter { !it.large }
-        large.forEachIndexed { index, view -> place(view, largeSlots.getOrNull(index), x0, pad, ref) }
-        mini.forEachIndexed { index, view -> place(view, miniSlots.getOrNull(index), x0, pad, ref) }
+        large.forEachIndexed { index, view -> place(view, largeSlots.getOrNull(index), x0, y0, ref) }
+        mini.forEachIndexed { index, view -> place(view, miniSlots.getOrNull(index), x0, y0, ref) }
         val target = geometry.cornerTarget(width, height)
         corner.layout(target?.left ?: 0, target?.top ?: 0, target?.right ?: 0, target?.bottom ?: 0)
         centre(empty, pad, pad, width - 2 * pad, ref)
     }
 
-    private fun place(view: View, slot: TileSlots.Slot?, x0: Int, pad: Int, ref: Int) {
+    private fun place(view: View, slot: TileSlots.Slot?, x0: Int, y0: Int, ref: Int) {
         if (slot == null) {
             view.layout(0, 0, 0, 0)
             return
         }
         val size = (slot.size * ref).toInt()
-        centre(view, x0 + (slot.x * ref).toInt(), pad + (slot.y * ref).toInt(), size, size)
+        centre(view, x0 + (slot.x * ref).toInt(), y0 + (slot.y * ref).toInt(), size, size)
     }
 
     private fun centre(view: View, left: Int, top: Int, width: Int, height: Int) {
