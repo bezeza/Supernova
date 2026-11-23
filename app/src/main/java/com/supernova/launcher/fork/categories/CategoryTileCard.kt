@@ -18,13 +18,14 @@ import com.supernova.launcher.data.LaunchableApp
 // large icons and a corner of four small ones, a tap on the corner opening the
 // whole category. The card lays its children out by hand, so a bind touches
 // the image views and nothing else.
-internal class CategoryTileCard(context: Context) : ViewGroup(context) {
+internal class CategoryTileCard(context: Context) : EditableCard(context) {
 
     private val corner = View(context)
     private val large = List(CategoryLayout.LARGE_SLOTS) { ImageView(context) }
     private val mini = List(CategoryLayout.MINI_MAX) { ImageView(context) }
     private val shape = GradientDrawable()
     private var slots: List<TileSlots.Slot> = TileSlots.normal(CategoryLayout.LARGE_SLOTS)
+
 
     // Shown in place of the icons while the category holds no app.
     private val empty = TextView(context).apply {
@@ -60,7 +61,9 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     fun setColors(card: Int, text: Int) {
         shape.setColor(card)
         empty.setTextColor(text)
+        edit.setColor(text)
     }
+
 
     fun bind(
         tile: CategoryLayout.Tile<LaunchableApp>,

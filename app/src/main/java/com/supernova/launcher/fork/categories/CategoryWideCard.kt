@@ -18,7 +18,7 @@ import kotlin.math.min
 // A category's tile as a row across the screen: the name on the left, up to
 // six icons of a middle size on the right, and "+N" when there are more apps.
 // Laid out by hand, like the square tile.
-internal class CategoryWideCard(context: Context) : ViewGroup(context) {
+internal class CategoryWideCard(context: Context) : EditableCard(context) {
 
     private val density = context.resources.displayMetrics.density
     private val shape = GradientDrawable()
@@ -42,6 +42,7 @@ internal class CategoryWideCard(context: Context) : ViewGroup(context) {
     // True: a tap on an icon launches the app. False: every tap opens the category.
     var launchFromIcons = true
 
+
     init {
         addView(nameView)
         icons.forEach { view ->
@@ -57,7 +58,9 @@ internal class CategoryWideCard(context: Context) : ViewGroup(context) {
         shape.setColor(card)
         nameView.setTextColor(text)
         more.setTextColor(text)
+        edit.setColor(text)
     }
+
 
     fun bind(
         apps: List<LaunchableApp>,

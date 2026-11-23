@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.LaunchableApp
@@ -33,24 +32,89 @@ internal sealed class CategoryRow(val key: String, val content: String) {
 
     class Loose(val app: LaunchableApp) : CategoryRow("app/${appKey(app)}", appKey(app))
 
+    // The bar on top while the tiles are arranged: how, and the button that ends it.
+    object Done : CategoryRow("done", "done")
+
     // The way back for categories taken off the tiles.
     class Hidden(val categories: List<HiddenCategory>) :
         CategoryRow("hidden", categories.joinToString(",") { it.id })
 }
 
-// Four columns: a tile takes two, a full-width row all four, a loose app one.
+// Four columns: a tile takes two, a full-width row all four, a loose app one. An adapter is many
+// small overrides, so the count of functions is not a measure of it.
+@Suppress("TooManyFunctions")
 internal class CategoriesAdapter(
     private val icons: CategoryIcons,
     private val actions: CategoriesActions,
+    private val editHandlers: EditHandlers,
     private val onShowHidden: (Context, List<HiddenCategory>) -> Unit
-) : ListAdapter<CategoryRow, RecyclerView.ViewHolder>(Diff) {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var look = TileLook(textColor = 0)
     private val textColor: Int get() = look.textColor
 
+    // The rows as the controller gave them; [items] are those on screen: with the bar on top while arranging.
+    private var base: List<CategoryRow> = emptyList()
+    private var items: List<CategoryRow> = emptyList()
+
+    // True while the tiles are being arranged: they shake, take drags and open their settings on a tap.
+    var editing = false
+        private set
+
     init {
         setHasStableIds(true)
     }
+
+    override fun getItemCount(): Int = items.size
+
+    private fun getItem(position: Int): CategoryRow = items[position]
+
+    // A new list: only the rows that changed are rebound.
+    fun submitList(list: List<CategoryRow>) {
+        base = list
+        show(withBar(list))
+    }
+
+    private fun withBar(list: List<CategoryRow>): List<CategoryRow> =
+        if (editing) listOf(CategoryRow.Done) + list else list
+
+    private fun show(new: List<CategoryRow>) {
+        val old = items
+        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = old.size
+
+            override fun getNewListSize() = new.size
+
+            override fun areItemsTheSame(oldPosition: Int, newPosition: Int) =
+                Diff.areItemsTheSame(old[oldPosition], new[newPosition])
+
+            override fun areContentsTheSame(oldPosition: Int, newPosition: Int) =
+                Diff.areContentsTheSame(old[oldPosition], new[newPosition])
+        })
+        items = new
+        diff.dispatchUpdatesTo(this)
+    }
+
+    fun setEditing(on: Boolean) {
+        if (editing == on) return
+        editing = on
+        show(withBar(base))
+        notifyItemRangeChanged(0, itemCount, PAYLOAD_EDIT)
+    }
+
+    // A drag moved the tile at [from] to [to]: only over another tile.
+    fun move(from: Int, to: Int): Boolean {
+        if (items.getOrNull(from) !is CategoryRow.Tile || items.getOrNull(to) !is CategoryRow.Tile) return false
+        items = CategoryReorder.moved(items, from, to)
+        base = items.filter { it !is CategoryRow.Done }
+        notifyItemMoved(from, to)
+        return true
+    }
+
+    fun isTile(position: Int): Boolean = items.getOrNull(position) is CategoryRow.Tile
+
+    // The folders' ids in the order the tiles are in now.
+    fun tileIds(): List<String> = items.filterIsInstance<CategoryRow.Tile>().map { it.entry.group.id }
 
     // The colours or a switch moved: the rows redraw.
     fun setLook(look: TileLook) {
@@ -67,6 +131,7 @@ internal class CategoriesAdapter(
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
         is CategoryRow.Hidden -> TYPE_HIDDEN
+        CategoryRow.Done -> TYPE_DONE
     }
 
     // A tile is two spans wide (a small one, one; a wide one, the row), a loose app one, anything else the whole row.
@@ -88,6 +153,7 @@ internal class CategoriesAdapter(
             TYPE_WIDE -> WideHolder(context)
             TYPE_HEADER -> HeaderHolder(context)
             TYPE_HIDDEN -> HiddenHolder(context)
+            TYPE_DONE -> DoneHolder(context)
             else -> LooseHolder(context)
         }
     }
@@ -99,7 +165,30 @@ internal class CategoriesAdapter(
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
             is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
+            CategoryRow.Done -> (holder as DoneHolder).bind()
         }
+    }
+
+    // Only the arranging started or stopped: the shake and the card's touches, not a whole bind.
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_EDIT) && holder is Arrangeable) {
+            holder.applyEditing(editing)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        (holder as? Arrangeable)?.applyEditing(editing)
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        (holder as? Arrangeable)?.applyEditing(false)
+    }
+
+    // A tile that shakes and takes drags while the tiles are arranged.
+    private interface Arrangeable {
+        fun applyEditing(on: Boolean)
     }
 
     private fun cardColor(): Int = CategoryTint.cardColor(textColor, look.backdrop)
@@ -130,8 +219,9 @@ internal class CategoriesAdapter(
         title.compoundDrawablePadding = dp(context, GLYPH_GAP_DP)
     }
 
-    private inner class TileHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
+    private inner class TileHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)), Arrangeable {
         private val card = CategoryTileCard(context)
+        private val wobble = Wobble(itemView)
         private val title = label(context, TILE_LABEL_SP, centred = true, lines = TITLE_LINES)
 
         init {
@@ -157,8 +247,12 @@ internal class CategoriesAdapter(
             title.setTextColor(textColor)
             showGlyph(title, entry.group.name)
             itemView.contentDescription = itemView.context.getString(R.string.folder_desc, entry.group.name)
-            val open = { view: View -> actions.onCategory(view, entry.group, entry.apps) }
+            // While arranging, a tap is for the tile's settings, not for opening it.
+            val open = { view: View ->
+                if (editing) editHandlers.onTap(view, entry) else actions.onCategory(view, entry.group, entry.apps)
+            }
             val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
+            card.edit.onResize = { dx -> resize(row, dx) }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)
             // A small tile's name is smaller too, to fit its narrower column.
@@ -167,12 +261,25 @@ internal class CategoriesAdapter(
             card.bind(row.layout, icons, actions, open = open, openLongPress = openLongPress)
             // The name under the tile opens it too.
             itemView.setOnClickListener(open)
-            itemView.setOnLongClickListener { openLongPress(it); true }
+            // While arranging a hold is the list's: it drags the tile.
+            itemView.setOnLongClickListener { if (editing) false else { openLongPress(it); true } }
+            applyEditing(editing)
+        }
+
+        override fun applyEditing(on: Boolean) {
+            card.edit.editing = on
+            if (on) wobble.start() else wobble.stop()
+        }
+
+        private fun resize(row: CategoryRow.Tile, dx: Float) {
+            val size = TileResize.resize(row.options.size, dx, card.edit.stepPx(itemView.parent as? View))
+            if (size != row.options.size) editHandlers.onResize(row.entry.group.id, size)
         }
     }
 
-    private inner class WideHolder(context: Context) : RecyclerView.ViewHolder(CategoryWideCard(context)) {
+    private inner class WideHolder(context: Context) : RecyclerView.ViewHolder(CategoryWideCard(context)), Arrangeable {
         private val card = itemView as CategoryWideCard
+        private val wobble = Wobble(itemView)
 
         init {
             val margin = dp(context, TILE_MARGIN_DP)
@@ -188,11 +295,57 @@ internal class CategoriesAdapter(
             showGlyph(card.nameView, entry.group.name)
             card.contentDescription = card.context.getString(R.string.folder_desc, entry.group.name)
             card.launchFromIcons = look.launchFromIcons
+            card.edit.onResize = { dx ->
+                val size = TileResize.resize(row.options.size, dx, card.edit.stepPx(itemView.parent as? View))
+                if (size != row.options.size) editHandlers.onResize(entry.group.id, size)
+            }
             card.bind(
                 entry.apps, icons, actions,
-                open = { view -> actions.onCategory(view, entry.group, entry.apps) },
+                open = { view ->
+                    if (editing) editHandlers.onTap(view, entry) else actions.onCategory(view, entry.group, entry.apps)
+                },
                 openLongPress = { view -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
             )
+            applyEditing(editing)
+        }
+
+        override fun applyEditing(on: Boolean) {
+            card.edit.editing = on
+            if (on) wobble.start() else wobble.stop()
+        }
+    }
+
+    // The bar on top while arranging: how, and the button that ends it.
+    private inner class DoneHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
+        private val hint = label(context, HINT_SP, centred = false, lines = HINT_LINES)
+        private val done = label(context, DONE_SP, centred = true)
+        private val shape = GradientDrawable()
+
+        init {
+            val bar = itemView as LinearLayout
+            bar.orientation = LinearLayout.HORIZONTAL
+            bar.gravity = Gravity.CENTER_VERTICAL
+            val pad = dp(context, DONE_PADDING_DP)
+            bar.setPadding(pad, pad / 2, pad, pad / 2)
+            bar.layoutParams = RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            hint.setText(R.string.fork_edit_hint)
+            bar.addView(hint, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            done.setText(R.string.fork_edit_done)
+            shape.cornerRadius = dp(context, DONE_CORNER_DP).toFloat()
+            done.background = shape
+            done.setPadding(pad, pad / 2, pad, pad / 2)
+            bar.addView(done, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { marginStart = pad })
+            done.setOnClickListener { editHandlers.onDone() }
+        }
+
+        fun bind() {
+            hint.setTextColor(textColor)
+            done.setTextColor(textColor)
+            shape.setColor(cardColor())
         }
     }
 
@@ -334,6 +487,13 @@ internal class CategoriesAdapter(
         const val TYPE_LOOSE = 3
         const val TYPE_HIDDEN = 4
         const val TYPE_WIDE = 5
+        const val TYPE_DONE = 6
+        const val PAYLOAD_EDIT = "edit"
+        const val HINT_SP = 11f
+        const val HINT_LINES = 3
+        const val DONE_SP = 14f
+        const val DONE_PADDING_DP = 12f
+        const val DONE_CORNER_DP = 18f
         const val SPAN_TILE = 2
         const val TILE_LABEL_SP = 12f
         const val SMALL_LABEL_SP = 10f

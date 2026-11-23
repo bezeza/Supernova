@@ -46,4 +46,6 @@
     <string name="fork_look_grid">2 × 2</string>
     <string name="fork_look_grid3">3 × 3</string>
     <string name="fork_look_single">The first app alone</string>
+    <string name="fork_edit_done">Done</string>
+    <string name="fork_edit_hint">Drag a tile to move it, its corner to resize it, tap for its settings</string>
 </resources>

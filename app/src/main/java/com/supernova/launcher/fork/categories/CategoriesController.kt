@@ -2,6 +2,7 @@ package com.supernova.launcher.fork.categories
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -29,19 +30,28 @@ class CategoriesController(
 
     private var options: Map<String, CategoryOptions> = emptyMap()
 
-    // A long press on a tile opens the category's options; the folder's own menu is a row in them.
-    private val rowActions = CategoriesActions(
+    // A tap on a tile while the tiles are arranged opens the category's options (the folder's own menu is a row in
+    // them); a corner dragged to another size changes the category's size.
+    private val editHandlers: EditHandlers = EditHandlers(
+        onTap = { view, entry -> showOptions(view, entry.group, entry.apps) },
+        onDone = { arranger.stop() },
+        onResize = { id, size -> actions.edits.onOptions(id) { it.copy(size = size) } }
+    )
+
+    // A long press on a tile starts arranging the tiles.
+    private val rowActions: CategoriesActions = CategoriesActions(
         actions.onApp, actions.onAppLongPress, actions.onCategory,
-        { view, group, apps -> showOptions(view, group, apps) },
+        { _, _, _ -> if (!state.isOpen) arranger.start() },
         actions.edits
     )
-    private val rows = CategoriesAdapter(CategoryIcons(catalog, decorateIcon), rowActions) { context, hidden ->
+    private val icons: CategoryIcons = CategoryIcons(catalog, decorateIcon)
+    private val rows: CategoriesAdapter = CategoriesAdapter(icons, rowActions, editHandlers) { context, hidden ->
         CategoryOptionsDialog.showHidden(context, hidden) { id ->
             actions.edits.onOptions(id) { it.copy(hidden = false) }
         }
     }
 
-    private val recycler = RecyclerView(container.context).apply {
+    private val recycler: RecyclerView = RecyclerView(container.context).apply {
         visibility = View.GONE
         layoutManager = GridLayoutManager(context, MIN_TILES * 2).apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -64,6 +74,8 @@ class CategoriesController(
         }
     }
 
+    private val arranger: TileArranger = TileArranger(recycler, rows) { actions.edits.onOrder(it) }
+
     private val state = CategoryScreenState()
     private val screen = CategoryScreen(container, screenAdapter, { back() }, { picked ->
         openGroup?.let { actions.edits.onPlaceLarge(it, picked) }
@@ -83,9 +95,18 @@ class CategoriesController(
         )
     }
 
-    // The drawer's swipe to the neighbouring tab, on the tiles and on a category's screen.
+    // The drawer's swipe to the neighbouring tab, on the tiles and on a category's screen. Not while the
+    // tiles are arranged: a drag is the tile's then.
     fun addTabSwipe(onTiles: RecyclerView.OnItemTouchListener, onScreen: RecyclerView.OnItemTouchListener) {
-        recycler.addOnItemTouchListener(onTiles)
+        recycler.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean =
+                !arranger.isOn && onTiles.onInterceptTouchEvent(rv, e)
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) = onTiles.onTouchEvent(rv, e)
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) =
+                onTiles.onRequestDisallowInterceptTouchEvent(disallowIntercept)
+        })
         screen.grid.addOnItemTouchListener(onScreen)
     }
 
@@ -96,6 +117,7 @@ class CategoriesController(
 
     fun setVisible(show: Boolean) {
         wanted = show
+        if (!show) arranger.stop()
         // The tiles going away (search, a tab, another style) takes the screen with them.
         if (!show && !standalone) closeScreen(animate = false)
         showTiles()
@@ -122,7 +144,7 @@ class CategoriesController(
 
     // Back: choosing large icons stops first, then the screen closes. True
     // when it did either, so the Back is spent.
-    fun back(): Boolean = screen.cancelPicking() || closeScreen()
+    fun back(): Boolean = arranger.stop() || screen.cancelPicking() || closeScreen()
 
     // A tap on an app of the screen: a choice while choosing, else [launch].
     fun onScreenAppClick(launch: () -> Unit, app: LaunchableApp) {
@@ -131,6 +153,7 @@ class CategoriesController(
 
     // True when a screen was open and is closed now: the Back that did it is spent.
     fun closeScreen(animate: Boolean = true): Boolean {
+        arranger.stop()
         val wasOpen = state.close()
         standalone = false
         showTiles()

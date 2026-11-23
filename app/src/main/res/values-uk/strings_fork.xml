@@ -46,4 +46,6 @@
     <string name="fork_look_grid">2 × 2</string>
     <string name="fork_look_grid3">3 × 3</string>
     <string name="fork_look_single">Лише перший застосунок</string>
+    <string name="fork_edit_done">Готово</string>
+    <string name="fork_edit_hint">Тягніть плитку, щоб перемістити, кутик, щоб змінити розмір, тапніть, щоб відкрити налаштування</string>
 </resources>
