@@ -33,10 +33,12 @@ class CategoriesController(
     private val rowActions = CategoriesActions(
         actions.onApp, actions.onAppLongPress, actions.onCategory,
         { view, group, apps -> showOptions(view, group, apps) },
-        actions.onPlaceLarge, actions.onOptions
+        actions.edits
     )
     private val rows = CategoriesAdapter(CategoryIcons(catalog, decorateIcon), rowActions) { context, hidden ->
-        CategoryOptionsDialog.showHidden(context, hidden) { id -> actions.onOptions(id) { it.copy(hidden = false) } }
+        CategoryOptionsDialog.showHidden(context, hidden) { id ->
+            actions.edits.onOptions(id) { it.copy(hidden = false) }
+        }
     }
 
     private val recycler = RecyclerView(container.context).apply {
@@ -63,9 +65,14 @@ class CategoriesController(
     }
 
     private val state = CategoryScreenState()
-    private val screen = CategoryScreen(container, screenAdapter, { back() }) { picked ->
-        openGroup?.let { actions.onPlaceLarge(it, picked) }
-    }
+    private val screen = CategoryScreen(container, screenAdapter, { back() }, { picked ->
+        openGroup?.let { actions.edits.onPlaceLarge(it, picked) }
+    }) { openGroup?.let { actions.edits.onAddApps(it) } }
+    // A folder of the drawer opened on a screen in another style: the tiles are not there to close it.
+    private var standalone = false
+    // Told when a screen opens or closes, so the drawer can hide or show its own list.
+    var onScreenChanged: (() -> Unit)? = null
+    val isScreenOpen: Boolean get() = state.isOpen
     private var openGroup: DrawerGroup? = null
 
     init {
@@ -90,7 +97,7 @@ class CategoriesController(
     fun setVisible(show: Boolean) {
         wanted = show
         // The tiles going away (search, a tab, another style) takes the screen with them.
-        if (!show) closeScreen(animate = false)
+        if (!show && !standalone) closeScreen(animate = false)
         showTiles()
     }
 
@@ -104,11 +111,13 @@ class CategoriesController(
     }
 
     // A tile opened: the category's apps on a screen of their own.
-    fun openScreen(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook) {
+    fun openScreen(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook, standalone: Boolean = false) {
+        this.standalone = standalone
         state.open(group.id)
         openGroup = group
         showTiles()
         screen.show(group, apps, look, animate = true)
+        onScreenChanged?.invoke()
     }
 
     // Back: choosing large icons stops first, then the screen closes. True
@@ -123,7 +132,9 @@ class CategoriesController(
     // True when a screen was open and is closed now: the Back that did it is spent.
     fun closeScreen(animate: Boolean = true): Boolean {
         val wasOpen = state.close()
+        standalone = false
         showTiles()
+        if (wasOpen) onScreenChanged?.invoke()
         screen.hide(animate && wasOpen)
         return wasOpen
     }
@@ -160,10 +171,10 @@ class CategoriesController(
 
     private fun showOptions(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
         val handlers = OptionsHandlers(
-            onSort = { sort -> actions.onOptions(group.id) { it.copy(sort = sort) } },
-            onSize = { size -> actions.onOptions(group.id) { it.copy(size = size) } },
-            onLarge = { count -> actions.onOptions(group.id) { it.copy(large = count) } },
-            onHide = { actions.onOptions(group.id) { it.copy(hidden = true) } },
+            onSort = { sort -> actions.edits.onOptions(group.id) { it.copy(sort = sort) } },
+            onSize = { size -> actions.edits.onOptions(group.id) { it.copy(size = size) } },
+            onLarge = { count -> actions.edits.onOptions(group.id) { it.copy(large = count) } },
+            onHide = { actions.edits.onOptions(group.id) { it.copy(hidden = true) } },
             onFolderMenu = { actions.onCategoryLongPress(view, group, apps) }
         )
         CategoryOptionsDialog.show(view.context, group.name, options[group.id] ?: CategoryOptions(), handlers)

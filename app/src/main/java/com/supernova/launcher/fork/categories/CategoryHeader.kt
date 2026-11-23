@@ -20,6 +20,7 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
 
     var onBack: () -> Unit = {}
     var onPick: () -> Unit = {}
+    var onAdd: () -> Unit = {}
 
     private val density = context.resources.displayMetrics.density
     private var name = ""
@@ -30,6 +31,8 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
     private val backButton = button(R.drawable.ic_back, context.getString(R.string.back)) { onBack() }
     private val pickButton =
         button(R.drawable.ic_fork_pick_large, context.getString(R.string.fork_pick_large)) { onPick() }
+
+    private val addButton = button(R.drawable.ic_fork_add, context.getString(R.string.fork_add_apps)) { onAdd() }
 
     private val title = TextView(context).apply {
         setTextSize(TypedValue.COMPLEX_UNIT_SP, TITLE_SP)
@@ -49,6 +52,7 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
         addView(title, LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
             marginStart = dp(TITLE_GAP_DP)
         })
+        addView(addButton, LayoutParams(size, size))
         addView(pickButton, LayoutParams(size, size))
     }
 
@@ -68,6 +72,7 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
     fun setHint(text: String?, choosable: Boolean) {
         hint = text
         pickButton.visibility = if (text != null) INVISIBLE else if (choosable) VISIBLE else GONE
+        addButton.visibility = if (text != null) INVISIBLE else VISIBLE
         render()
     }
 
@@ -78,6 +83,7 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
         title.setTextColor(color)
         backButton.imageTintList = ColorStateList.valueOf(color)
         pickButton.imageTintList = ColorStateList.valueOf(color)
+        addButton.imageTintList = ColorStateList.valueOf(color)
         render()
     }
 

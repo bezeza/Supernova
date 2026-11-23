@@ -33,4 +33,7 @@
     <string name="fork_large_icons">Большие иконки: %1$s</string>
     <string name="fork_large_none">нет, все малые</string>
     <string name="fork_more_apps">+%1$d</string>
+    <string name="fork_add_apps">Добавить приложения</string>
+    <string name="fork_folder_screen">Папки на весь экран</string>
+    <string name="fork_folder_screen_summary">Папка меню открывается на весь экран, как категория, вместо окна</string>
 </resources>

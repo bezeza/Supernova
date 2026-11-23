@@ -29,6 +29,7 @@ import com.supernova.launcher.fork.ForkHooks
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
 import com.supernova.launcher.fork.categories.CategoriesData
+import com.supernova.launcher.fork.categories.CategoryEdits
 import com.supernova.launcher.fork.categories.CategoryOptions
 import com.supernova.launcher.fork.categories.CategorySettings
 import com.supernova.launcher.fork.categories.CategoryOptionsStore
@@ -98,11 +99,11 @@ class DrawerController(
     private val categories: CategoriesController = ForkHooks.categories(
         binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
         CategoriesActions(
-            onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress, ::placeCategoryLarge,
-            ::changeCategoryOptions
+            onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress,
+            CategoryEdits(::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory)
         ),
         categoryAdapter
-    )
+    ).also { it.onScreenChanged = { applyListVisibility() } }
     private var categoriesStyle = false
 
     // A group tab held and moved along the bar: the group tabs in a new order.
@@ -123,7 +124,7 @@ class DrawerController(
         onLongPress = onAppLongPress,
         onWebSearch = { onWebSearch(binding.drawerSearch.text?.toString().orEmpty().trim()) },
         onChip = { chip, query -> onChipSearch(chip, query) },
-        onFolderClick = { view, folder -> onFolderClick(view, folder.group, folder.members) },
+        onFolderClick = { view, folder -> onFolderTap(view, folder.group, folder.members) }, // Fork
         onFolderLongPress = { view, folder -> onFolderLongPress(view, folder.group, folder.members) }
     )
 
@@ -460,10 +461,12 @@ class DrawerController(
         val pagedEmpty = paged && adapter.items().isEmpty()
         val categoriesShown = categoriesShown() // Fork
         categories.setVisible(categoriesShown)
-        val flatHidden = categoriesShown || (paged && !pagedEmpty)
+        val screenOpen = screenOverList() // Fork
+        val pagedList = paged && !pagedEmpty
+        val flatHidden = categoriesShown || screenOpen || pagedList
         binding.drawerRecycler.visibility = if (searchingExternally || flatHidden) View.GONE else View.VISIBLE
         binding.drawerPager.visibility =
-            if (!searchingExternally && paged && !pagedEmpty) View.VISIBLE else View.GONE
+            if (!searchingExternally && !screenOpen && pagedList) View.VISIBLE else View.GONE
     }
 
     private fun liftSearchRow() {
@@ -1907,7 +1910,32 @@ class DrawerController(
 
     // Fork: a category's own screen, set up as the drawer's grid is.
     @Suppress("UNUSED_PARAMETER")
-    private fun openCategoryScreen(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
+    private fun openCategoryScreen(view: View, group: DrawerGroup, apps: List<LaunchableApp>) =
+        showCategoryScreen(group, apps, standalone = false)
+
+    // Fork: a search or another tab takes a folder's screen off the drawer; true while one is still over the list.
+    private fun screenOverList(): Boolean {
+        val searchedOrTabbed = selectedTab != null || searchingExternally || !binding.drawerSearch.text.isNullOrEmpty()
+        if (!categoriesStyle && searchedOrTabbed) categories.closeScreen(animate = false)
+        return categories.isScreenOpen
+    }
+
+    // Fork: a folder of the drawer tapped in another style opens on the screen, when its setting is on.
+    private fun onFolderTap(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
+        if (viewModel.state.value.prefs.folderScreen && !categoriesStyle) {
+            showCategoryScreen(group, apps, standalone = true)
+        } else {
+            onFolderClick(view, group, apps)
+        }
+    }
+
+    // Fork: the "+" on the screen: the folder's apps to pick, as in the folder's menu.
+    private fun addAppsToCategory(group: DrawerGroup) {
+        val icons = ItemIcons(binding.root.context, viewModel)
+        GroupChecklist(binding.root.context, viewModel, icons).show(group, viewModel.visibleApps())
+    }
+
+    private fun showCategoryScreen(group: DrawerGroup, apps: List<LaunchableApp>, standalone: Boolean) {
         val prefs = viewModel.state.value.prefs
         val recycler = binding.drawerRecycler
         categoryAdapter.displayMode = adapter.displayMode
@@ -1921,7 +1949,8 @@ class DrawerController(
             ScreenLook(
                 columnCount(prefs), recycler.paddingLeft, recycler.paddingTop,
                 recycler.paddingRight, recycler.paddingBottom
-            )
+            ),
+            standalone
         )
     }
 
