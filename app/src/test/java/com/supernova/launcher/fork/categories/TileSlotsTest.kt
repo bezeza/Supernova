@@ -83,4 +83,34 @@ class TileSlotsTest {
         assertEquals(9, tile.mini.size)
         assertEquals(3, tile.hidden)
     }
+
+    @Test
+    fun aDoubleTileHasSevenLargeAndAFourSmallCorner() {
+        val slots = TileSlots.double()
+        assertEquals(7, TileSlots.largeCount(slots))
+        assertEquals(4, TileSlots.miniCount(slots))
+        assertTrue(slots.take(7).all { it.large })
+    }
+
+    @Test
+    fun aDoubleTileRunsTwoHeightsAcrossAndStaysOneHigh() {
+        val slots = TileSlots.double()
+        assertEquals(2f, TileSlots.contentWidth(slots), eps)
+        assertTrue(slots.all { it.x >= -eps && it.y >= -eps && it.x + it.size <= 2f + eps })
+        assertTrue(slots.all { it.y + it.size <= 1f + eps })
+        assertTrue(noOverlap(slots))
+    }
+
+    @Test
+    fun aSquareTileRunsOneHeightAcross() {
+        assertEquals(1f, TileSlots.contentWidth(TileSlots.normal(3)), eps)
+    }
+
+    @Test
+    fun aDoubleTileTakesTheFirstSevenAppsLargeAndTheNextFourSmall() {
+        val tile = CategoryLayout.tile((1..20).toList(), TileSlots.double())
+        assertEquals((1..7).toList(), tile.large)
+        assertEquals((8..11).toList(), tile.mini)
+        assertEquals(9, tile.hidden)
+    }
 }

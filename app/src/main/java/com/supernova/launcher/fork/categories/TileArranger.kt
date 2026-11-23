@@ -1,5 +1,6 @@
 package com.supernova.launcher.fork.categories
 
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
@@ -44,6 +45,8 @@ internal class TileArranger(
     fun start() {
         if (rows.editing) return
         rows.setEditing(true)
+        // The tiles make way for one another, but a changed tile keeps its own view: a drag is on it.
+        recycler.itemAnimator = DefaultItemAnimator().apply { supportsChangeAnimations = false }
         touchHelper.attachToRecyclerView(recycler)
         recycler.scrollToPosition(0)
     }
@@ -52,6 +55,7 @@ internal class TileArranger(
     fun stop(): Boolean {
         if (!rows.editing) return false
         rows.setEditing(false)
+        recycler.itemAnimator = null
         touchHelper.attachToRecyclerView(null)
         return true
     }

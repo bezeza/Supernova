@@ -113,70 +113,68 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         mini.forEachIndexed { index, view -> view.setImageDrawable(miniIcons.getOrNull(index)) }
     }
 
+    // The margin round a tile in the list: a double tile is as high as the normal one beside it.
+    var gapPx = 0
+
+    private val geometry = CardGeometry({ slots }, { gapPx })
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val side = MeasureSpec.getSize(widthMeasureSpec)
-        setMeasuredDimension(side, side)
-        val inner = side - 2 * padding(side)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = geometry.height(width)
+        setMeasuredDimension(width, height)
+        val ref = geometry.reference(height)
         val largeSlots = slots.filter { it.large }
         val miniSlots = slots.filter { !it.large }
         fun measureIcon(view: View, slot: TileSlots.Slot?) {
-            val size = if (slot == null) 0 else (slot.size * inner * ICON_FILL).toInt()
+            val size = if (slot == null) 0 else (slot.size * ref * ICON_FILL).toInt()
             val spec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY)
             view.measure(spec, spec)
         }
         large.forEachIndexed { index, view -> measureIcon(view, largeSlots.getOrNull(index)) }
         mini.forEachIndexed { index, view -> measureIcon(view, miniSlots.getOrNull(index)) }
-        val target = cornerTarget(side)
+        val target = geometry.cornerTarget(width, height)
         corner.measure(
             MeasureSpec.makeMeasureSpec(target?.width ?: 0, MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(target?.height ?: 0, MeasureSpec.EXACTLY)
         )
         empty.measure(
-            MeasureSpec.makeMeasureSpec(inner, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(inner, MeasureSpec.AT_MOST)
+            MeasureSpec.makeMeasureSpec(width - 2 * geometry.padding(height), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(ref, MeasureSpec.AT_MOST)
         )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val side = r - l
-        val pad = padding(side)
-        val inner = side - 2 * pad
+        val width = r - l
+        val height = b - t
+        val pad = geometry.padding(height)
+        val ref = geometry.reference(height)
+        val x0 = geometry.left(width, height)
         val largeSlots = slots.filter { it.large }
         val miniSlots = slots.filter { !it.large }
-        large.forEachIndexed { index, view -> place(view, largeSlots.getOrNull(index), pad, inner) }
-        mini.forEachIndexed { index, view -> place(view, miniSlots.getOrNull(index), pad, inner) }
-        val target = cornerTarget(side)
+        large.forEachIndexed { index, view -> place(view, largeSlots.getOrNull(index), x0, pad, ref) }
+        mini.forEachIndexed { index, view -> place(view, miniSlots.getOrNull(index), x0, pad, ref) }
+        val target = geometry.cornerTarget(width, height)
         corner.layout(target?.left ?: 0, target?.top ?: 0, target?.right ?: 0, target?.bottom ?: 0)
-        centre(empty, pad, pad, inner)
+        centre(empty, pad, pad, width - 2 * pad, ref)
     }
 
-    // The corner of small icons has a target of its own only in the usual layout
-    // (three large icons); in the others a tap off an icon is the card's.
-    private fun cornerTarget(side: Int): TileGeometry.Rect? {
-        if (TileSlots.largeCount(slots) != CategoryLayout.LARGE_SLOTS) return null
-        val pad = padding(side)
-        return TileGeometry.cornerTarget(side, pad, (side - 2 * pad) / 2)
-    }
-
-    private fun place(view: View, slot: TileSlots.Slot?, pad: Int, inner: Int) {
+    private fun place(view: View, slot: TileSlots.Slot?, x0: Int, pad: Int, ref: Int) {
         if (slot == null) {
             view.layout(0, 0, 0, 0)
             return
         }
-        centre(view, pad + (slot.x * inner).toInt(), pad + (slot.y * inner).toInt(), (slot.size * inner).toInt())
+        val size = (slot.size * ref).toInt()
+        centre(view, x0 + (slot.x * ref).toInt(), pad + (slot.y * ref).toInt(), size, size)
     }
 
-    private fun centre(view: View, left: Int, top: Int, cell: Int) {
-        val x = left + (cell - view.measuredWidth) / 2
-        val y = top + (cell - view.measuredHeight) / 2
+    private fun centre(view: View, left: Int, top: Int, width: Int, height: Int) {
+        val x = left + (width - view.measuredWidth) / 2
+        val y = top + (height - view.measuredHeight) / 2
         view.layout(x, y, x + view.measuredWidth, y + view.measuredHeight)
     }
 
-    private fun padding(side: Int): Int = (side * PADDING_SHARE).toInt()
-
     companion object {
         private const val CORNER_DP = 24f
-        private const val PADDING_SHARE = 0.07f
         private const val ICON_FILL = 0.8f
         private const val EMPTY_SP = 11f
         private const val EMPTY_LINES = 4

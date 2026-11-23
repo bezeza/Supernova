@@ -28,11 +28,10 @@
     <string name="fork_recent_count">Скільки нових застосунків</string>
     <string name="fork_tile_size">Розмір плитки: %1$s</string>
     <string name="fork_size_normal">Звичайна</string>
-    <string name="fork_size_wide">Широка, рядок на всю ширину</string>
+    <string name="fork_size_wide">Подвійна (2×): завширшки з дві плитки</string>
     <string name="fork_size_small">Маленька</string>
     <string name="fork_large_icons">Великі іконки: %1$s</string>
     <string name="fork_large_none">жодної, усі малі</string>
-    <string name="fork_more_apps">+%1$d</string>
     <string name="fork_add_apps">Додати застосунки</string>
     <string name="fork_folder_screen">Папки на весь екран</string>
     <string name="fork_folder_screen_summary">Папка меню відкривається на весь екран, як категорія, замість вікна</string>
@@ -47,5 +46,5 @@
     <string name="fork_look_grid3">3 × 3</string>
     <string name="fork_look_single">Лише перший застосунок</string>
     <string name="fork_edit_done">Готово</string>
-    <string name="fork_edit_hint">Тягніть плитку, щоб перемістити, кутик, щоб змінити розмір, тапніть, щоб відкрити налаштування</string>
+    <string name="fork_edit_hint">Тягніть плитку, щоб перемістити, кутик, щоб змінити розмір, шестерню, щоб відкрити налаштування</string>
 </resources>
