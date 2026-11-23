@@ -113,6 +113,21 @@ internal class CategoriesAdapter(
 
     fun isTile(position: Int): Boolean = items.getOrNull(position) is CategoryRow.Tile
 
+    // A corner dragged to another size: the tile takes it at once, without waiting for the saved setting to
+    // come back round, and the setting is saved. What comes back the same changes nothing.
+    private fun resize(row: CategoryRow.Tile, dx: Float, step: Float) {
+        val size = TileResize.resize(row.options.size, dx, step)
+        if (size == row.options.size) return
+        val id = row.entry.group.id
+        val at = items.indexOfFirst { it is CategoryRow.Tile && it.entry.group.id == id }
+        if (at < 0) return
+        val sized = CategoryRow.Tile(row.entry, row.options.copy(size = size))
+        items = items.toMutableList().also { it[at] = sized }
+        base = items.filter { it !is CategoryRow.Done }
+        notifyItemChanged(at)
+        editHandlers.onResize(id, size)
+    }
+
     // The folders' ids in the order the tiles are in now.
     fun tileIds(): List<String> = items.filterIsInstance<CategoryRow.Tile>().map { it.entry.group.id }
 
@@ -252,7 +267,7 @@ internal class CategoriesAdapter(
                 if (editing) editHandlers.onTap(view, entry) else actions.onCategory(view, entry.group, entry.apps)
             }
             val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
-            card.edit.onResize = { dx -> resize(row, dx) }
+            card.edit.onResize = { dx -> resize(row, dx, card.edit.stepPx(itemView.parent as? View)) }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)
             // A small tile's name is smaller too, to fit its narrower column.
@@ -269,11 +284,6 @@ internal class CategoriesAdapter(
         override fun applyEditing(on: Boolean) {
             card.edit.editing = on
             if (on) wobble.start() else wobble.stop()
-        }
-
-        private fun resize(row: CategoryRow.Tile, dx: Float) {
-            val size = TileResize.resize(row.options.size, dx, card.edit.stepPx(itemView.parent as? View))
-            if (size != row.options.size) editHandlers.onResize(row.entry.group.id, size)
         }
     }
 
@@ -295,10 +305,7 @@ internal class CategoriesAdapter(
             showGlyph(card.nameView, entry.group.name)
             card.contentDescription = card.context.getString(R.string.folder_desc, entry.group.name)
             card.launchFromIcons = look.launchFromIcons
-            card.edit.onResize = { dx ->
-                val size = TileResize.resize(row.options.size, dx, card.edit.stepPx(itemView.parent as? View))
-                if (size != row.options.size) editHandlers.onResize(entry.group.id, size)
-            }
+            card.edit.onResize = { dx -> resize(row, dx, card.edit.stepPx(itemView.parent as? View)) }
             card.bind(
                 entry.apps, icons, actions,
                 open = { view ->

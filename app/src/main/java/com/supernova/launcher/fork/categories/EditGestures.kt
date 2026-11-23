@@ -53,10 +53,15 @@ internal class EditGestures(private val card: ViewGroup) {
                 // A drag of the grip is the card's: the list must not take it for a tile drag.
                 if (onGrip) card.parent?.requestDisallowInterceptTouchEvent(true)
             }
-            MotionEvent.ACTION_MOVE ->
+            MotionEvent.ACTION_MOVE -> {
                 if (!moved && hypot(event.x - downX, event.y - downY) > slop) moved = true
+                if (onGrip && moved) follow(event.x - downX)
+            }
             MotionEvent.ACTION_UP -> finish(event)
-            MotionEvent.ACTION_CANCEL -> tracking = false
+            MotionEvent.ACTION_CANCEL -> {
+                tracking = false
+                settle()
+            }
         }
         return true
     }
@@ -69,6 +74,22 @@ internal class EditGestures(private val card: ViewGroup) {
         }
         onGrip = false
         tracking = false
+        settle()
+    }
+
+    // The card stretches or shrinks a little as the corner is dragged, so the drag answers at once.
+    private fun follow(dx: Float) {
+        val width = card.width.coerceAtLeast(1)
+        val scale = (1f + dx / width * FOLLOW).coerceIn(1f - FOLLOW_MAX, 1f + FOLLOW_MAX)
+        card.pivotX = 0f
+        card.pivotY = 0f
+        card.scaleX = scale
+        card.scaleY = scale
+    }
+
+    private fun settle() {
+        card.scaleX = 1f
+        card.scaleY = 1f
     }
 
     // The grip's target: the card's bottom right corner.
@@ -95,5 +116,7 @@ internal class EditGestures(private val card: ViewGroup) {
         const val GRIP_DP = 18f
         const val GRIP_INSET_DP = 8f
         const val GRIP_TARGET_DP = 44f
+        const val FOLLOW = 0.4f
+        const val FOLLOW_MAX = 0.12f
     }
 }
