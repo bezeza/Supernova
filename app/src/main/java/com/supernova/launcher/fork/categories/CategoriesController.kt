@@ -1,5 +1,6 @@
 package com.supernova.launcher.fork.categories
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +27,17 @@ class CategoriesController(
     screenAdapter: AppDrawerAdapter
 ) {
 
-    private val rows = CategoriesAdapter(CategoryIcons(catalog, decorateIcon), actions)
+    private var options: Map<String, CategoryOptions> = emptyMap()
+
+    // A long press on a tile opens the category's options; the folder's own menu is a row in them.
+    private val rowActions = CategoriesActions(
+        actions.onApp, actions.onAppLongPress, actions.onCategory,
+        { view, group, apps -> showOptions(view, group, apps) },
+        actions.onPlaceLarge, actions.onOptions
+    )
+    private val rows = CategoriesAdapter(CategoryIcons(catalog, decorateIcon), rowActions) { context, hidden ->
+        CategoryOptionsDialog.showHidden(context, hidden) { id -> actions.onOptions(id) { it.copy(hidden = false) } }
+    }
 
     private val recycler = RecyclerView(container.context).apply {
         visibility = View.GONE
@@ -52,7 +63,9 @@ class CategoriesController(
     }
 
     private val state = CategoryScreenState()
-    private val screen = CategoryScreen(container, screenAdapter, { back() }) { picked -> placeLarge(picked) }
+    private val screen = CategoryScreen(container, screenAdapter, { back() }) { picked ->
+        openGroup?.let { actions.onPlaceLarge(it, picked) }
+    }
     private var openGroup: DrawerGroup? = null
 
     init {
@@ -107,11 +120,6 @@ class CategoriesController(
         if (!screen.handleTap(app)) launch()
     }
 
-    private fun placeLarge(picked: List<LaunchableApp>) {
-        val group = openGroup ?: return
-        actions.onPlaceLarge(group, picked)
-    }
-
     // True when a screen was open and is closed now: the Back that did it is spent.
     fun closeScreen(animate: Boolean = true): Boolean {
         val wasOpen = state.close()
@@ -123,6 +131,7 @@ class CategoriesController(
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setLook(data.look)
+        options = data.settings.options
         screen.setLook(data.look.textColor, data.look.showIcons)
         if (state.isOpen) {
             val open = data.categories.firstOrNull { it.group.id == state.openId }
@@ -130,13 +139,14 @@ class CategoriesController(
             else closeScreen(animate = false)
         }
         val context = recycler.context
+        val slots = data.settings.recentCount.coerceIn(CategoryLayout.RECENT_MIN, CategoryLayout.RECENT_MAX)
         val list = ArrayList<CategoryRow>()
         val recent = if (showRecent) {
-            CategoryLayout.recentlyInstalled(data.recent, CategoryLayout.RECENT_LIMIT) { it.installTime }
+            CategoryLayout.recentlyInstalled(data.recent, slots) { it.installTime }
         } else {
             emptyList()
         }
-        if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent))
+        if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent, slots))
         data.categories.mapTo(list) { CategoryRow.Tile(it) }
         if (data.loose.isNotEmpty()) {
             if (data.categories.isNotEmpty()) {
@@ -144,7 +154,17 @@ class CategoriesController(
             }
             data.loose.mapTo(list) { CategoryRow.Loose(it) }
         }
+        if (data.settings.hidden.isNotEmpty()) list.add(CategoryRow.Hidden(data.settings.hidden))
         rows.submitList(list)
+    }
+
+    private fun showOptions(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {
+        val handlers = OptionsHandlers(
+            onSort = { sort -> actions.onOptions(group.id) { it.copy(sort = sort) } },
+            onHide = { actions.onOptions(group.id) { it.copy(hidden = true) } },
+            onFolderMenu = { actions.onCategoryLongPress(view, group, apps) }
+        )
+        CategoryOptionsDialog.show(view.context, group.name, options[group.id] ?: CategoryOptions(), handlers)
     }
 
     // A badge or an icon moved: the rows rebind, the list itself is unchanged.

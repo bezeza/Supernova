@@ -16,4 +16,14 @@
     <string name="fork_pick_large_hint">Choose large icon %1$d of %2$d</string>
     <string name="fork_tap_large_icon">Tap on a large icon</string>
     <string name="fork_tap_large_icon_summary">On: launches the app, as in iOS. Off: any tap on the tile opens the category</string>
+    <string name="fork_sort_inside">Sort inside: %1$s</string>
+    <string name="fork_hide_category">Hide category</string>
+    <string name="fork_folder_menu">Folder menu…</string>
+    <string name="fork_sort_drawer">As in the drawer</string>
+    <string name="fork_sort_manual">Manual</string>
+    <string name="fork_sort_alpha">A–Z</string>
+    <string name="fork_sort_frequency">Most used</string>
+    <string name="fork_hidden_categories">Hidden categories: %1$d</string>
+    <string name="fork_show_again">Show again</string>
+    <string name="fork_recent_count">How many new apps</string>
 </resources>

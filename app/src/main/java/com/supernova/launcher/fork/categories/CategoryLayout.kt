@@ -23,5 +23,7 @@ object CategoryLayout {
     fun <T> recentlyInstalled(apps: List<T>, limit: Int, installTime: (T) -> Long): List<T> =
         apps.filter { installTime(it) > 0L }.sortedByDescending(installTime).take(limit)
 
-    const val RECENT_LIMIT = 4
+    const val RECENT_MIN = 2
+    const val RECENT_DEFAULT = 4
+    const val RECENT_MAX = 8
 }

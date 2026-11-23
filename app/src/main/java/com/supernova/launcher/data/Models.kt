@@ -270,6 +270,10 @@ data class LauncherPrefs(
     // Fork: the category icon before a tile's name, and the search row at the bottom.
     val categoriesShowIcons: Boolean = false,
     val categoriesLaunchLarge: Boolean = true,
+    // How many newest installs the Categories row shows, and each category's own
+    // options as JSON by folder id (fork/categories/CategoryOptions).
+    val categoriesRecentCount: Int = 4,
+    val categoriesOptions: String = "",
     val categoriesSearchBottom: Boolean = false,
     // Smart folders the user deleted, or a fresh install left out as too big,
     // by name: regenerating on an install leaves them out. Turning Smart
