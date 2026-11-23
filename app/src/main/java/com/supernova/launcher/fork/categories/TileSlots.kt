@@ -3,6 +3,8 @@ package com.supernova.launcher.fork.categories
 // Where the icons of a square tile go, as fractions of the card's inner
 // square: a large icon fills its cell, a small one is a quarter of the card
 // (or a ninth). Plain data, so each layout can be tested for room and overlap.
+// One function for each layout a tile can have, so there are many.
+@Suppress("TooManyFunctions")
 internal object TileSlots {
 
     class Slot(val x: Float, val y: Float, val size: Float, val large: Boolean)
@@ -14,6 +16,7 @@ internal object TileSlots {
     private const val LARGE_CELLS = 2
     private const val GRID_THREE = 3
     private const val GRID_TWO = 2
+    const val SMALL_NAME = 0.22f
     private const val DOUBLE_COLUMNS = 4
     private const val DOUBLE_LARGE = 7
     private const val CORNER_X = 1.5f
@@ -64,8 +67,17 @@ internal object TileSlots {
     // How many heights of the card the icons run across: 1 for a square tile, 2 for a double one.
     fun contentWidth(slots: List<Slot>): Float = slots.maxOfOrNull { it.x + it.size } ?: 1f
 
-    // A small tile is a 2 by 2 of small icons.
-    fun small(): List<Slot> = grid(HALF, GRID_TWO, large = false)
+    // A small tile keeps a strip along its top for its name, [SMALL_NAME] of its height, and under it is a 2 by 2 of
+    // small icons.
+    fun small(): List<Slot> = buildList {
+        val cell = (1f - SMALL_NAME) / GRID_TWO
+        for (y in 0 until GRID_TWO) {
+            for (x in 0 until GRID_TWO) add(Slot(x * cell, SMALL_NAME + y * cell, cell, false))
+        }
+    }
+
+    // The share of the card's height the icons leave free along its top, for the name inside the card.
+    fun nameShare(slots: List<Slot>): Float = slots.minOfOrNull { it.y } ?: 0f
 
     fun largeCount(slots: List<Slot>): Int = slots.count { it.large }
 

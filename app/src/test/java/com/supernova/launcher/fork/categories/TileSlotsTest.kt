@@ -153,4 +153,20 @@ class TileSlotsTest {
         assertTrue(inside(slots))
         assertTrue(noOverlap(slots))
     }
+
+    @Test
+    fun aSmallTileKeepsAStripOnTopForItsName() {
+        val slots = TileSlots.small()
+        assertEquals(TileSlots.SMALL_NAME, TileSlots.nameShare(slots), eps)
+        assertTrue(slots.all { it.y >= TileSlots.SMALL_NAME - eps })
+        assertTrue(inside(slots))
+        assertTrue(noOverlap(slots))
+    }
+
+    @Test
+    fun theOtherTilesKeepNoStripForAName() {
+        val layouts = listOf(TileSlots.normal(3), TileSlots.normal(1), TileSlots.normal(0))
+        (layouts + listOf(TileSlots.double(), TileSlots.tall(), TileSlots.big()))
+            .forEach { assertEquals(0f, TileSlots.nameShare(it), eps) }
+    }
 }

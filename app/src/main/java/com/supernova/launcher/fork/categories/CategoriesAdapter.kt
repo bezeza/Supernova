@@ -282,7 +282,7 @@ internal class CategoriesAdapter(
     }
 
     // A tile's card with its name under it: the whole of a tile in the list, or one of the two of a pair.
-    private inner class TileCell(context: Context, compact: Boolean = false) {
+    private inner class TileCell(context: Context) {
         val view = LinearLayout(context)
         private val card = CategoryTileCard(context)
         private val title = label(context, TILE_LABEL_SP, centred = true, lines = TITLE_LINES)
@@ -291,16 +291,13 @@ internal class CategoriesAdapter(
             view.orientation = LinearLayout.VERTICAL
             val margin = dp(context, TILE_MARGIN_DP)
             card.gapPx = margin
-            // A cell of a pair is tighter above and below, and its name closer, so two fit in a normal tile's height.
-            val vertical = if (compact) margin / 2 else margin
-            view.setPadding(margin, vertical, margin, vertical)
+            view.setPadding(margin, margin, margin, margin)
             view.addView(card, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ))
-            val gap = if (compact) PAIR_TITLE_GAP_DP else TITLE_GAP_DP
             view.addView(title, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(context, gap) })
+            ).apply { topMargin = dp(context, TITLE_GAP_DP) })
         }
 
         fun bind(row: CategoryRow.Tile) {
@@ -319,9 +316,10 @@ internal class CategoriesAdapter(
             card.edit.onGear = { editHandlers.onTap(card, entry) }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)
-            // A small tile's name is smaller too, to fit its narrower column.
-            val labelSp = if (row.options.size == CategorySize.SMALL) SMALL_LABEL_SP else TILE_LABEL_SP
-            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSp)
+            // A small tile's name is inside its card, so a pair of them is as high as a normal tile's card.
+            val small = row.options.size == CategorySize.SMALL
+            title.visibility = if (small) View.GONE else View.VISIBLE
+            card.setName(entry.group.name)
             card.bind(row.layout, icons, actions, open = open, openLongPress = openLongPress)
             // The name under the tile opens it too.
             view.setOnClickListener(open)
@@ -355,18 +353,14 @@ internal class CategoriesAdapter(
         }
     }
 
-    // The gap under a normal tile's card and one line of its name: what a pair's height adds to its two spans.
-    private fun titleReserve(context: Context): Int =
-        dp(context, TITLE_GAP_DP) + label(context, TILE_LABEL_SP, centred = true, lines = 1).lineHeight
-
     // Two small tiles one over the other, in the space of a normal tile.
-    private inner class PairHolder(context: Context) : RecyclerView.ViewHolder(PairColumn(context)), Arrangeable {
-        private val cells = List(2) { TileCell(context, compact = true) }
+    private inner class PairHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)), Arrangeable {
+        private val cells = List(2) { TileCell(context) }
         private val wobble = Wobble(itemView)
 
         init {
-            val column = itemView as PairColumn
-            column.titleReserve = { titleReserve(context) }
+            val column = itemView as LinearLayout
+            column.orientation = LinearLayout.VERTICAL
             column.layoutParams = RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
@@ -571,7 +565,6 @@ internal class CategoriesAdapter(
         const val SPAN_TILE = 2
         const val SPAN_DOUBLE = 4
         const val TILE_LABEL_SP = 12f
-        const val SMALL_LABEL_SP = 10f
         const val TITLE_LINES = 2
         const val GLYPH_DP = 16f
         const val GLYPH_GAP_DP = 4f
@@ -579,7 +572,6 @@ internal class CategoriesAdapter(
         const val HEADER_SP = 13f
         const val TILE_MARGIN_DP = 6f
         const val TITLE_GAP_DP = 6f
-        const val PAIR_TITLE_GAP_DP = 3f
         const val RECENT_PADDING_DP = 12f
         const val RECENT_CORNER_DP = 24f
         const val RECENT_ICON_DP = 52f

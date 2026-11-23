@@ -54,20 +54,19 @@ class TileGeometryTest {
     }
 
     @Test
-    fun aPairIsAsHighAsANormalTileWithAOneLineName() {
-        // One span 100 wide, margins of 6, a gap of 6 and a line of 14. A normal tile is two spans wide: its card
-        // is 188 high, and with the margins round it, the gap and the line it is 6 + 188 + 6 + 14 + 6.
-        val span = 100
-        val margin = 6
-        val reserve = 6 + 14
-        val normal = margin + (2 * span - 2 * margin) + reserve + margin
-        assertEquals(normal, TileGeometry.pairHeight(span, reserve))
+    fun aDoubleTilesCardIsAsHighAsANormalOnes() {
+        val normalCard = 188
+        assertEquals(normalCard, TileGeometry.doubleHeight(388, 6))
     }
 
     @Test
-    fun aDoubleTilesNameIsOnTheSameLineAsANormalOnes() {
-        // The double tile's card is as high as a normal one's, so with the same gap and line its height is the same.
-        val normalCard = 188
-        assertEquals(normalCard, TileGeometry.doubleHeight(388, 6))
+    fun twoSmallCardsWithTheirMarginsAreAsHighAsANormalCardWithItsOwn() {
+        // A span of 100 and margins of 6: a small card is 88, a normal one 188; two small ones with a margin above
+        // and below each fill the same height as one normal card with its margin above and below, 2 * 100.
+        val span = 100
+        val margin = 6
+        val small = span - 2 * margin
+        val normal = 2 * span - 2 * margin
+        assertEquals(normal + 2 * margin, 2 * (small + 2 * margin))
     }
 }

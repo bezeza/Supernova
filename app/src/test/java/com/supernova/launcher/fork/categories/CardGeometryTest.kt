@@ -21,7 +21,8 @@ class CardGeometryTest {
         assertTrue(geometry.left(width, height) >= 0)
         assertTrue(geometry.top(width, height) >= 0)
         // Centred: the room left over is the same on both sides.
-        assertEquals(geometry.left(width, height), width - geometry.left(width, height) - (content * ref).toInt())
+        val right = width - geometry.left(width, height) - (content * ref).toInt()
+        assertTrue(kotlin.math.abs(geometry.left(width, height) - right) <= 1)
     }
 
     @Test

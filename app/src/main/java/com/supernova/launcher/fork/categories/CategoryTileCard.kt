@@ -27,6 +27,15 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
     private var slots: List<TileSlots.Slot> = TileSlots.normal(CategoryLayout.LARGE_SLOTS)
 
 
+    // A small tile's name, in a strip along the top of the card: the one name it has, none under the card.
+    private val name = TextView(context).apply {
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, NAME_SP)
+        gravity = Gravity.CENTER
+        maxLines = 1
+        ellipsize = TextUtils.TruncateAt.END
+        visibility = GONE
+    }
+
     // Shown in place of the icons while the category holds no app.
     private val empty = TextView(context).apply {
         setText(R.string.fork_empty_category)
@@ -37,6 +46,7 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
     }
 
     init {
+        addView(name)
         addView(empty)
         (large + mini).forEach { view ->
             view.scaleType = ImageView.ScaleType.FIT_CENTER
@@ -55,12 +65,18 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
     fun setSlots(layout: List<TileSlots.Slot>) {
         if (layout === slots) return
         slots = layout
+        name.visibility = if (TileSlots.nameShare(layout) > 0f) VISIBLE else GONE
         requestLayout()
+    }
+
+    fun setName(text: String) {
+        name.text = text
     }
 
     fun setColors(card: Int, text: Int) {
         shape.setColor(card)
         empty.setTextColor(text)
+        name.setTextColor(text)
         edit.setColor(text)
     }
 
@@ -141,6 +157,11 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
             MeasureSpec.makeMeasureSpec(width - 2 * geometry.padding(width, height), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(ref, MeasureSpec.AT_MOST)
         )
+        val strip = (TileSlots.nameShare(slots) * ref).toInt()
+        name.measure(
+            MeasureSpec.makeMeasureSpec(width - 2 * geometry.padding(width, height), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(strip, MeasureSpec.EXACTLY)
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -157,6 +178,7 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         val target = geometry.cornerTarget(width, height)
         corner.layout(target?.left ?: 0, target?.top ?: 0, target?.right ?: 0, target?.bottom ?: 0)
         centre(empty, pad, pad, width - 2 * pad, ref)
+        name.layout(pad, y0, pad + name.measuredWidth, y0 + name.measuredHeight)
     }
 
     private fun place(view: View, slot: TileSlots.Slot?, x0: Int, y0: Int, ref: Int) {
@@ -178,6 +200,7 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         private const val CORNER_DP = 24f
         private const val ICON_FILL = 0.8f
         private const val EMPTY_SP = 11f
+        private const val NAME_SP = 10f
         private const val EMPTY_LINES = 4
     }
 }

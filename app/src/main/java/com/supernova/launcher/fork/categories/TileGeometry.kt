@@ -25,11 +25,6 @@ internal object TileGeometry {
     // the width less the margin that fell between, halved.
     fun doubleHeight(width: Int, margin: Int): Int = width / 2 - margin
 
-    // A pair of small tiles is as high as the normal tile beside it: that one is its width less nothing (two spans of a
-    // pair's width, less the margins round the card, which the margins above and below make up), the gap and a line of
-    // its name. [width] is the width of the pair (one span), [titleReserve] the gap and the line.
-    fun pairHeight(width: Int, titleReserve: Int): Int = 2 * width + titleReserve
-
     // A tall tile is two normal ones one over the other with the margins between them: twice the width and
     // the margins that fell between.
     fun tallHeight(width: Int, margin: Int): Int = 2 * width + 2 * margin
