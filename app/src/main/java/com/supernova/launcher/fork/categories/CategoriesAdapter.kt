@@ -208,6 +208,8 @@ internal class CategoriesAdapter(
                 if (row is CategoryRow.Tile && row.entry.group.id == id) row.sized(size) else row
             }
             show(onScreen(base))
+            // Tiles of a changed height leave the rows under them where they were: the rows are laid out afresh.
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_RELAYOUT)
             editHandlers.onResize(id, size)
             return
         }
@@ -300,6 +302,9 @@ internal class CategoriesAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.contains(PAYLOAD_EDIT) && holder is Arrangeable) {
             holder.applyEditing(editing)
+        } else if (payloads.contains(PAYLOAD_RELAYOUT)) {
+            // Only a fresh pass of the layout: the rows are as they were bound.
+            holder.itemView.requestLayout()
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -636,6 +641,7 @@ internal class CategoriesAdapter(
         const val TYPE_BLOCK = 8
         const val TYPE_GAP = 9
         const val PAYLOAD_EDIT = "edit"
+        const val PAYLOAD_RELAYOUT = "relayout"
         const val SPAN_TILE = 2
         const val SPAN_DOUBLE = 4
         const val TILE_LABEL_SP = 12f

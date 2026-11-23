@@ -135,7 +135,10 @@ internal class EditGestures(private val card: ViewGroup) {
     private fun finish() {
         when {
             !tracking -> Unit
-            onGrip && moved -> onResize(dragged, draggedHeight)
+            onGrip && moved -> {
+                onResize(dragged, draggedHeight)
+                relayoutList()
+            }
             !moved && gearHit -> onGear()
         }
         onGrip = false
@@ -155,6 +158,16 @@ internal class EditGestures(private val card: ViewGroup) {
 
     fun draw(canvas: Canvas) {
         if (editing) marks.draw(canvas)
+    }
+
+    // A tile that changed its size in place leaves the tiles below it where they were until the list lays out
+    // again: end what the list is animating and make it lay out now.
+    private fun relayoutList() {
+        val list = list() ?: return
+        list.post {
+            list.itemAnimator?.endAnimations()
+            list.requestLayout()
+        }
     }
 
     // The outline over the list takes the width and height the finger gives the tile's corner, at once.

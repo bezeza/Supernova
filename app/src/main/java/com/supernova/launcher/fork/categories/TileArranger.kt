@@ -49,6 +49,11 @@ internal class TileArranger(
             if (now != dragStart) onOrder(now)
             dragStart = now
             keepingScroll { rows.gather(false) }
+            // A tile dropped elsewhere leaves the rows under it as they were laid out: lay them out afresh.
+            recycler.post {
+                recycler.itemAnimator?.endAnimations()
+                recycler.requestLayout()
+            }
         }
     })
 
