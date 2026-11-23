@@ -29,6 +29,9 @@ internal class TileArranger(
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
 
+        // A hold on a resize grip is a resize: the tile is not picked up under the finger.
+        override fun isLongPressDragEnabled(): Boolean = !rows.gripHeld
+
         override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
             super.onSelectedChanged(viewHolder, actionState)
             if (actionState != ItemTouchHelper.ACTION_STATE_DRAG) return

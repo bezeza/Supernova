@@ -72,7 +72,6 @@ class CategoriesController(
         }
         adapter = rows
         itemAnimator = null
-        setHasFixedSize(true)
         clipToPadding = false
         overScrollMode = View.OVER_SCROLL_NEVER
         setPadding(sidePx, 0, sidePx, baseBottomPx)

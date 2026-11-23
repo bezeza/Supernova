@@ -77,6 +77,10 @@ internal class CategoriesAdapter(
     var editing = false
         private set
 
+    // True while a finger holds a tile's resize grip: a hold there is a resize, never a drag of the tile.
+    var gripHeld = false
+        private set
+
     // True while a tile that is not small is dragged: the small ones stand in blocks of four, see [TilePairs.blocks].
     private var gathered = false
 
@@ -375,6 +379,7 @@ internal class CategoriesAdapter(
             card.edit.onPreview = { w, h -> resize(entry.group.id, w, h, targets(view), save = false) }
             card.edit.onResize = { w, h -> resize(entry.group.id, w, h, targets(view), save = true) }
             card.edit.onGear = { editHandlers.onTap(card, entry) }
+            card.edit.onGripHeld = { gripHeld = it }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)
             // A small tile's name is inside its card, so a pair of them is as high as a normal tile's card.
