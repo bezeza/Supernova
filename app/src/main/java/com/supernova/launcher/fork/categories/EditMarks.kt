@@ -36,17 +36,21 @@ internal class EditMarks(private val card: ViewGroup) {
 
     // The grip's target: the card's bottom right corner, the bottom left one on a small tile.
     fun onGrip(x: Float, y: Float): Boolean {
-        val size = TARGET_DP * density
+        val size = target()
         val across = if (small) x <= size else x >= card.width - size
         return across && y >= card.height - size
     }
 
     // The gear's target: the card's top right corner, the bottom right one on a small tile.
     fun onGear(x: Float, y: Float): Boolean {
-        val size = TARGET_DP * density
+        val size = target()
         val down = if (small) y >= card.height - size else y <= size
         return x >= card.width - size && down
     }
+
+    // The size of a target: [TARGET_DP], or a third of a narrow card, so on a small tile the gear and the grip
+    // do not take its whole lower half between them.
+    private fun target(): Float = minOf(TARGET_DP * density, card.width / TARGETS_ACROSS)
 
     fun draw(canvas: Canvas) {
         val gearInset = (GEAR_INSET_DP * density).toInt()
@@ -75,6 +79,7 @@ internal class EditMarks(private val card: ViewGroup) {
         const val GEAR_BACKING_DP = 28f
         const val GEAR_INSET_DP = 6f
         const val TARGET_DP = 44f
+        const val TARGETS_ACROSS = 3f
         const val BACKING_ALPHA = 0x40
         const val COLOR_MASK = 0xFFFFFF
         const val ALPHA_SHIFT = 24
