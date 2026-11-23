@@ -3,6 +3,7 @@ package com.supernova.launcher.fork.categories
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.ViewGroup
@@ -30,7 +31,13 @@ internal class EditGestures(private val card: ViewGroup) {
             if (field == value) return
             field = value
             card.invalidate()
+            keepGestureOff()
         }
+
+    init {
+        // The card's size changes as the others make way, and so do its corners.
+        card.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepGestureOff() }
+    }
 
     // The widths a tile can be dragged to, asked when a drag of the grip begins.
     var targets: () -> ResizeTargets? = { null }
@@ -65,6 +72,7 @@ internal class EditGestures(private val card: ViewGroup) {
         get() = marks.small
         set(value) {
             marks.small = value
+            keepGestureOff()
         }
 
     fun setColor(color: Int) {
@@ -114,6 +122,14 @@ internal class EditGestures(private val card: ViewGroup) {
         gearHit = false
         tracking = false
         settle()
+    }
+
+    // While arranging, the system's Back gesture at the screen's edge does not take a touch on the gear or the
+    // grip (a wide tile's reach the edge). The system keeps only so many of these per edge, those of the
+    // tiles on the screen first.
+    private fun keepGestureOff() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        card.systemGestureExclusionRects = if (editing) marks.zones() else emptyList()
     }
 
     fun draw(canvas: Canvas) {

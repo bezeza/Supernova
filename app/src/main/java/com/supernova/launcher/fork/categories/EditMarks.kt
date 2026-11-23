@@ -2,6 +2,7 @@ package com.supernova.launcher.fork.categories
 
 import android.graphics.Canvas
 import android.graphics.PorterDuff
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.view.ViewGroup
@@ -46,6 +47,17 @@ internal class EditMarks(private val card: ViewGroup) {
         val size = target()
         val down = if (small) y >= card.height - size else y <= size
         return x >= card.width - size && down
+    }
+
+    // The gear's and the grip's targets as rectangles of the card, so the system's Back gesture at the screen's
+    // edge can be kept off them.
+    fun zones(): List<Rect> {
+        val size = target().toInt()
+        val width = card.width
+        val height = card.height
+        val gear = if (small) Rect(width - size, height - size, width, height) else Rect(width - size, 0, width, size)
+        val grip = if (small) Rect(0, height - size, size, height) else Rect(width - size, height - size, width, height)
+        return listOf(gear, grip)
     }
 
     // The size of a target: [TARGET_DP], or a third of a narrow card, so on a small tile the gear and the grip
