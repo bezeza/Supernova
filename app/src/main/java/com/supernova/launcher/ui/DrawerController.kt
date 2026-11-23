@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.doOnLayout
 import androidx.core.widget.doAfterTextChanged
@@ -1565,6 +1566,7 @@ class DrawerController(
             if (iconsChanged) {
                 adapter.notifyDataSetChanged()
                 categories.rebind() // Fork
+                homeCategories.forEach { it.rebind() } // Fork
             }
             syncPages()
         } else {
@@ -1651,6 +1653,7 @@ class DrawerController(
     fun notifyContentChanged() {
         adapter.notifyDataSetChanged()
         categories.rebind() // Fork
+        homeCategories.forEach { it.rebind() } // Fork
         syncPages()
         // The recents row's icons carry badges too, and its key can't see a
         // count move.
@@ -1837,6 +1840,7 @@ class DrawerController(
         )
         adapter.submit(apps, folders, prefs.drawerFoldersFirst, listOrder(prefs), replace)
         submitCategories(prefs, tab, folders, apps) // Fork
+        submitHomeCategories(prefs) // Fork
         applyListVisibility()
         revealPrivateSectionIfDue()
         // The first apps make a tile measurable.
@@ -1855,6 +1859,20 @@ class DrawerController(
         apps: List<LaunchableApp>
     ) {
         if (!categoriesStyle || tab != null) return
+        categories.submit(
+            categoriesData(prefs, folders.map { it.group to it.members }, apps, SurfaceId.DRAWER),
+            showRecent = prefs.categoriesShowRecent
+        )
+    }
+
+    // Fork: the categories and the tiles' look, from the folders (with the apps they hold) and the apps outside them.
+    // [surface] is the style the tiles take their colours from: the drawer's, or the home screen's.
+    private fun categoriesData(
+        prefs: LauncherPrefs,
+        folders: List<Pair<DrawerGroup, List<LaunchableApp>>>,
+        apps: List<LaunchableApp>,
+        surface: SurfaceId
+    ): CategoriesData {
         val options = CategoryOptionsStore.decode(prefs.categoriesOptions)
         val usage = AppUsage(viewModel.launchCounts(), emptyList(), viewModel::hiddenKey)
         val orderings = Orderings<LaunchableApp>(
@@ -1862,32 +1880,87 @@ class DrawerController(
             byUse = { DrawerOrder.sorted(it, DrawerSort.MOST_USED, usage) },
             keyOf = viewModel::hiddenKey
         )
-        val (hiddenFolders, shownFolders) = folders.partition { options[it.group.id]?.hidden == true }
-        categories.submit(
-            CategoriesData(
-                categories = shownFolders.map { entry ->
-                    val sort = options[entry.group.id]?.sort ?: CategorySort.DRAWER
-                    val members = entry.group.members.toList()
-                    CategoryEntry(entry.group, CategoryOrder.apply(entry.members, sort, members, orderings))
-                },
-                settings = CategorySettings(
-                    options,
-                    hiddenFolders.map { HiddenCategory(it.group.id, it.group.name) },
-                    prefs.categoriesRecentCount
-                ),
-                loose = apps,
-                recent = appsForTab(null),
-                look = TileLook(
-                    textColor = Styles.resolve(binding.root.context, prefs).of(SurfaceId.DRAWER).text,
-                    backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
-                        .styleFor(SurfaceId.DRAWER).alpha ?: prefs.drawerBgOpacity,
-                    showIcons = prefs.categoriesShowIcons,
-                    launchFromIcons = prefs.categoriesLaunchLarge
-                )
+        val (hiddenFolders, shownFolders) = folders.partition { options[it.first.id]?.hidden == true }
+        return CategoriesData(
+            categories = shownFolders.map { (group, folderApps) ->
+                val sort = options[group.id]?.sort ?: CategorySort.DRAWER
+                CategoryEntry(group, CategoryOrder.apply(folderApps, sort, group.members.toList(), orderings))
+            },
+            settings = CategorySettings(
+                options,
+                hiddenFolders.map { HiddenCategory(it.first.id, it.first.name) },
+                prefs.categoriesRecentCount
             ),
-            showRecent = prefs.categoriesShowRecent
+            loose = apps,
+            recent = appsForTab(null),
+            look = TileLook(
+                textColor = Styles.resolve(binding.root.context, prefs).of(surface).text,
+                backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
+                    .styleFor(surface).alpha ?: prefs.drawerBgOpacity,
+                showIcons = prefs.categoriesShowIcons,
+                launchFromIcons = prefs.categoriesLaunchLarge
+            )
         )
     }
+
+    // Fork: the categories page of the home screen. The pager has a copy of the page in up to three places, so each
+    // copy has a controller of its own, fed while its view is on a window with the folders and apps of the All
+    // list, as the Categories drawer is. Tapped, a tile opens the category on a screen of its own over the page.
+    private val homeCategories = mutableListOf<CategoriesController>()
+
+    fun newHomeCategories(context: Context): View {
+        val page = FrameLayout(context)
+        lateinit var controller: CategoriesController
+        val cells = newCellAdapter { view, app -> controller.onScreenAppClick({ onAppClick(view, app) }, app) }
+        controller = ForkHooks.categories(
+            page, viewModel.appCatalog(), decorateIcon,
+            CategoriesActions(
+                onAppClick, onAppLongPress,
+                { _, group, apps -> showCategoryScreen(group, apps, standalone = false, controller, cells) },
+                { view, group, apps -> if (group.id != OTHER_APPS_ID) onFolderLongPress(view, group, apps) },
+                CategoryEdits(::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder)
+            ),
+            cells
+        )
+        controller.setVisible(true)
+        page.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) {
+                homeCategories.add(controller)
+                submitHomeCategories(viewModel.state.value.prefs)
+            }
+
+            override fun onViewDetachedFromWindow(view: View) {
+                homeCategories.remove(controller)
+            }
+        })
+        return page
+    }
+
+    private fun submitHomeCategories(prefs: LauncherPrefs) {
+        if (homeCategories.isEmpty() || !prefs.categoriesHomePage) return
+        val entries = viewModel.drawerFoldersFor(null)
+            .filter { viewModel.drawerFolderHasContent(it) }
+            .map { it to viewModel.drawerFolderApps(it) }
+        val inFolders = viewModel.drawerFolderGroups()
+            .filter { viewModel.leavesMainList(it) }
+            .flatMapTo(mutableSetOf()) { it.members } - peekedHiddenKeys()
+        val apps = appsForTab(null).filterNot { viewModel.hiddenKey(it) in inFolders }
+        // The apps no folder took are one tile at the end, when there are some.
+        val other = DrawerGroup(
+            name = binding.root.context.getString(R.string.fork_other_apps),
+            members = apps.mapTo(mutableSetOf()) { viewModel.hiddenKey(it) },
+            id = OTHER_APPS_ID
+        )
+        val tiles = entries + listOfNotNull((other to apps).takeIf { apps.isNotEmpty() })
+        val data = categoriesData(prefs, tiles, emptyList(), SurfaceId.HOME)
+        homeCategories.forEach { it.submit(data, prefs.categoriesShowRecent) }
+    }
+
+    // Fork: Back on the home screen's categories page: a category's screen closes, or the arranging stops.
+    fun homeCategoriesBack(): Boolean = homeCategories.any { it.back() }
+
+    // Fork: the pager left the categories page: a category's screen on it goes, with no animation.
+    fun closeHomeScreens() = homeCategories.forEach { it.closeScreen(animate = false) }
 
     // Fork: an app tapped on a category's screen launches, unless its large icons are being chosen.
     private fun onCategoryAppClick(view: View, app: LaunchableApp) {
@@ -1896,6 +1969,7 @@ class DrawerController(
 
     // Fork: the apps chosen as large icons become the folder's first apps, in the order chosen.
     private fun placeCategoryLarge(group: DrawerGroup, picked: List<LaunchableApp>) {
+        if (group.id == OTHER_APPS_ID) return
         picked.asReversed().forEach { viewModel.moveAppInFolder(group.id, it, LauncherViewModel.InFolderMove.START) }
         // The choice is a manual order: a sort of its own would undo it.
         changeCategoryOptions(group.id) { it.copy(sort = CategorySort.MANUAL) }
@@ -1938,20 +2012,27 @@ class DrawerController(
 
     // Fork: the "+" on the screen: the folder's apps to pick, as in the folder's menu.
     private fun addAppsToCategory(group: DrawerGroup) {
+        if (group.id == OTHER_APPS_ID) return
         val icons = ItemIcons(binding.root.context, viewModel)
         GroupChecklist(binding.root.context, viewModel, icons).show(group, viewModel.visibleApps())
     }
 
-    private fun showCategoryScreen(group: DrawerGroup, apps: List<LaunchableApp>, standalone: Boolean) {
+    private fun showCategoryScreen(
+        group: DrawerGroup,
+        apps: List<LaunchableApp>,
+        standalone: Boolean,
+        controller: CategoriesController = categories,
+        cells: AppDrawerAdapter = categoryAdapter
+    ) {
         val prefs = viewModel.state.value.prefs
         val recycler = binding.drawerRecycler
-        categoryAdapter.displayMode = adapter.displayMode
-        categoryAdapter.tileWidthPx = adapter.tileWidthPx
-        categoryAdapter.tileHeightPx = adapter.tileHeightPx
-        categoryAdapter.tileContentPx = adapter.tileContentPx
-        categoryAdapter.tileCompactPx = adapter.tileCompactPx
-        lastDisplay?.let { categoryAdapter.setDisplay(it.first, it.second, it.third) }
-        categories.openScreen(
+        cells.displayMode = adapter.displayMode
+        cells.tileWidthPx = adapter.tileWidthPx
+        cells.tileHeightPx = adapter.tileHeightPx
+        cells.tileContentPx = adapter.tileContentPx
+        cells.tileCompactPx = adapter.tileCompactPx
+        lastDisplay?.let { cells.setDisplay(it.first, it.second, it.third) }
+        controller.openScreen(
             group, apps,
             ScreenLook(
                 columnCount(prefs), recycler.paddingLeft, recycler.paddingTop,
@@ -2772,6 +2853,8 @@ class DrawerController(
     private val context: Context get() = binding.root.context
 
     private companion object {
+        // Fork: the id of the tile of the apps no folder took, on the home screen's categories page.
+        const val OTHER_APPS_ID = "fork:other-apps"
         // showKeyboard's retries: up to ten, 50ms apart (half a second in
         // all), and how long after the ask a window that gets focus (back)
         // asks again.

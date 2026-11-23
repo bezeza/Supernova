@@ -33,6 +33,8 @@
     <string name="fork_large_icons">Большие иконки: %1$s</string>
     <string name="fork_large_none">нет, все малые</string>
     <string name="fork_add_apps">Добавить приложения</string>
+    <string name="fork_home_page">Страница категорий</string>
+    <string name="fork_home_page_summary">Последняя страница рабочего стола показывает плитки категорий</string>
     <string name="fork_folder_screen">Папки на весь экран</string>
     <string name="fork_folder_screen_summary">Папка меню открывается на весь экран, как категория, вместо окна</string>
     <string name="fork_folder_columns">Колонки в окне</string>

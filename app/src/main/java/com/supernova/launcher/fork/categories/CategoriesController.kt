@@ -90,7 +90,7 @@ class CategoriesController(
     init {
         container.addView(
             recycler,
-            1,
+            minOf(1, container.childCount),
             FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         )
     }

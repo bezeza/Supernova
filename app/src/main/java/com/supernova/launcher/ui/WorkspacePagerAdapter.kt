@@ -122,6 +122,13 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
     // Edit mode's add-page slot: one position past the last real
     // page, in every copy while looping, drawn as a "+" instead of a canvas.
     private var addSlot = false
+    // Fork: makes the view of the categories page, the last page of the pager while the setting is on; null for none.
+    var categoriesPageFactory: ((ViewGroup) -> View?)? = null
+
+    // Fork: the categories page, one position past the last real page and past the add-page slot (in every copy while
+    // looping), showing the category tiles instead of a canvas.
+    private var categoriesPage = false
+
     // Edit mode left while the pager sat on the slot: the pager slides back
     // onto the last page first and the slot goes once it has settled
     // (onPagerIdle), so the exit doesn't cut.
@@ -133,12 +140,18 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
     val realPageCount: Int get() = pageCount
 
     // Positions per copy: the real pages plus the slot while it is up.
-    private val span: Int get() = pageCount + if (addSlot) 1 else 0
+    private val span: Int get() = pageCount + (if (addSlot) 1 else 0) + (if (categoriesPage) 1 else 0)
+
+    // Fork: how many positions the pager has in a copy, real pages and the slots after them.
+    val pageSpan: Int get() = span
 
     // The slot reports as the page past the last one.
     fun realPage(position: Int): Int = if (looping) position % span else position
 
     fun isAddPage(position: Int): Boolean = addSlot && realPage(position) == pageCount
+
+    // Fork: the categories page is the last position of a copy.
+    fun isCategoriesPage(position: Int): Boolean = categoriesPage && realPage(position) == span - 1
 
     // Target position for a programmatic jump to a real page: the middle copy
     // while looping, the page itself otherwise.
@@ -148,6 +161,8 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
     }
 
     fun recenterIfNeeded(pager: ViewPager2) {
+        // Fork: a position the pager no longer has (the categories page was switched off while it sat there).
+        if (!looping && itemCount > 0 && pager.currentItem >= itemCount) pager.setCurrentItem(itemCount - 1, false)
         if (!looping) return
         val position = pager.currentItem
         if (position < span || position >= span * 2) {
@@ -170,9 +185,9 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
         if (show) {
             slotRemovalPending = false
             if (addSlot || pageCount >= LauncherRepository.MAX_PAGES) return
-            val current = realPage(pager.currentItem)
+            val current = logicalPage(pager)
             addSlot = true
-            if (looping) rebuildAround(pager, current) else notifyItemInserted(pageCount)
+            if (looping || categoriesPage) rebuildAround(pager, current) else notifyItemInserted(pageCount)
         } else {
             if (!addSlot || slotRemovalPending) return
             if (isAddPage(pager.currentItem)) {
@@ -185,9 +200,9 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
     }
 
     private fun removeSlot(pager: ViewPager2) {
-        val current = realPage(pager.currentItem).coerceAtMost(pageCount - 1)
+        val current = logicalPage(pager).let { if (it == ON_CATEGORIES) it else it.coerceAtMost(pageCount - 1) }
         addSlot = false
-        if (looping) {
+        if (looping || categoriesPage) {
             rebuildAround(pager, current)
         } else {
             notifyItemRemoved(pageCount)
@@ -197,11 +212,15 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
 
     // Every copy changes length: rebuild, and put the pager back on the page
     // it was showing (identical content, so the jump is invisible).
-    private fun rebuildAround(pager: ViewPager2, realPage: Int) {
+    private fun rebuildAround(pager: ViewPager2, page: Int) {
         renderedPages.clear()
         notifyDataSetChanged()
-        pager.setCurrentItem(centerPosition(realPage), false)
+        pager.setCurrentItem(centerPosition(if (page == ON_CATEGORIES) span - 1 else page), false)
     }
+
+    // The page the pager is on, or [ON_CATEGORIES]: that one moves when the add-page slot comes or goes.
+    private fun logicalPage(pager: ViewPager2): Int =
+        if (isCategoriesPage(pager.currentItem)) ON_CATEGORIES else realPage(pager.currentItem)
 
     fun refresh() {
         val state = host.state()
@@ -210,16 +229,19 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
             .filter { it.container == ContainerType.WORKSPACE }
             .maxOfOrNull { it.page + 1 } ?: 1
         val newCount = max(1, max(model.pageCount, itemMax))
-        val newLooping = state.prefs.infiniteScroll && newCount > 1
+        val newCategories = state.prefs.categoriesHomePage // Fork
+        val newLooping = state.prefs.infiniteScroll && newCount + (if (newCategories) 1 else 0) > 1
 
         // First bindable refresh: the item count goes 0 -> N, so this needs
         // the wholesale notify below rather than the per-page diff.
         val becameBindable = !bindable
         bindable = true
 
-        if (becameBindable || newCount != pageCount || newLooping != looping) {
+        val changed = newCount != pageCount || newLooping != looping || newCategories != categoriesPage
+        if (becameBindable || changed) {
             pageCount = newCount
             looping = newLooping
+            categoriesPage = newCategories
             if (addSlot && pageCount >= LauncherRepository.MAX_PAGES) {
                 addSlot = false
                 slotRemovalPending = false
@@ -411,6 +433,12 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == TYPE_ADD_PAGE) {
             AddPageViewHolder(ViewWorkspaceAddPageBinding.inflate(inflater, parent, false))
+        } else if (viewType == TYPE_CATEGORIES) {
+            val page = categoriesPageFactory?.invoke(parent) ?: View(parent.context)
+            page.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            object : RecyclerView.ViewHolder(page) {}
         } else {
             PageViewHolder(ViewWorkspacePageBinding.inflate(inflater, parent, false))
         }
@@ -431,7 +459,11 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
     }
 
     override fun getItemViewType(position: Int): Int =
-        if (isAddPage(position)) TYPE_ADD_PAGE else TYPE_PAGE
+        when {
+            isAddPage(position) -> TYPE_ADD_PAGE
+            isCategoriesPage(position) -> TYPE_CATEGORIES
+            else -> TYPE_PAGE
+        }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         // A wholesale rebind (a new day's calendar icons, a wallpaper color
@@ -624,5 +656,7 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
         const val MIN_WIDGET_SPAN = 0.5f
         const val TYPE_PAGE = 0
         const val TYPE_ADD_PAGE = 1
+        const val TYPE_CATEGORIES = 2
+        const val ON_CATEGORIES = -1
     }
 }

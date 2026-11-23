@@ -693,7 +693,7 @@ class LauncherActivity :
                 // A query typed in the drawer goes first: the full list
                 // comes back, and the next Back closes the drawer.
                 ::drawer.isInitialized && drawer.isExpanded -> if (!drawer.clearQuery()) drawer.hide()
-                else -> Unit
+                else -> backOnCategoriesPage() // Fork
             }
         }
 
@@ -1130,6 +1130,8 @@ class LauncherActivity :
             if (feed.isOpen) return super.dispatchTouchEvent(ev)
         }
         if (heldBySwipe(ev)) return true
+        // Fork: on the categories page the tiles' list owns the touches.
+        if (categoriesPageInView()) return super.dispatchTouchEvent(ev)
         // A widget scrolling its own content owns the vertical stream. The
         // detector observes without consuming, so otherwise a drag inside a
         // list widget also read as the home swipe-up/down binding and fired
@@ -1403,6 +1405,7 @@ class LauncherActivity :
 
     private fun setupWorkspace() {
         workspaceAdapter = WorkspacePagerAdapter(this)
+        workspaceAdapter.categoriesPageFactory = ::newCategoriesPage // Fork
         binding.workspacePager.adapter = workspaceAdapter
         // Build the neighbour page before the fling starts instead of during
         // it, and stop the default cross-fade on page rebinds.
@@ -1421,7 +1424,9 @@ class LauncherActivity :
             override fun onPageSelected(position: Int) {
                 if (::editMode.isInitialized && editMode.isOpen) editMode.onPageChanged()
                 val pages = workspaceAdapter.realPageCount
-                val addPage = workspaceAdapter.isAddPage(position)
+                // Fork: the categories page is away from the real pages, as the add-page slot is.
+                val addPage = workspaceAdapter.isAddPage(position) || workspaceAdapter.isCategoriesPage(position)
+                if (!workspaceAdapter.isCategoriesPage(position) && ::drawer.isInitialized) drawer.closeHomeScreens()
                 // Edit mode's add-page slot reports as the page past the
                 // last: the model's current page stays a real one, and the
                 // clock rule sees the slot as away from home.
@@ -1433,7 +1438,11 @@ class LauncherActivity :
                     if (addPage || framePage != page) widgets.dismissResizeFrame()
                 }
                 binding.workspacePager.announceForAccessibility(
-                    if (addPage) getString(R.string.add_page) else getString(R.string.page_desc, page + 1, pages)
+                    when {
+                        workspaceAdapter.isCategoriesPage(position) -> getString(R.string.fork_home_page)
+                        addPage -> getString(R.string.add_page)
+                        else -> getString(R.string.page_desc, page + 1, pages)
+                    }
                 )
             }
 
@@ -2102,7 +2111,8 @@ class LauncherActivity :
         val pages = workspaceAdapter.realPageCount
         if (viewModel.state.value.prefs.infiniteScroll && pages > 1) return true
         val page = workspaceAdapter.realPage(binding.workspacePager.currentItem)
-        return if (direction > 0) page < pages - 1 else page > 0
+        // Fork: the categories page is a position past the last real page.
+        return if (direction > 0) page < workspaceAdapter.pageSpan - 1 else page > 0
     }
 
     // force: the dock's content changed without anything in its signature
@@ -4092,7 +4102,8 @@ class LauncherActivity :
             !(::editMode.isInitialized && editMode.isOpen) &&
             !desktopPreviews.isShowing && pendingEditAddPage == null && undoSnackbar == null &&
             binding.workspacePager.scrollState == androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_IDLE &&
-            workspaceAdapter.realPageCount > 1 && !workspaceAdapter.isAddPage(binding.workspacePager.currentItem)
+            workspaceAdapter.realPageCount > 1 && !workspaceAdapter.isAddPage(binding.workspacePager.currentItem) &&
+            !workspaceAdapter.isCategoriesPage(binding.workspacePager.currentItem) // Fork
 
     // Pages before the one in view went, so it is further left now. The
     // adapter may have the new count already (then the pager moves at once)
@@ -5281,6 +5292,19 @@ class LauncherActivity :
     }
 
     override fun onAddPageTap() = requestEditAddPage(then = null)
+
+    // Fork: the categories page of the pager, made by the drawer, which has the folders and the apps.
+    private fun newCategoriesPage(parent: ViewGroup): View? =
+        if (::drawer.isInitialized) drawer.newHomeCategories(parent.context) else null
+
+    // Fork: Back on the categories page leaves a category's screen, or the arranging of the tiles.
+    private fun backOnCategoriesPage() {
+        if (categoriesPageInView()) drawer.homeCategoriesBack()
+    }
+
+    // Fork: the pager sits on the categories page: its tiles scroll and take taps, not the home screen's swipes.
+    private fun categoriesPageInView(): Boolean =
+        ::workspaceAdapter.isInitialized && workspaceAdapter.isCategoriesPage(binding.workspacePager.currentItem)
 
     // Beside the "+", the slot taps like any page's empty space.
     override fun onAddPageBackgroundTap() {

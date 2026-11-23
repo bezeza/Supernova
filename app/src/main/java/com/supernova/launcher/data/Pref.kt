@@ -223,6 +223,7 @@ object Pref {
     val categoriesRecentCount = int("categories_recent_count", CategoryLayout.RECENT_MIN..CategoryLayout.RECENT_MAX)
     val categoriesOptions = text("categories_options")
     val folderScreen = bool("folder_screen")
+    val categoriesHomePage = bool("categories_home_page")
     val folderOptions = text("folder_options")
     val categoriesSearchBottom = bool("categories_search_bottom")
     val smartFoldersDismissed = textSet("smart_folders_dismissed")
