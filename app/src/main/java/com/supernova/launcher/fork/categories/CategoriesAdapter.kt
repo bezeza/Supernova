@@ -43,6 +43,10 @@ internal sealed class CategoryRow(val key: String, val content: String) {
     class Block(val tiles: List<Tile>) :
         CategoryRow("block/" + tiles.joinToString("/") { it.entry.group.id }, tiles.joinToString("||") { it.content })
 
+    // Empty, the width of one column, after a small row that is alone in its slot: the tile after it stands at the
+    // edge of the grid, see [TilePairs.gaps].
+    class Gap(after: CategoryRow) : CategoryRow("gap/${after.key}", "gap")
+
     class Header(val text: String) : CategoryRow("header", text)
 
     class Loose(val app: LaunchableApp) : CategoryRow("app/${appKey(app)}", appKey(app))
@@ -105,10 +109,13 @@ internal class CategoriesAdapter(
         }
 
     // The rows with each two small tiles in a row made a pair.
-    private fun grouped(list: List<CategoryRow>): List<CategoryRow> =
-        TilePairs.group(list, { it is CategoryRow.Tile && it.options.size == CategorySize.SMALL }) { a, b ->
+    private fun grouped(list: List<CategoryRow>): List<CategoryRow> {
+        val small = { row: CategoryRow -> row is CategoryRow.Tile && row.options.size == CategorySize.SMALL }
+        val paired = TilePairs.group(list, small) { a, b ->
             CategoryRow.Pair(a as CategoryRow.Tile, b as CategoryRow.Tile)
         }
+        return TilePairs.gaps(paired, { it is CategoryRow.Pair || small(it) }) { CategoryRow.Gap(it) }
+    }
 
     // The rows as the controller gave them: pairs taken apart, the bar left out.
     private fun flat(list: List<CategoryRow>): List<CategoryRow> =
@@ -118,7 +125,7 @@ internal class CategoriesAdapter(
                 is CategoryRow.Block -> row.tiles
                 else -> null
             }
-        }.filter { it !is CategoryRow.Done }
+        }.filter { it !is CategoryRow.Done && it !is CategoryRow.Gap }
 
     private fun withBar(list: List<CategoryRow>): List<CategoryRow> =
         if (editing) listOf(CategoryRow.Done) + list else list
@@ -245,6 +252,7 @@ internal class CategoriesAdapter(
         is CategoryRow.Tile -> TYPE_TILE
         is CategoryRow.Pair -> TYPE_PAIR
         is CategoryRow.Block -> TYPE_BLOCK
+        is CategoryRow.Gap -> TYPE_GAP
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
         is CategoryRow.Hidden -> TYPE_HIDDEN
@@ -260,7 +268,7 @@ internal class CategoriesAdapter(
             CategorySize.WIDE, CategorySize.LARGE -> minOf(SPAN_DOUBLE, spanCount)
         }
         is CategoryRow.Block -> SPAN_TILE
-        is CategoryRow.Loose, is CategoryRow.Pair -> 1
+        is CategoryRow.Loose, is CategoryRow.Pair, is CategoryRow.Gap -> 1
         else -> spanCount
     }
 
@@ -274,6 +282,7 @@ internal class CategoriesAdapter(
             TYPE_DONE -> DoneHolder(context)
             TYPE_PAIR -> PairHolder(context)
             TYPE_BLOCK -> BlockHolder(context)
+            TYPE_GAP -> GapHolder(View(context))
             else -> LooseHolder(context)
         }
     }
@@ -284,6 +293,7 @@ internal class CategoriesAdapter(
             is CategoryRow.Tile -> (holder as TileHolder).bind(row)
             is CategoryRow.Pair -> (holder as PairHolder).bind(row)
             is CategoryRow.Block -> (holder as BlockHolder).bind(row)
+            is CategoryRow.Gap -> Unit
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
             is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
@@ -482,6 +492,13 @@ internal class CategoriesAdapter(
         }
     }
 
+    // Nothing to see: it only holds a column of the grid, the row is as high as the tile beside it.
+    private inner class GapHolder(view: View) : RecyclerView.ViewHolder(view) {
+        init {
+            view.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0)
+        }
+    }
+
     // The bar on top while arranging: how, and the button that ends it.
     private inner class DoneHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
         private val hint = label(context, HINT_SP, centred = false, lines = HINT_LINES)
@@ -656,6 +673,7 @@ internal class CategoriesAdapter(
         const val TYPE_DONE = 6
         const val TYPE_PAIR = 7
         const val TYPE_BLOCK = 8
+        const val TYPE_GAP = 9
         const val PAYLOAD_EDIT = "edit"
         const val HINT_SP = 11f
         const val HINT_LINES = 3

@@ -108,4 +108,46 @@ class TilePairsTest {
         val parts = TilePairs.split(moved) { if (it.startsWith("[")) it.trim('[', ']').split(" ") else null }
         assertEquals(listOf("s1", "s2", "s3", "s4", "n1", "n2"), parts)
     }
+
+    // A small row is "p1" (a pair or a lone small tile), a gap after it is "p1_"; anything else is not small.
+    private fun gaps(vararg items: String): List<String> =
+        TilePairs.gaps(items.toList(), { it.startsWith("p") }) { "${it}_" }
+
+    @Test
+    fun aLoneSmallRowBeforeANormalTileGetsAGap() {
+        assertEquals(listOf("p1", "p1_", "n1"), gaps("p1", "n1"))
+    }
+
+    @Test
+    fun aNormalTileBeforeALoneSmallRowGetsNoGapAtTheEnd() {
+        assertEquals(listOf("n1", "p1"), gaps("n1", "p1"))
+    }
+
+    @Test
+    fun aLoneSmallRowBetweenNormalTilesGetsAGapAfterIt() {
+        assertEquals(listOf("n1", "p1", "p1_", "n2"), gaps("n1", "p1", "n2"))
+    }
+
+    @Test
+    fun twoSmallRowsFillTheSlotAndGetNoGap() {
+        assertEquals(listOf("p1", "p2", "n1"), gaps("p1", "p2", "n1"))
+    }
+
+    @Test
+    fun threeSmallRowsHaveOneAloneAtTheEnd() {
+        assertEquals(listOf("p1", "p2", "p3", "p3_", "n1"), gaps("p1", "p2", "p3", "n1"))
+    }
+
+    @Test
+    fun eachRunIsCountedOnItsOwn() {
+        assertEquals(
+            listOf("p1", "p1_", "n1", "p2", "p3", "n2"),
+            gaps("p1", "n1", "p2", "p3", "n2")
+        )
+    }
+
+    @Test
+    fun noRowsNoGaps() {
+        assertEquals(emptyList<String>(), gaps())
+    }
 }

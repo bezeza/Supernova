@@ -25,6 +25,25 @@ internal object TilePairs {
         return out
     }
 
+    // Small rows (pairs, or a lone small tile) fill two columns each, the space of a normal tile when two follow
+    // each other. A run of them with an odd number of rows has one row left alone in its slot, and the tile after it
+    // would stand in the middle of the grid, so a [gap] is put after that row to fill the other half of the slot.
+    // The gap is made from the run's last row. No gap at the very end: nothing there needs it.
+    fun <T> gaps(items: List<T>, isSmallRow: (T) -> Boolean, gap: (T) -> T): List<T> {
+        val out = ArrayList<T>(items.size)
+        var run = 0
+        for (item in items) {
+            if (isSmallRow(item)) {
+                run += 1
+            } else {
+                if (run % 2 == 1) out.add(gap(out.last()))
+                run = 0
+            }
+            out.add(item)
+        }
+        return out
+    }
+
     // While a tile that is not small is dragged, the small ones stand in blocks: each run of small ones that
     // follow each other is cut into blocks of [BLOCK] (the last may hold fewer, even one) and each is made one item by
     // [block], so the dragged tile changes places with a whole block, the space of a normal tile, and the
