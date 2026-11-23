@@ -20,13 +20,15 @@ enum class CategorySort {
 
 // The size of a category's tile: NORMAL is a square of two columns, WIDE two such
 // tiles side by side, TALL two one over the other, LARGE four of them (two by two),
-// SMALL one column. LARGE and TALL come last, so a backup from before them still reads.
+// SMALL one column, STRIP the whole width and half a normal tile high. New sizes come last, so a backup from
+// before them still reads (and an older build reads an unknown one as NORMAL).
 enum class CategorySize {
     NORMAL,
     WIDE,
     SMALL,
     LARGE,
-    TALL;
+    TALL,
+    STRIP;
 
     companion object {
         fun fromName(name: String): CategorySize =
@@ -42,10 +44,15 @@ data class CategoryOptions(
     val hidden: Boolean = false,
     val size: CategorySize = CategorySize.NORMAL,
     // How many large icons a normal tile has: 3, 1 or 0 (all small).
-    val large: Int = LARGE_DEFAULT
+    val large: Int = LARGE_DEFAULT,
+    // The cell the tile was put in, the top left one of its footprint; null while it was never put anywhere, and
+    // the tile then stands where the order of the folders puts it.
+    val col: Int? = null,
+    val row: Int? = null
 ) {
     val isDefault: Boolean
-        get() = sort == CategorySort.DRAWER && !hidden && size == CategorySize.NORMAL && large == LARGE_DEFAULT
+        get() = sort == CategorySort.DRAWER && !hidden && size == CategorySize.NORMAL && large == LARGE_DEFAULT &&
+            col == null && row == null
 
     companion object {
         const val LARGE_DEFAULT = 3
@@ -61,13 +68,22 @@ internal class StoredOptions(
     val sort: String = "",
     val hidden: Boolean = false,
     val size: String = "",
-    val large: Int = CategoryOptions.LARGE_DEFAULT
+    val large: Int = CategoryOptions.LARGE_DEFAULT,
+    // -1: no cell. Written only for a tile that has one; an older build leaves these keys alone.
+    val col: Int = NO_CELL,
+    val row: Int = NO_CELL
 )
+
+private const val NO_CELL = -1
 
 // The options of every category in one preference, a JSON object by the
 // folder's id: `{"Ігри":{"sort":"ALPHA","hidden":true}}`. DrawerGroup, and so
 // the stored groups, are not touched. A value that cannot be read is no options.
 object CategoryOptionsStore {
+
+    // The strip of the newest installs is no folder, but it has a size and a cell of its own.
+    const val RECENT_KEY = "fork:recent"
+    private val KEPT_KEYS = setOf(RECENT_KEY)
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -75,7 +91,11 @@ object CategoryOptionsStore {
         val stored = if (raw.isBlank()) null else parse(raw)
         return stored?.mapValues { (_, v) ->
             val large = CategoryOptions.largeOrDefault(v.large)
-            CategoryOptions(CategorySort.fromName(v.sort), v.hidden, CategorySize.fromName(v.size), large)
+            val placed = v.col >= 0 && v.row >= 0
+            CategoryOptions(
+                CategorySort.fromName(v.sort), v.hidden, CategorySize.fromName(v.size), large,
+                v.col.takeIf { placed }, v.row.takeIf { placed }
+            )
         } ?: emptyMap()
     }
 
@@ -85,7 +105,9 @@ object CategoryOptionsStore {
     // Defaults are not written, so a category set back to them leaves no trace.
     fun encode(options: Map<String, CategoryOptions>): String {
         val stored = options.filterValues { !it.isDefault }
-            .mapValues { (_, v) -> StoredOptions(v.sort.name, v.hidden, v.size.name, v.large) }
+            .mapValues { (_, v) ->
+                StoredOptions(v.sort.name, v.hidden, v.size.name, v.large, v.col ?: NO_CELL, v.row ?: NO_CELL)
+            }
         return if (stored.isEmpty()) "" else json.encodeToString(stored)
     }
 
@@ -99,6 +121,6 @@ object CategoryOptionsStore {
     ): String {
         val all = decode(raw).toMutableMap()
         all[id] = change(all[id] ?: CategoryOptions())
-        return encode(all.filterKeys { it == id || it in existing })
+        return encode(all.filterKeys { it == id || it in existing || it in KEPT_KEYS })
     }
 }

@@ -28,7 +28,7 @@ internal sealed class CategoryRow(val key: String, val content: String) {
         val slots = when (options.size) {
             CategorySize.SMALL -> TileSlots.small()
             CategorySize.NORMAL -> TileSlots.normal(options.large)
-            CategorySize.WIDE -> TileSlots.double()
+            CategorySize.WIDE, CategorySize.STRIP -> TileSlots.double()
             CategorySize.LARGE -> TileSlots.big()
             CategorySize.TALL -> TileSlots.tall()
         }
@@ -264,7 +264,7 @@ internal class CategoriesAdapter(
         is CategoryRow.Tile -> when (row.options.size) {
             CategorySize.NORMAL, CategorySize.TALL -> SPAN_TILE
             CategorySize.SMALL -> 1
-            CategorySize.WIDE, CategorySize.LARGE -> minOf(SPAN_DOUBLE, spanCount)
+            CategorySize.WIDE, CategorySize.LARGE, CategorySize.STRIP -> minOf(SPAN_DOUBLE, spanCount)
         }
         is CategoryRow.Block -> SPAN_TILE
         is CategoryRow.Loose, is CategoryRow.Pair, is CategoryRow.Gap -> 1

@@ -35,7 +35,7 @@ internal object CategoryOptionsDialog {
                         pick(context, name, choice, handlers.onSort)
                     }
                     Row.SIZE -> {
-                        val choice = Choice(CategorySize.entries, options.size, ::sizeLabel)
+                        val choice = Choice(CategorySize.entries - CategorySize.STRIP, options.size, ::sizeLabel)
                         pick(context, name, choice, handlers.onSize)
                     }
                     Row.LARGE -> {
@@ -83,7 +83,7 @@ internal object CategoryOptionsDialog {
     private fun sizeLabel(context: Context, size: CategorySize): String = context.getString(
         when (size) {
             CategorySize.NORMAL -> R.string.fork_size_normal
-            CategorySize.WIDE -> R.string.fork_size_wide
+            CategorySize.WIDE, CategorySize.STRIP -> R.string.fork_size_wide
             CategorySize.SMALL -> R.string.fork_size_small
             CategorySize.LARGE -> R.string.fork_size_large
             CategorySize.TALL -> R.string.fork_size_tall
