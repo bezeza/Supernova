@@ -1,15 +1,10 @@
 package com.supernova.launcher.fork.categories
 
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.supernova.launcher.R
 import com.supernova.launcher.data.DrawerGroup
 import com.supernova.launcher.data.LaunchableApp
 import com.supernova.launcher.ui.AppDrawerAdapter
@@ -19,63 +14,25 @@ import com.supernova.launcher.ui.AppDrawerAdapter
 class ScreenLook(val columns: Int, val left: Int, val top: Int, val right: Int, val bottom: Int)
 
 // One category on a screen of its own, over the tiles, like a folder in App
-// Library or a category in HyperOS: the name and a back button on top, the
-// category's apps in the drawer's own grid below. It draws with the drawer's
-// own adapter, so icons, labels, badges, taps and long presses are the
-// drawer's. Back, the arrow and a swipe to the right all return to the tiles.
-// The button on top chooses the category's large icons: tapped apps, in turn.
+// Library or a category in HyperOS. The content is a [CategoryPage]; this puts
+// it over the tiles' list in the drawer's container and brings it in and out:
+// it fades and scales in, and goes away the same way. Back, the arrow and a
+// swipe to the right all return to the tiles.
 internal class CategoryScreen(
     container: FrameLayout,
-    private val cells: AppDrawerAdapter,
-    private val onBack: () -> Unit,
+    cells: AppDrawerAdapter,
+    onBack: () -> Unit,
     // The apps chosen as large icons, in the order chosen.
-    private val onPicked: (List<LaunchableApp>) -> Unit,
+    onPicked: (List<LaunchableApp>) -> Unit,
     // The header's "+": add apps to the category.
-    private val onAdd: () -> Unit
+    onAdd: () -> Unit
 ) {
 
-    private val context = container.context
-    private val density = context.resources.displayMetrics.density
-    private var picker: LargePicker<LaunchableApp>? = null
-    private var shownApps: List<LaunchableApp> = emptyList()
-
-    private val header = CategoryHeader(context).also {
-        it.onBack = { onBack() }
-        it.onPick = { startPicking() }
-        it.onAdd = { onAdd() }
-    }
+    private val page = CategoryPage(container.context, cells, onBack, onPicked, onAdd)
+    private val root = page.view.apply { visibility = View.GONE }
 
     // The apps' grid; the controller hangs the drawer's tab swipe on it.
-    val grid = RecyclerView(context).apply {
-        val manager = GridLayoutManager(context, 1)
-        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int = cells.spanSizeAt(position, manager.spanCount)
-        }
-        layoutManager = manager
-        adapter = cells
-        itemAnimator = null
-        clipToPadding = false
-        overScrollMode = View.OVER_SCROLL_NEVER
-    }
-
-    private val root = LinearLayout(context).apply {
-        orientation = LinearLayout.VERTICAL
-        visibility = View.GONE
-        // The tiles below are not to take a touch that lands between icons.
-        isClickable = true
-        val wide = ViewGroup.LayoutParams.MATCH_PARENT
-        addView(header, LinearLayout.LayoutParams(wide, ViewGroup.LayoutParams.WRAP_CONTENT))
-        addView(grid, LinearLayout.LayoutParams(wide, 0, 1f))
-    }
-
-    private val swipe = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-        override fun onFling(first: MotionEvent?, second: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-            first ?: return false
-            val goesBack = BackSwipe.isBack(second.x - first.x, second.y - first.y, velocityX, density)
-            if (goesBack) onBack()
-            return goesBack
-        }
-    })
+    val grid: RecyclerView get() = page.grid
 
     init {
         // Above the tiles' list, which sits at index 1.
@@ -84,24 +41,12 @@ internal class CategoryScreen(
             container.childCount,
             FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         )
-        grid.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                swipe.onTouchEvent(e)
-                return false
-            }
-        })
     }
 
     val isShown: Boolean get() = root.isVisible
 
     fun show(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook, animate: Boolean) {
-        picker = null
-        shownApps = apps
-        header.show(group.name, choosable = apps.size > 1)
-        (grid.layoutManager as GridLayoutManager).spanCount = look.columns.coerceAtLeast(1)
-        grid.setPadding(look.left, look.top, look.right, look.bottom)
-        cells.submit(apps, emptyList(), true, AppDrawerAdapter.Order.UNSORTED, replace = true)
-        grid.scrollToPosition(0)
+        page.bind(group, apps, look)
         root.animate().cancel()
         root.visibility = View.VISIBLE
         if (animate) {
@@ -117,14 +62,10 @@ internal class CategoryScreen(
     }
 
     // New apps for the open category: the grid diffs against what it had.
-    fun update(apps: List<LaunchableApp>) {
-        shownApps = apps
-        header.setChoosable(apps.size > 1)
-        cells.submit(apps, emptyList(), true, AppDrawerAdapter.Order.UNSORTED, replace = false)
-    }
+    fun update(apps: List<LaunchableApp>) = page.update(apps)
 
     fun hide(animate: Boolean) {
-        picker = null
+        page.release()
         root.animate().cancel()
         if (!animate || !isShown) {
             root.visibility = View.GONE
@@ -134,45 +75,15 @@ internal class CategoryScreen(
             .withEndAction { root.visibility = View.GONE }.start()
     }
 
-    fun rebind() = cells.notifyItemRangeChanged(0, cells.itemCount)
+    fun rebind() = page.rebind()
 
-    fun setLook(textColor: Int, showIcon: Boolean) = header.setLook(textColor, showIcon)
+    fun setLook(textColor: Int, showIcon: Boolean) = page.setLook(textColor, showIcon)
 
     // True while choosing, whatever the tap was: it is the choosing's, not a launch.
-    fun handleTap(app: LaunchableApp): Boolean {
-        val current = picker ?: return false
-        if (current.pick(app)) finishOrHint(current)
-        return true
-    }
-
-    private fun finishOrHint(current: LargePicker<LaunchableApp>) {
-        if (!current.isComplete) {
-            header.setHint(hintFor(current), choosable = true)
-            return
-        }
-        picker = null
-        header.setHint(null, choosable = shownApps.size > 1)
-        onPicked(current.picked)
-    }
+    fun handleTap(app: LaunchableApp): Boolean = page.handleTap(app)
 
     // Back while choosing stops the choosing and leaves the screen open.
-    fun cancelPicking(): Boolean {
-        if (picker == null) return false
-        picker = null
-        header.setHint(null, choosable = shownApps.size > 1)
-        return true
-    }
-
-    private fun startPicking() {
-        val slots = minOf(CategoryLayout.LARGE_SLOTS, shownApps.size)
-        if (slots < 1) return
-        val current = LargePicker<LaunchableApp>(slots)
-        picker = current
-        header.setHint(hintFor(current), choosable = true)
-    }
-
-    private fun hintFor(current: LargePicker<LaunchableApp>): String =
-        context.getString(R.string.fork_pick_large_hint, current.next, current.slots)
+    fun cancelPicking(): Boolean = page.cancelPicking()
 
     private companion object {
         const val ANIMATION_MS = 180L
