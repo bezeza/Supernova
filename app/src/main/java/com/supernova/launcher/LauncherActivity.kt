@@ -3559,7 +3559,7 @@ class LauncherActivity :
         if (group.type == DrawerGroupType.FOLDER) {
             val others = viewModel.drawerFolderGroups().filter { it.id != group.id }
             if (others.isNotEmpty()) {
-                menu.addRow(getString(R.string.merge_folder), R.drawable.ic_menu_select_apps) {
+                menu.addRow(getString(R.string.merge_folder), R.drawable.ic_menu_merge_folder) {
                     MaterialAlertDialogBuilder(this)
                         .setTitle(getString(R.string.merge_folder_title, group.name))
                         .setItems(others.map { it.name }.toTypedArray()) { _, which ->
