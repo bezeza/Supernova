@@ -83,8 +83,13 @@ internal class CategoriesAdapter(
     // A new list: only the rows that changed are rebound.
     fun submitList(list: List<CategoryRow>) {
         base = list
-        show(withBar(grouped(list)))
+        show(onScreen(list))
     }
+
+    // What is on screen for the rows: while arranging every tile is its own item, so one small tile can be dragged;
+    // otherwise two small ones in a row are a pair, and the bar on top is only there while arranging.
+    private fun onScreen(list: List<CategoryRow>): List<CategoryRow> =
+        withBar(if (editing) list else grouped(list))
 
     // The rows with each two small tiles in a row made a pair.
     private fun grouped(list: List<CategoryRow>): List<CategoryRow> =
@@ -120,7 +125,7 @@ internal class CategoriesAdapter(
     fun setEditing(on: Boolean) {
         if (editing == on) return
         editing = on
-        show(withBar(grouped(base)))
+        show(onScreen(base))
         notifyItemRangeChanged(0, itemCount, PAYLOAD_EDIT)
     }
 
@@ -131,6 +136,22 @@ internal class CategoriesAdapter(
         base = flat(items)
         notifyItemMoved(from, to)
         return true
+    }
+
+    // The row at [position] by what outlasts a regrouping: a tile's folder id (a pair's first), else the row's key.
+    fun anchorAt(position: Int): String? = when (val row = items.getOrNull(position)) {
+        is CategoryRow.Tile -> row.entry.group.id
+        is CategoryRow.Pair -> row.first.entry.group.id
+        else -> row?.key
+    }
+
+    // Where the row an [anchorAt] named is now, or -1.
+    fun positionOf(anchor: String): Int = items.indexOfFirst { row ->
+        when (row) {
+            is CategoryRow.Tile -> row.entry.group.id == anchor
+            is CategoryRow.Pair -> row.first.entry.group.id == anchor || row.second.entry.group.id == anchor
+            else -> row.key == anchor
+        }
     }
 
     // A tile, or a pair of small ones: what can be dragged.
@@ -146,7 +167,7 @@ internal class CategoriesAdapter(
             base = flat(items).map { row ->
                 if (row is CategoryRow.Tile && row.entry.group.id == id) row.sized(size) else row
             }
-            show(withBar(grouped(base)))
+            show(onScreen(base))
             editHandlers.onResize(id, size)
             return
         }

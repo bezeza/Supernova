@@ -2,6 +2,7 @@ package com.supernova.launcher.fork.categories
 
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 // Arranging the tiles: while it is on the tiles shake, a hold drags one to
@@ -42,20 +43,31 @@ internal class TileArranger(
 
     val isOn: Boolean get() = rows.editing
 
+    // The list's first visible row stays where it is on screen while [change] regroups the tiles under it.
+    private fun keepingScroll(change: () -> Unit) {
+        val layout = recycler.layoutManager as? LinearLayoutManager
+        val first = layout?.findFirstVisibleItemPosition() ?: RecyclerView.NO_POSITION
+        val anchor = if (first == RecyclerView.NO_POSITION) null else rows.anchorAt(first)
+        val top = layout?.findViewByPosition(first)?.top ?: 0
+        change()
+        val at = anchor?.let { rows.positionOf(it) } ?: RecyclerView.NO_POSITION
+        if (layout != null && at != RecyclerView.NO_POSITION) layout.scrollToPositionWithOffset(at, top)
+    }
+
     fun start() {
         if (rows.editing) return
-        rows.setEditing(true)
+        keepingScroll { rows.setEditing(true) }
         // The tiles make way for one another, but a changed tile keeps its own view: a drag is on it.
         recycler.itemAnimator = DefaultItemAnimator().apply { supportsChangeAnimations = false }
         touchHelper.attachToRecyclerView(recycler)
-        recycler.scrollToPosition(0)
     }
 
     // True when the tiles were being arranged: the Back that ended it is spent.
     fun stop(): Boolean {
         if (!rows.editing) return false
-        rows.setEditing(false)
+        // No animation as the pairs form again, and the list stays where it is.
         recycler.itemAnimator = null
+        keepingScroll { rows.setEditing(false) }
         touchHelper.attachToRecyclerView(null)
         return true
     }
