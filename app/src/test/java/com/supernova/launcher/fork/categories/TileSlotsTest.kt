@@ -83,4 +83,90 @@ class TileSlotsTest {
         assertEquals(9, tile.mini.size)
         assertEquals(3, tile.hidden)
     }
+
+    @Test
+    fun aDoubleTileHasSevenLargeAndAFourSmallCorner() {
+        val slots = TileSlots.double()
+        assertEquals(7, TileSlots.largeCount(slots))
+        assertEquals(4, TileSlots.miniCount(slots))
+        assertTrue(slots.take(7).all { it.large })
+    }
+
+    @Test
+    fun aDoubleTileRunsTwoHeightsAcrossAndStaysOneHigh() {
+        val slots = TileSlots.double()
+        assertEquals(2f, TileSlots.contentWidth(slots), eps)
+        assertTrue(slots.all { it.x >= -eps && it.y >= -eps && it.x + it.size <= 2f + eps })
+        assertTrue(slots.all { it.y + it.size <= 1f + eps })
+        assertTrue(noOverlap(slots))
+    }
+
+    @Test
+    fun aSquareTileRunsOneHeightAcross() {
+        assertEquals(1f, TileSlots.contentWidth(TileSlots.normal(3)), eps)
+    }
+
+    @Test
+    fun aDoubleTileTakesTheFirstSevenAppsLargeAndTheNextFourSmall() {
+        val tile = CategoryLayout.tile((1..20).toList(), TileSlots.double())
+        assertEquals((1..7).toList(), tile.large)
+        assertEquals((8..11).toList(), tile.mini)
+        assertEquals(9, tile.hidden)
+    }
+
+    @Test
+    fun aBigTileHasFifteenLargeAndAFourSmallCorner() {
+        val slots = TileSlots.big()
+        assertEquals(15, TileSlots.largeCount(slots))
+        assertEquals(4, TileSlots.miniCount(slots))
+        assertTrue(slots.take(15).all { it.large })
+    }
+
+    @Test
+    fun aBigTileIsASquareAndItsIconsStayInsideAndApart() {
+        val slots = TileSlots.big()
+        assertEquals(1f, TileSlots.contentWidth(slots), eps)
+        assertTrue(inside(slots))
+        assertTrue(noOverlap(slots))
+    }
+
+    @Test
+    fun aBigTileTakesTheFirstFifteenAppsLargeAndTheNextFourSmall() {
+        val tile = CategoryLayout.tile((1..30).toList(), TileSlots.big())
+        assertEquals((1..15).toList(), tile.large)
+        assertEquals((16..19).toList(), tile.mini)
+        assertEquals(11, tile.hidden)
+    }
+
+    @Test
+    fun aTallTileHasSevenLargeAndAFourSmallCorner() {
+        val slots = TileSlots.tall()
+        assertEquals(7, TileSlots.largeCount(slots))
+        assertEquals(4, TileSlots.miniCount(slots))
+        assertTrue(slots.take(7).all { it.large })
+    }
+
+    @Test
+    fun aTallTileRunsAHalfHeightAcrossAndStaysInsideAndApart() {
+        val slots = TileSlots.tall()
+        assertEquals(0.5f, TileSlots.contentWidth(slots), eps)
+        assertTrue(inside(slots))
+        assertTrue(noOverlap(slots))
+    }
+
+    @Test
+    fun aSmallTileKeepsAStripOnTopForItsName() {
+        val slots = TileSlots.small()
+        assertEquals(TileSlots.SMALL_NAME, TileSlots.nameShare(slots), eps)
+        assertTrue(slots.all { it.y >= TileSlots.SMALL_NAME - eps })
+        assertTrue(inside(slots))
+        assertTrue(noOverlap(slots))
+    }
+
+    @Test
+    fun theOtherTilesKeepNoStripForAName() {
+        val layouts = listOf(TileSlots.normal(3), TileSlots.normal(1), TileSlots.normal(0))
+        (layouts + listOf(TileSlots.double(), TileSlots.tall(), TileSlots.big()))
+            .forEach { assertEquals(0f, TileSlots.nameShare(it), eps) }
+    }
 }

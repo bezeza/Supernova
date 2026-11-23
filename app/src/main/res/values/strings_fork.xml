@@ -28,11 +28,10 @@
     <string name="fork_recent_count">How many new apps</string>
     <string name="fork_tile_size">Tile size: %1$s</string>
     <string name="fork_size_normal">Normal</string>
-    <string name="fork_size_wide">Wide, a row across the screen</string>
+    <string name="fork_size_wide">2× (double): two tiles wide</string>
     <string name="fork_size_small">Small</string>
     <string name="fork_large_icons">Large icons: %1$s</string>
     <string name="fork_large_none">none, all small</string>
-    <string name="fork_more_apps">+%1$d</string>
     <string name="fork_add_apps">Add apps</string>
     <string name="fork_folder_screen">Folders as a screen</string>
     <string name="fork_folder_screen_summary">A folder of the drawer opens on a full screen, like a category, instead of a window</string>
@@ -46,4 +45,8 @@
     <string name="fork_look_grid">2 × 2</string>
     <string name="fork_look_grid3">3 × 3</string>
     <string name="fork_look_single">The first app alone</string>
+    <string name="fork_edit_done">Done</string>
+    <string name="fork_edit_hint">Drag a tile to move it, its corner to resize it, the gear for its settings</string>
+    <string name="fork_size_large">Big (2×2): four tiles</string>
+    <string name="fork_size_tall">Tall (1×2): two tiles one over the other</string>
 </resources>

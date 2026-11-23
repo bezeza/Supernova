@@ -7,6 +7,9 @@ package com.supernova.launcher.fork.categories
 object CategoryLayout {
 
     const val LARGE_SLOTS = 3
+
+    // The most large icons any tile has: a big tile's fifteen.
+    const val LARGE_MAX = 15
     const val MINI_SLOTS = 4
     const val MINI_MAX = 12
 

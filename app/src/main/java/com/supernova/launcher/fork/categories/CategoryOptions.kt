@@ -18,12 +18,15 @@ enum class CategorySort {
     }
 }
 
-// The size of a category's tile: NORMAL is a square of two columns, WIDE a row
-// across the screen, SMALL one column.
+// The size of a category's tile: NORMAL is a square of two columns, WIDE two such
+// tiles side by side, TALL two one over the other, LARGE four of them (two by two),
+// SMALL one column. LARGE and TALL come last, so a backup from before them still reads.
 enum class CategorySize {
     NORMAL,
     WIDE,
-    SMALL;
+    SMALL,
+    LARGE,
+    TALL;
 
     companion object {
         fun fromName(name: String): CategorySize =

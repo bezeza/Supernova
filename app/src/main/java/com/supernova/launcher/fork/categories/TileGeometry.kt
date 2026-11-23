@@ -14,12 +14,18 @@ internal object TileGeometry {
         val height: Int get() = bottom - top
     }
 
-    // The corner cell is the card's bottom right one, inside [pad] of padding.
-    // Its target runs from [CORNER_REACH] of a cell before the cell to the
-    // card's own edge, padding included.
-    fun cornerTarget(side: Int, pad: Int, cell: Int): Rect {
+    // The corner of small icons starts at ([left], [top]) and the card ends at ([right], [bottom]). Its target
+    // runs from [CORNER_REACH] of a [cell] before the corner to the card's own edge, padding included.
+    fun cornerTarget(left: Int, top: Int, right: Int, bottom: Int, cell: Int): Rect {
         val reach = (cell * CORNER_REACH).toInt()
-        val start = pad + cell
-        return Rect(start - reach, start - reach, side, side)
+        return Rect(left - reach, top - reach, right, bottom)
     }
+
+    // A double tile is two normal ones wide with the margin between them, and as high as one:
+    // the width less the margin that fell between, halved.
+    fun doubleHeight(width: Int, margin: Int): Int = width / 2 - margin
+
+    // A tall tile is two normal ones one over the other with the margins between them: twice the width and
+    // the margins that fell between.
+    fun tallHeight(width: Int, margin: Int): Int = 2 * width + 2 * margin
 }

@@ -57,7 +57,18 @@ class CategoryEdits(
     // A category's settings changed: its folder id and the change.
     val onOptions: (String, (CategoryOptions) -> CategoryOptions) -> Unit,
     // The "+" on a category's screen: pick the apps of the folder.
-    val onAddApps: (DrawerGroup) -> Unit
+    val onAddApps: (DrawerGroup) -> Unit,
+    // The tiles dragged to a new order: the ids of the shown folders, in that order.
+    val onOrder: (List<String>) -> Unit
+)
+
+// What arranging the tiles asks of the controller.
+internal class EditHandlers(
+    // A tap on a tile: its settings.
+    val onTap: (View, CategoryEntry) -> Unit,
+    val onDone: () -> Unit,
+    // A tile's corner dragged to another size.
+    val onResize: (String, CategorySize) -> Unit
 )
 
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

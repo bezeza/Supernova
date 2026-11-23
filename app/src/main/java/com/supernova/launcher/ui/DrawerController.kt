@@ -34,6 +34,7 @@ import com.supernova.launcher.fork.categories.CategoryOptions
 import com.supernova.launcher.fork.categories.CategorySettings
 import com.supernova.launcher.fork.categories.CategoryOptionsStore
 import com.supernova.launcher.fork.categories.CategoryOrder
+import com.supernova.launcher.fork.categories.CategoryReorder
 import com.supernova.launcher.fork.categories.CategorySort
 import com.supernova.launcher.fork.categories.HiddenCategory
 import com.supernova.launcher.fork.categories.Orderings
@@ -100,7 +101,7 @@ class DrawerController(
         binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
         CategoriesActions(
             onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress,
-            CategoryEdits(::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory)
+            CategoryEdits(::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder)
         ),
         categoryAdapter
     ).also { it.onScreenChanged = { applyListVisibility() } }
@@ -1901,6 +1902,12 @@ class DrawerController(
     }
 
     // Fork: one category's own options, stored by its folder id; the categories that are gone are dropped.
+    // Fork: the tiles dragged to a new order: the folders' own, the ones without a tile keeping their places.
+    private fun changeCategoryOrder(shown: List<String>) {
+        val all = viewModel.drawerFolderGroups().map { it.id }
+        viewModel.setGroupOrder(com.supernova.launcher.data.DrawerGroupType.FOLDER, CategoryReorder.merged(all, shown))
+    }
+
     private fun changeCategoryOptions(id: String, change: (CategoryOptions) -> CategoryOptions) {
         val raw = viewModel.state.value.prefs.categoriesOptions
         val existing = viewModel.drawerGroups().map { it.id }
