@@ -39,6 +39,10 @@ internal sealed class CategoryRow(val key: String, val content: String) {
     class Pair(val first: Tile, val second: Tile) :
         CategoryRow("pair/${first.entry.group.id}/${second.entry.group.id}", first.content + "||" + second.content)
 
+    // One to four small tiles, in the space of a normal tile: how they stand while a bigger tile is dragged.
+    class Block(val tiles: List<Tile>) :
+        CategoryRow("block/" + tiles.joinToString("/") { it.entry.group.id }, tiles.joinToString("||") { it.content })
+
     class Header(val text: String) : CategoryRow("header", text)
 
     class Loose(val app: LaunchableApp) : CategoryRow("app/${appKey(app)}", appKey(app))
@@ -72,6 +76,9 @@ internal class CategoriesAdapter(
     var editing = false
         private set
 
+    // True while a tile that is not small is dragged: the small ones stand in blocks of four, see [TilePairs.blocks].
+    private var gathered = false
+
     init {
         setHasStableIds(true)
     }
@@ -89,7 +96,13 @@ internal class CategoriesAdapter(
     // What is on screen for the rows: while arranging every tile is its own item, so one small tile can be dragged;
     // otherwise two small ones in a row are a pair, and the bar on top is only there while arranging.
     private fun onScreen(list: List<CategoryRow>): List<CategoryRow> =
-        withBar(if (editing) list else grouped(list))
+        withBar(if (!editing) grouped(list) else if (gathered) blocked(list) else list)
+
+    // The rows with the small tiles in blocks of four, the last block of a run holding what is left.
+    private fun blocked(list: List<CategoryRow>): List<CategoryRow> =
+        TilePairs.blocks(list, { it is CategoryRow.Tile && it.options.size == CategorySize.SMALL }) { tiles ->
+            CategoryRow.Block(tiles.map { it as CategoryRow.Tile })
+        }
 
     // The rows with each two small tiles in a row made a pair.
     private fun grouped(list: List<CategoryRow>): List<CategoryRow> =
@@ -99,8 +112,13 @@ internal class CategoriesAdapter(
 
     // The rows as the controller gave them: pairs taken apart, the bar left out.
     private fun flat(list: List<CategoryRow>): List<CategoryRow> =
-        TilePairs.split(list) { (it as? CategoryRow.Pair)?.let { pair -> listOf(pair.first, pair.second) } }
-            .filter { it !is CategoryRow.Done }
+        TilePairs.split(list) { row ->
+            when (row) {
+                is CategoryRow.Pair -> listOf(row.first, row.second)
+                is CategoryRow.Block -> row.tiles
+                else -> null
+            }
+        }.filter { it !is CategoryRow.Done }
 
     private fun withBar(list: List<CategoryRow>): List<CategoryRow> =
         if (editing) listOf(CategoryRow.Done) + list else list
@@ -122,9 +140,21 @@ internal class CategoriesAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
+    // The small tiles stand in blocks (or not) while a tile that is not small is dragged.
+    fun gather(on: Boolean) {
+        if (!editing || gathered == on) return
+        gathered = on
+        show(onScreen(base))
+    }
+
+    // The tile at [position] is a small one: its drag is its own, the others' is of the blocks of small ones.
+    fun isSmallTile(position: Int): Boolean =
+        (items.getOrNull(position) as? CategoryRow.Tile)?.options?.size == CategorySize.SMALL
+
     fun setEditing(on: Boolean) {
         if (editing == on) return
         editing = on
+        gathered = false
         show(onScreen(base))
         notifyItemRangeChanged(0, itemCount, PAYLOAD_EDIT)
     }
@@ -142,6 +172,7 @@ internal class CategoriesAdapter(
     fun anchorAt(position: Int): String? = when (val row = items.getOrNull(position)) {
         is CategoryRow.Tile -> row.entry.group.id
         is CategoryRow.Pair -> row.first.entry.group.id
+        is CategoryRow.Block -> row.tiles.first().entry.group.id
         else -> row?.key
     }
 
@@ -150,13 +181,17 @@ internal class CategoriesAdapter(
         when (row) {
             is CategoryRow.Tile -> row.entry.group.id == anchor
             is CategoryRow.Pair -> row.first.entry.group.id == anchor || row.second.entry.group.id == anchor
+            is CategoryRow.Block -> row.tiles.any { it.entry.group.id == anchor }
             else -> row.key == anchor
         }
     }
 
-    // A tile, or a pair of small ones: what can be dragged.
+    // A tile, a pair or a block of small ones: what a dragged tile can change places with.
     fun isTile(position: Int): Boolean =
-        items.getOrNull(position).let { it is CategoryRow.Tile || it is CategoryRow.Pair }
+        items.getOrNull(position).let { it is CategoryRow.Tile || it is CategoryRow.Pair || it is CategoryRow.Block }
+
+    // What can be dragged: a tile (a block of small ones only gives way).
+    fun isDraggable(position: Int): Boolean = items.getOrNull(position) is CategoryRow.Tile
 
     // A corner dragged to another size. While the finger is down the tile takes the size at once, in its own place,
     // so the others make way; a tile in a pair waits, a change there regroups the pairs and would take the tile
@@ -194,7 +229,7 @@ internal class CategoriesAdapter(
     }
 
     // The folders' ids in the order the tiles are in now.
-    fun tileIds(): List<String> = items.filterIsInstance<CategoryRow.Tile>().map { it.entry.group.id }
+    fun tileIds(): List<String> = flat(items).filterIsInstance<CategoryRow.Tile>().map { it.entry.group.id }
 
     // The colours or a switch moved: the rows redraw.
     fun setLook(look: TileLook) {
@@ -209,6 +244,7 @@ internal class CategoriesAdapter(
         is CategoryRow.Recent -> TYPE_RECENT
         is CategoryRow.Tile -> TYPE_TILE
         is CategoryRow.Pair -> TYPE_PAIR
+        is CategoryRow.Block -> TYPE_BLOCK
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
         is CategoryRow.Hidden -> TYPE_HIDDEN
@@ -223,6 +259,7 @@ internal class CategoriesAdapter(
             CategorySize.SMALL -> 1
             CategorySize.WIDE, CategorySize.LARGE -> minOf(SPAN_DOUBLE, spanCount)
         }
+        is CategoryRow.Block -> SPAN_TILE
         is CategoryRow.Loose, is CategoryRow.Pair -> 1
         else -> spanCount
     }
@@ -236,6 +273,7 @@ internal class CategoriesAdapter(
             TYPE_HIDDEN -> HiddenHolder(context)
             TYPE_DONE -> DoneHolder(context)
             TYPE_PAIR -> PairHolder(context)
+            TYPE_BLOCK -> BlockHolder(context)
             else -> LooseHolder(context)
         }
     }
@@ -245,6 +283,7 @@ internal class CategoriesAdapter(
             is CategoryRow.Recent -> (holder as RecentHolder).bind(row)
             is CategoryRow.Tile -> (holder as TileHolder).bind(row)
             is CategoryRow.Pair -> (holder as PairHolder).bind(row)
+            is CategoryRow.Block -> (holder as BlockHolder).bind(row)
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
             is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
@@ -395,6 +434,45 @@ internal class CategoriesAdapter(
         fun bind(row: CategoryRow.Pair) {
             cells[0].bind(row.first)
             cells[1].bind(row.second)
+            applyEditing(editing)
+        }
+
+        override fun applyEditing(on: Boolean) {
+            cells.forEach { it.setEditing(on) }
+            if (on) wobble.start() else wobble.stop()
+        }
+    }
+
+    // Up to four small tiles, two columns of two, in the space of a normal tile: the small ones while a bigger
+    // tile is dragged. A tile that is not there leaves its place empty.
+    private inner class BlockHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)), Arrangeable {
+        private val cells = List(TilePairs.BLOCK) { TileCell(context) }
+        private val wobble = Wobble(itemView)
+
+        init {
+            val row = itemView as LinearLayout
+            row.orientation = LinearLayout.HORIZONTAL
+            row.layoutParams = RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            cells.chunked(2).forEach { two ->
+                val column = LinearLayout(context)
+                column.orientation = LinearLayout.VERTICAL
+                two.forEach {
+                    column.addView(it.view, LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                    ))
+                }
+                row.addView(column, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            }
+        }
+
+        fun bind(row: CategoryRow.Block) {
+            cells.forEachIndexed { index, cell ->
+                val tile = row.tiles.getOrNull(index)
+                cell.view.visibility = if (tile == null) View.INVISIBLE else View.VISIBLE
+                if (tile != null) cell.bind(tile)
+            }
             applyEditing(editing)
         }
 
@@ -577,6 +655,7 @@ internal class CategoriesAdapter(
         const val TYPE_HIDDEN = 4
         const val TYPE_DONE = 6
         const val TYPE_PAIR = 7
+        const val TYPE_BLOCK = 8
         const val PAYLOAD_EDIT = "edit"
         const val HINT_SP = 11f
         const val HINT_LINES = 3

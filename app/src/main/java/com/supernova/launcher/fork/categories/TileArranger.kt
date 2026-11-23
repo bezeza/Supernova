@@ -17,7 +17,7 @@ internal class TileArranger(
 
     private val touchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
-            if (rows.isTile(viewHolder.bindingAdapterPosition)) makeMovementFlags(DRAG_FLAGS, 0) else 0
+            if (rows.isDraggable(viewHolder.bindingAdapterPosition)) makeMovementFlags(DRAG_FLAGS, 0) else 0
 
         override fun onMove(
             recyclerView: RecyclerView,
@@ -29,7 +29,12 @@ internal class TileArranger(
 
         override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
             super.onSelectedChanged(viewHolder, actionState)
-            if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) dragStart = rows.tileIds()
+            if (actionState != ItemTouchHelper.ACTION_STATE_DRAG) return
+            dragStart = rows.tileIds()
+            // A bigger tile changes places with a whole block of small ones, which keep together.
+            if (viewHolder != null && !rows.isSmallTile(viewHolder.bindingAdapterPosition)) {
+                keepingScroll { rows.gather(true) }
+            }
         }
 
         // Dropped: the new order is the folders' own, kept.
@@ -38,6 +43,7 @@ internal class TileArranger(
             val now = rows.tileIds()
             if (now != dragStart) onOrder(now)
             dragStart = now
+            keepingScroll { rows.gather(false) }
         }
     })
 
