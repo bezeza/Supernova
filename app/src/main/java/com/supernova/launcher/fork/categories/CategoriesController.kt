@@ -2,10 +2,13 @@ package com.supernova.launcher.fork.categories
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.supernova.launcher.R
@@ -19,6 +22,7 @@ import com.supernova.launcher.ui.AppDrawerAdapter
 // Search results and the group tabs stay the drawer's own lists, so they work
 // as they do in every other style. The drawer feeds it through [submit] and
 // shows it through [setVisible]; nothing else of the drawer is replaced.
+@Suppress("TooManyFunctions") // A controller is many small entry points for the drawer.
 class CategoriesController(
     container: FrameLayout,
     catalog: AppCatalog,
@@ -27,6 +31,11 @@ class CategoriesController(
     // The drawer's own kind of adapter, for the apps of a category opened on its own screen.
     screenAdapter: AppDrawerAdapter
 ) {
+
+    // How far the bottom of this list lies under what the host puts over it (a dock, a page indicator): the tiles
+    // and the bar that ends the arranging are kept clear of that much.
+    var bottomClearance: () -> Int = { 0 }
+
 
     private var options: Map<String, CategoryOptions> = emptyMap()
 
@@ -51,6 +60,9 @@ class CategoriesController(
         }
     }
 
+    private val sidePx = (SIDE_DP * container.resources.displayMetrics.density).toInt()
+    private val baseBottomPx = container.resources.getDimensionPixelSize(R.dimen.space_ml)
+
     private val recycler: RecyclerView = RecyclerView(container.context).apply {
         visibility = View.GONE
         layoutManager = GridLayoutManager(context, MIN_TILES * 2).apply {
@@ -63,18 +75,28 @@ class CategoriesController(
         setHasFixedSize(true)
         clipToPadding = false
         overScrollMode = View.OVER_SCROLL_NEVER
-        val side = (SIDE_DP * resources.displayMetrics.density).toInt()
-        val bottom = resources.getDimensionPixelSize(R.dimen.space_ml)
-        setPadding(side, 0, side, bottom)
+        setPadding(sidePx, 0, sidePx, baseBottomPx)
         // A wide screen (landscape, a tablet) gets more tiles per row rather than bigger ones.
         addOnLayoutChangeListener { view, left, _, right, _, _, _, _, _ ->
             val tiles = ((right - left) / (TILE_MAX_DP * view.resources.displayMetrics.density))
                 .toInt().coerceAtLeast(MIN_TILES)
             (layoutManager as GridLayoutManager).spanCount = tiles * 2
+            keepClear()
         }
     }
 
-    private val arranger: TileArranger = TileArranger(recycler, rows) { actions.edits.onOrder(it) }
+    // The bar that ends the arranging: over the bottom of the list, seen however far the list is scrolled.
+    private val doneBar: PinnedDoneBar = PinnedDoneBar(container.context) { arranger.stop() }.apply {
+        visibility = View.GONE
+        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepClear() }
+    }
+
+    private val arranger: TileArranger = TileArranger(
+        recycler, rows, { actions.edits.onOrder(it) }
+    ) { editing ->
+        doneBar.visibility = if (editing) View.VISIBLE else View.GONE
+        keepClear()
+    }
 
     private val state = CategoryScreenState()
     private val screen = CategoryScreen(container, screenAdapter, { back() }, { picked ->
@@ -93,6 +115,41 @@ class CategoriesController(
             minOf(1, container.childCount),
             FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         )
+        // Over the tiles, under a category's screen.
+        container.addView(
+            doneBar,
+            container.indexOfChild(recycler) + 1,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
+            )
+        )
+    }
+
+    // The list keeps clear of what is over its bottom, and, while arranging, of the bar over it; the bar keeps clear
+    // of what is over the bottom too.
+    private fun keepClear() {
+        val clearance = bottomClearance() + systemBarsOverCopy()
+        val gap = (BAR_GAP_DP * recycler.resources.displayMetrics.density).toInt()
+        val bar = doneBar.layoutParams as FrameLayout.LayoutParams
+        if (bar.bottomMargin != clearance + gap || bar.marginStart != sidePx || bar.marginEnd != sidePx) {
+            bar.setMargins(sidePx, 0, sidePx, clearance + gap)
+            doneBar.layoutParams = bar
+        }
+        val barSpace = if (arranger.isOn) doneBar.height + gap else 0
+        val bottom = baseBottomPx + clearance + barSpace
+        if (recycler.paddingBottom != bottom) recycler.setPadding(sidePx, 0, sidePx, bottom)
+    }
+
+    // How much of the bottom of this list the system's navigation bar covers: the drawer's list runs under it, the
+    // home screen's pages stop above the dock.
+    private fun systemBarsOverCopy(): Int {
+        val types = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+        val bar = ViewCompat.getRootWindowInsets(recycler)?.getInsets(types)?.bottom
+        val host = recycler.parent as? View
+        if (bar == null || host == null) return 0
+        val at = IntArray(2)
+        host.getLocationInWindow(at)
+        return BottomClearance.underNavigation(at[1] + host.height, host.rootView.height, bar)
     }
 
     // The drawer's swipe to the neighbouring tab, on the tiles and on a category's screen. Not while the
@@ -165,6 +222,7 @@ class CategoriesController(
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setLook(data.look)
+        doneBar.setLook(data.look.textColor, CategoryTint.cardColor(data.look.textColor, data.look.backdrop))
         options = data.settings.options
         screen.setLook(data.look.textColor, data.look.showIcons)
         if (state.isOpen) {
@@ -213,5 +271,6 @@ class CategoriesController(
         const val MIN_TILES = 2
         const val TILE_MAX_DP = 200f
         const val SIDE_DP = 6f
+        const val BAR_GAP_DP = 8f
     }
 }

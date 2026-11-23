@@ -51,9 +51,6 @@ internal sealed class CategoryRow(val key: String, val content: String) {
 
     class Loose(val app: LaunchableApp) : CategoryRow("app/${appKey(app)}", appKey(app))
 
-    // The bar on top while the tiles are arranged: how, and the button that ends it.
-    object Done : CategoryRow("done", "done")
-
     // The way back for categories taken off the tiles.
     class Hidden(val categories: List<HiddenCategory>) :
         CategoryRow("hidden", categories.joinToString(",") { it.id })
@@ -100,7 +97,7 @@ internal class CategoriesAdapter(
     // What is on screen for the rows: while arranging every tile is its own item, so one small tile can be dragged;
     // otherwise two small ones in a row are a pair, and the bar on top is only there while arranging.
     private fun onScreen(list: List<CategoryRow>): List<CategoryRow> =
-        withBar(if (!editing) grouped(list) else if (gathered) blocked(list) else list)
+        if (!editing) grouped(list) else if (gathered) blocked(list) else list
 
     // The rows with the small tiles in blocks of four, the last block of a run holding what is left.
     private fun blocked(list: List<CategoryRow>): List<CategoryRow> =
@@ -125,10 +122,7 @@ internal class CategoriesAdapter(
                 is CategoryRow.Block -> row.tiles
                 else -> null
             }
-        }.filter { it !is CategoryRow.Done && it !is CategoryRow.Gap }
-
-    private fun withBar(list: List<CategoryRow>): List<CategoryRow> =
-        if (editing) listOf(CategoryRow.Done) + list else list
+        }.filter { it !is CategoryRow.Gap }
 
     private fun show(new: List<CategoryRow>) {
         val old = items
@@ -256,7 +250,6 @@ internal class CategoriesAdapter(
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
         is CategoryRow.Hidden -> TYPE_HIDDEN
-        CategoryRow.Done -> TYPE_DONE
     }
 
     // A tile is two spans wide (a small one, one; a double one, four, or the row if that is narrower), a loose
@@ -279,7 +272,6 @@ internal class CategoriesAdapter(
             TYPE_TILE -> TileHolder(TileCell(context))
             TYPE_HEADER -> HeaderHolder(context)
             TYPE_HIDDEN -> HiddenHolder(context)
-            TYPE_DONE -> DoneHolder(context)
             TYPE_PAIR -> PairHolder(context)
             TYPE_BLOCK -> BlockHolder(context)
             TYPE_GAP -> GapHolder(View(context))
@@ -297,7 +289,6 @@ internal class CategoriesAdapter(
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
             is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
-            CategoryRow.Done -> (holder as DoneHolder).bind()
         }
     }
 
@@ -499,40 +490,6 @@ internal class CategoriesAdapter(
         }
     }
 
-    // The bar on top while arranging: how, and the button that ends it.
-    private inner class DoneHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
-        private val hint = label(context, HINT_SP, centred = false, lines = HINT_LINES)
-        private val done = label(context, DONE_SP, centred = true)
-        private val shape = GradientDrawable()
-
-        init {
-            val bar = itemView as LinearLayout
-            bar.orientation = LinearLayout.HORIZONTAL
-            bar.gravity = Gravity.CENTER_VERTICAL
-            val pad = dp(context, DONE_PADDING_DP)
-            bar.setPadding(pad, pad / 2, pad, pad / 2)
-            bar.layoutParams = RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            hint.setText(R.string.fork_edit_hint)
-            bar.addView(hint, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-            done.setText(R.string.fork_edit_done)
-            shape.cornerRadius = dp(context, DONE_CORNER_DP).toFloat()
-            done.background = shape
-            done.setPadding(pad, pad / 2, pad, pad / 2)
-            bar.addView(done, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { marginStart = pad })
-            done.setOnClickListener { editHandlers.onDone() }
-        }
-
-        fun bind() {
-            hint.setTextColor(textColor)
-            done.setTextColor(textColor)
-            shape.setColor(cardColor())
-        }
-    }
-
     private inner class RecentHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
         private val shape = GradientDrawable()
         private val title = label(context, TILE_LABEL_SP, centred = false, lines = TITLE_LINES)
@@ -670,16 +627,10 @@ internal class CategoriesAdapter(
         const val TYPE_HEADER = 2
         const val TYPE_LOOSE = 3
         const val TYPE_HIDDEN = 4
-        const val TYPE_DONE = 6
         const val TYPE_PAIR = 7
         const val TYPE_BLOCK = 8
         const val TYPE_GAP = 9
         const val PAYLOAD_EDIT = "edit"
-        const val HINT_SP = 11f
-        const val HINT_LINES = 3
-        const val DONE_SP = 14f
-        const val DONE_PADDING_DP = 12f
-        const val DONE_CORNER_DP = 18f
         const val SPAN_TILE = 2
         const val SPAN_DOUBLE = 4
         const val TILE_LABEL_SP = 12f

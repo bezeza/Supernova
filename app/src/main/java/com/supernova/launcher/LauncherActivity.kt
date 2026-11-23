@@ -5293,9 +5293,29 @@ class LauncherActivity :
 
     override fun onAddPageTap() = requestEditAddPage(then = null)
 
+    // Fork: while a category's screen is open on the categories page the pager does not turn: a swipe to the right
+    // is the screen's way back, and the pager used to take it for a page turn.
+    private fun onHomeCategoryScreenChanged(open: Boolean) {
+        binding.workspacePager.isUserInputEnabled = !open
+    }
+
     // Fork: the categories page of the pager, made by the drawer, which has the folders and the apps.
     private fun newCategoriesPage(parent: ViewGroup): View? =
-        if (::drawer.isInitialized) drawer.newHomeCategories(parent.context) else null
+        if (::drawer.isInitialized) {
+            drawer.newHomeCategories(parent.context, ::categoriesBottomClearance, ::onHomeCategoryScreenChanged)
+        } else {
+            null
+        }
+
+    // Fork: how far the bottom of the pager lies under the dock and the page indicator, which are drawn over it: the
+    // categories page keeps its last row clear of them.
+    private fun categoriesBottomClearance(): Int = com.supernova.launcher.fork.categories.BottomClearance.over(
+        binding.workspacePager.bottom,
+        listOf(
+            binding.dockBar.top.takeIf { binding.dockBar.isVisible },
+            binding.pageIndicator.top.takeIf { binding.pageIndicator.isVisible }
+        )
+    )
 
     // Fork: Back on the categories page leaves a category's screen, or the arranging of the tiles.
     private fun backOnCategoriesPage() {

@@ -1908,7 +1908,11 @@ class DrawerController(
     // list, as the Categories drawer is. Tapped, a tile opens the category on a screen of its own over the page.
     private val homeCategories = mutableListOf<CategoriesController>()
 
-    fun newHomeCategories(context: Context): View {
+    fun newHomeCategories(
+        context: Context,
+        bottomClearance: () -> Int,
+        onScreenChanged: (Boolean) -> Unit
+    ): View {
         val page = FrameLayout(context)
         lateinit var controller: CategoriesController
         val cells = newCellAdapter { view, app -> controller.onScreenAppClick({ onAppClick(view, app) }, app) }
@@ -1922,6 +1926,8 @@ class DrawerController(
             ),
             cells
         )
+        controller.bottomClearance = bottomClearance
+        controller.onScreenChanged = { onScreenChanged(controller.isScreenOpen) }
         controller.setVisible(true)
         page.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(view: View) {
@@ -1931,6 +1937,8 @@ class DrawerController(
 
             override fun onViewDetachedFromWindow(view: View) {
                 homeCategories.remove(controller)
+                // The pager turns again once the page that held a screen is gone.
+                controller.closeScreen(animate = false)
             }
         })
         return page

@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 internal class TileArranger(
     private val recycler: RecyclerView,
     private val rows: CategoriesAdapter,
-    private val onOrder: (List<String>) -> Unit
+    private val onOrder: (List<String>) -> Unit,
+    // Told when arranging starts and stops: the bar that ends it comes and goes.
+    private val onEditing: (Boolean) -> Unit = {}
 ) {
 
     private var dragStart: List<String> = emptyList()
@@ -50,17 +52,11 @@ internal class TileArranger(
     val isOn: Boolean get() = rows.editing
 
     // The list's first visible row stays where it is on screen while [change] regroups the tiles under it.
-    // At the very top it stays at the top, so the bar that comes on top while arranging is seen.
     private fun keepingScroll(change: () -> Unit) {
         val layout = recycler.layoutManager as? LinearLayoutManager
         val first = layout?.findFirstVisibleItemPosition() ?: RecyclerView.NO_POSITION
         val anchor = if (first == RecyclerView.NO_POSITION) null else rows.anchorAt(first)
         val top = layout?.findViewByPosition(first)?.top ?: 0
-        if (first == 0 && top >= 0) {
-            change()
-            recycler.scrollToPosition(0)
-            return
-        }
         change()
         val at = anchor?.let { rows.positionOf(it) } ?: RecyclerView.NO_POSITION
         if (layout != null && at != RecyclerView.NO_POSITION) layout.scrollToPositionWithOffset(at, top)
@@ -69,6 +65,7 @@ internal class TileArranger(
     fun start() {
         if (rows.editing) return
         keepingScroll { rows.setEditing(true) }
+        onEditing(true)
         // The tiles make way for one another, but a changed tile keeps its own view: a drag is on it.
         recycler.itemAnimator = DefaultItemAnimator().apply { supportsChangeAnimations = false }
         touchHelper.attachToRecyclerView(recycler)
@@ -80,6 +77,7 @@ internal class TileArranger(
         // No animation as the pairs form again, and the list stays where it is.
         recycler.itemAnimator = null
         keepingScroll { rows.setEditing(false) }
+        onEditing(false)
         touchHelper.attachToRecyclerView(null)
         return true
     }
