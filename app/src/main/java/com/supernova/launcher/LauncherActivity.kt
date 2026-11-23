@@ -3392,7 +3392,7 @@ class LauncherActivity :
         source: android.widget.PopupWindow?
     ) {
         if (app.privateSpace || viewModel.drawerFolderGroups().isEmpty()) return
-        menu.addRow(getString(R.string.move_to_folder), R.drawable.ic_menu_select_apps) {
+        menu.addRow(getString(R.string.move_to_folder), R.drawable.ic_menu_move_to_folder) {
             source?.dismiss()
             pickFolderFor(app)
         }
