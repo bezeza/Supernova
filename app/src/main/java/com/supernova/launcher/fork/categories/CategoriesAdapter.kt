@@ -282,7 +282,7 @@ internal class CategoriesAdapter(
     }
 
     // A tile's card with its name under it: the whole of a tile in the list, or one of the two of a pair.
-    private inner class TileCell(context: Context) {
+    private inner class TileCell(context: Context, compact: Boolean = false) {
         val view = LinearLayout(context)
         private val card = CategoryTileCard(context)
         private val title = label(context, TILE_LABEL_SP, centred = true, lines = TITLE_LINES)
@@ -291,13 +291,16 @@ internal class CategoriesAdapter(
             view.orientation = LinearLayout.VERTICAL
             val margin = dp(context, TILE_MARGIN_DP)
             card.gapPx = margin
-            view.setPadding(margin, margin, margin, margin)
+            // A cell of a pair is tighter above and below, and its name closer, so two fit in a normal tile's height.
+            val vertical = if (compact) margin / 2 else margin
+            view.setPadding(margin, vertical, margin, vertical)
             view.addView(card, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ))
+            val gap = if (compact) PAIR_TITLE_GAP_DP else TITLE_GAP_DP
             view.addView(title, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(context, TITLE_GAP_DP) })
+            ).apply { topMargin = dp(context, gap) })
         }
 
         fun bind(row: CategoryRow.Tile) {
@@ -352,14 +355,18 @@ internal class CategoriesAdapter(
         }
     }
 
+    // The gap under a normal tile's card and one line of its name: what a pair's height adds to its two spans.
+    private fun titleReserve(context: Context): Int =
+        dp(context, TITLE_GAP_DP) + label(context, TILE_LABEL_SP, centred = true, lines = 1).lineHeight
+
     // Two small tiles one over the other, in the space of a normal tile.
-    private inner class PairHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)), Arrangeable {
-        private val cells = List(2) { TileCell(context) }
+    private inner class PairHolder(context: Context) : RecyclerView.ViewHolder(PairColumn(context)), Arrangeable {
+        private val cells = List(2) { TileCell(context, compact = true) }
         private val wobble = Wobble(itemView)
 
         init {
-            val column = itemView as LinearLayout
-            column.orientation = LinearLayout.VERTICAL
+            val column = itemView as PairColumn
+            column.titleReserve = { titleReserve(context) }
             column.layoutParams = RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
@@ -572,6 +579,7 @@ internal class CategoriesAdapter(
         const val HEADER_SP = 13f
         const val TILE_MARGIN_DP = 6f
         const val TITLE_GAP_DP = 6f
+        const val PAIR_TITLE_GAP_DP = 3f
         const val RECENT_PADDING_DP = 12f
         const val RECENT_CORNER_DP = 24f
         const val RECENT_ICON_DP = 52f
