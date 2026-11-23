@@ -26,4 +26,11 @@
     <string name="fork_hidden_categories">Скрытые категории: %1$d</string>
     <string name="fork_show_again">Показать снова</string>
     <string name="fork_recent_count">Сколько новых приложений</string>
+    <string name="fork_tile_size">Размер плитки: %1$s</string>
+    <string name="fork_size_normal">Обычная</string>
+    <string name="fork_size_wide">Широкая, строка на всю ширину</string>
+    <string name="fork_size_small">Маленькая</string>
+    <string name="fork_large_icons">Большие иконки: %1$s</string>
+    <string name="fork_large_none">нет, все малые</string>
+    <string name="fork_more_apps">+%1$d</string>
 </resources>

@@ -26,4 +26,11 @@
     <string name="fork_hidden_categories">Приховані категорії: %1$d</string>
     <string name="fork_show_again">Показати знову</string>
     <string name="fork_recent_count">Скільки нових застосунків</string>
+    <string name="fork_tile_size">Розмір плитки: %1$s</string>
+    <string name="fork_size_normal">Звичайна</string>
+    <string name="fork_size_wide">Широка, рядок на всю ширину</string>
+    <string name="fork_size_small">Маленька</string>
+    <string name="fork_large_icons">Великі іконки: %1$s</string>
+    <string name="fork_large_none">жодної, усі малі</string>
+    <string name="fork_more_apps">+%1$d</string>
 </resources>

@@ -8,14 +8,20 @@ object CategoryLayout {
 
     const val LARGE_SLOTS = 3
     const val MINI_SLOTS = 4
+    const val MINI_MAX = 12
 
     // [hidden] is how many apps fit nowhere on the tile.
     class Tile<T>(val large: List<T>, val mini: List<T>, val hidden: Int)
 
-    fun <T> tile(apps: List<T>): Tile<T> {
-        val large = apps.take(LARGE_SLOTS)
-        val mini = apps.drop(LARGE_SLOTS).take(MINI_SLOTS)
-        return Tile(large, mini, (apps.size - LARGE_SLOTS - MINI_SLOTS).coerceAtLeast(0))
+    fun <T> tile(apps: List<T>): Tile<T> = tile(apps, TileSlots.normal(LARGE_SLOTS))
+
+    // The apps in a layout's slots: the first ones in the large slots, the next in the small ones.
+    internal fun <T> tile(apps: List<T>, slots: List<TileSlots.Slot>): Tile<T> {
+        val largeSlots = TileSlots.largeCount(slots)
+        val miniSlots = TileSlots.miniCount(slots)
+        val large = apps.take(largeSlots)
+        val mini = apps.drop(largeSlots).take(miniSlots)
+        return Tile(large, mini, (apps.size - largeSlots - miniSlots).coerceAtLeast(0))
     }
 
     // The newest installs for the full-width row over the tiles. An app with

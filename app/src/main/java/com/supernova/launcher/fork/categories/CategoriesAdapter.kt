@@ -21,11 +21,12 @@ internal sealed class CategoryRow(val key: String, val content: String) {
     class Recent(val apps: List<LaunchableApp>, val slots: Int) :
         CategoryRow("recent", slots.toString() + ":" + apps.joinToString(",") { appKey(it) })
 
-    class Tile(val entry: CategoryEntry) : CategoryRow(
+    class Tile(val entry: CategoryEntry, val options: CategoryOptions = CategoryOptions()) : CategoryRow(
         "tile/${entry.group.id}",
-        entry.group.name + "|" + entry.apps.joinToString(",") { appKey(it) }
+        entry.group.name + "|" + options.size + options.large + "|" + entry.apps.joinToString(",") { appKey(it) }
     ) {
-        val layout = CategoryLayout.tile(entry.apps)
+        val slots = if (options.size == CategorySize.SMALL) TileSlots.small() else TileSlots.normal(options.large)
+        val layout = CategoryLayout.tile(entry.apps, slots)
     }
 
     class Header(val text: String) : CategoryRow("header", text)
@@ -60,17 +61,21 @@ internal class CategoriesAdapter(
 
     override fun getItemId(position: Int): Long = getItem(position).key.hashCode().toLong()
 
-    override fun getItemViewType(position: Int): Int = when (getItem(position)) {
+    override fun getItemViewType(position: Int): Int = when (val row = getItem(position)) {
         is CategoryRow.Recent -> TYPE_RECENT
-        is CategoryRow.Tile -> TYPE_TILE
+        is CategoryRow.Tile -> if (row.options.size == CategorySize.WIDE) TYPE_WIDE else TYPE_TILE
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
         is CategoryRow.Hidden -> TYPE_HIDDEN
     }
 
-    // A tile is two spans wide, a loose app one, anything else the whole row.
-    fun spanAt(position: Int, spanCount: Int): Int = when (getItem(position)) {
-        is CategoryRow.Tile -> SPAN_TILE
+    // A tile is two spans wide (a small one, one; a wide one, the row), a loose app one, anything else the whole row.
+    fun spanAt(position: Int, spanCount: Int): Int = when (val row = getItem(position)) {
+        is CategoryRow.Tile -> when (row.options.size) {
+            CategorySize.NORMAL -> SPAN_TILE
+            CategorySize.SMALL -> 1
+            CategorySize.WIDE -> spanCount
+        }
         is CategoryRow.Loose -> 1
         else -> spanCount
     }
@@ -80,6 +85,7 @@ internal class CategoriesAdapter(
         return when (viewType) {
             TYPE_RECENT -> RecentHolder(context)
             TYPE_TILE -> TileHolder(context)
+            TYPE_WIDE -> WideHolder(context)
             TYPE_HEADER -> HeaderHolder(context)
             TYPE_HIDDEN -> HiddenHolder(context)
             else -> LooseHolder(context)
@@ -89,7 +95,7 @@ internal class CategoriesAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val row = getItem(position)) {
             is CategoryRow.Recent -> (holder as RecentHolder).bind(row)
-            is CategoryRow.Tile -> (holder as TileHolder).bind(row)
+            is CategoryRow.Tile -> if (holder is WideHolder) holder.bind(row) else (holder as TileHolder).bind(row)
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
             is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
@@ -146,19 +152,47 @@ internal class CategoriesAdapter(
 
         fun bind(row: CategoryRow.Tile) {
             val entry = row.entry
-            card.setCardColor(cardColor())
+            card.setColors(cardColor(), textColor)
             title.text = entry.group.name
             title.setTextColor(textColor)
-            card.setTextColor(textColor)
             showGlyph(title, entry.group.name)
             itemView.contentDescription = itemView.context.getString(R.string.folder_desc, entry.group.name)
             val open = { view: View -> actions.onCategory(view, entry.group, entry.apps) }
             val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
             card.launchFromIcons = look.launchFromIcons
+            card.setSlots(row.slots)
+            // A small tile's name is smaller too, to fit its narrower column.
+            val labelSp = if (row.options.size == CategorySize.SMALL) SMALL_LABEL_SP else TILE_LABEL_SP
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSp)
             card.bind(row.layout, icons, actions, open = open, openLongPress = openLongPress)
             // The name under the tile opens it too.
             itemView.setOnClickListener(open)
             itemView.setOnLongClickListener { openLongPress(it); true }
+        }
+    }
+
+    private inner class WideHolder(context: Context) : RecyclerView.ViewHolder(CategoryWideCard(context)) {
+        private val card = itemView as CategoryWideCard
+
+        init {
+            val margin = dp(context, TILE_MARGIN_DP)
+            card.layoutParams = RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(margin, margin, margin, margin) }
+        }
+
+        fun bind(row: CategoryRow.Tile) {
+            val entry = row.entry
+            card.setColors(cardColor(), textColor)
+            card.nameView.text = entry.group.name
+            showGlyph(card.nameView, entry.group.name)
+            card.contentDescription = card.context.getString(R.string.folder_desc, entry.group.name)
+            card.launchFromIcons = look.launchFromIcons
+            card.bind(
+                entry.apps, icons, actions,
+                open = { view -> actions.onCategory(view, entry.group, entry.apps) },
+                openLongPress = { view -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
+            )
         }
     }
 
@@ -299,8 +333,10 @@ internal class CategoriesAdapter(
         const val TYPE_HEADER = 2
         const val TYPE_LOOSE = 3
         const val TYPE_HIDDEN = 4
+        const val TYPE_WIDE = 5
         const val SPAN_TILE = 2
         const val TILE_LABEL_SP = 12f
+        const val SMALL_LABEL_SP = 10f
         const val TITLE_LINES = 2
         const val GLYPH_DP = 16f
         const val GLYPH_GAP_DP = 4f

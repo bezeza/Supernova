@@ -65,4 +65,35 @@ class CategoryOptionsStoreTest {
         val second = CategoryOptionsStore.update(first, "Ігри", listOf("Ігри")) { it.copy(hidden = true) }
         assertEquals(setOf("Ігри"), CategoryOptionsStore.decode(second).keys)
     }
+
+    @Test
+    fun sizeAndLargeCountRoundTrip() {
+        val raw = CategoryOptionsStore.encode(
+            mapOf("Ігри" to CategoryOptions(size = CategorySize.WIDE), "ШІ" to CategoryOptions(large = 0))
+        )
+        val back = CategoryOptionsStore.decode(raw)
+        assertEquals(CategorySize.WIDE, back.getValue("Ігри").size)
+        assertEquals(3, back.getValue("Ігри").large)
+        assertEquals(0, back.getValue("ШІ").large)
+        assertEquals(CategorySize.NORMAL, back.getValue("ШІ").size)
+    }
+
+    @Test
+    fun anOldValueWithoutSizeReadsAsNormalWithThreeLarge() {
+        val back = CategoryOptionsStore.decode("""{"Ігри":{"sort":"ALPHA","hidden":false}}""")
+        assertEquals(CategorySize.NORMAL, back.getValue("Ігри").size)
+        assertEquals(3, back.getValue("Ігри").large)
+    }
+
+    @Test
+    fun aLargeCountThatIsNotThreeOneOrZeroReadsAsThree() {
+        val back = CategoryOptionsStore.decode("""{"Ігри":{"large":7,"hidden":true}}""")
+        assertEquals(3, back.getValue("Ігри").large)
+    }
+
+    @Test
+    fun anUnknownSizeReadsAsNormal() {
+        val back = CategoryOptionsStore.decode("""{"Ігри":{"size":"HUGE","hidden":true}}""")
+        assertEquals(CategorySize.NORMAL, back.getValue("Ігри").size)
+    }
 }

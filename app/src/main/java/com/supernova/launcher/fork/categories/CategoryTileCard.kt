@@ -13,16 +13,18 @@ import android.widget.TextView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.LaunchableApp
 
-// The round, translucent card of one category: three large icons (a tap
-// launches the app) and a corner with up to four small ones (a tap opens the
-// whole category). The card is square and lays its children out by hand, so a
-// bind touches seven image views and nothing else.
+// The round, translucent card of one category, square: its large icons (a tap
+// launches the app) and small ones, laid out by [TileSlots]. Normally three
+// large icons and a corner of four small ones, a tap on the corner opening the
+// whole category. The card lays its children out by hand, so a bind touches
+// the image views and nothing else.
 internal class CategoryTileCard(context: Context) : ViewGroup(context) {
 
     private val corner = View(context)
     private val large = List(CategoryLayout.LARGE_SLOTS) { ImageView(context) }
-    private val mini = List(CategoryLayout.MINI_SLOTS) { ImageView(context) }
+    private val mini = List(CategoryLayout.MINI_MAX) { ImageView(context) }
     private val shape = GradientDrawable()
+    private var slots: List<TileSlots.Slot> = TileSlots.normal(CategoryLayout.LARGE_SLOTS)
 
     // Shown in place of the icons while the category holds no app.
     private val empty = TextView(context).apply {
@@ -48,9 +50,17 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     // True: a tap on a large icon launches the app, as in iOS. False: every tap opens the category.
     var launchFromIcons = true
 
-    fun setCardColor(color: Int) = shape.setColor(color)
+    // The layout of the icons; a bind follows it.
+    fun setSlots(layout: List<TileSlots.Slot>) {
+        if (layout === slots) return
+        slots = layout
+        requestLayout()
+    }
 
-    fun setTextColor(color: Int) = empty.setTextColor(color)
+    fun setColors(card: Int, text: Int) {
+        shape.setColor(card)
+        empty.setTextColor(text)
+    }
 
     fun bind(
         tile: CategoryLayout.Tile<LaunchableApp>,
@@ -59,7 +69,7 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
         open: (View) -> Unit,
         openLongPress: (View) -> Unit
     ) {
-        empty.visibility = if (tile.large.isEmpty()) VISIBLE else GONE
+        empty.visibility = if (tile.large.isEmpty() && tile.mini.isEmpty()) VISIBLE else GONE
         setOnClickListener(open)
         setOnLongClickListener { openLongPress(it); true }
         corner.setOnClickListener(open)
@@ -103,17 +113,21 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val side = MeasureSpec.getSize(widthMeasureSpec)
         setMeasuredDimension(side, side)
-        val cell = cellSize(side)
-        val largeSize = MeasureSpec.makeMeasureSpec((cell * ICON_FILL).toInt(), MeasureSpec.EXACTLY)
-        large.forEach { it.measure(largeSize, largeSize) }
-        val miniSize = MeasureSpec.makeMeasureSpec((cell / 2 * ICON_FILL).toInt(), MeasureSpec.EXACTLY)
-        mini.forEach { it.measure(miniSize, miniSize) }
-        val target = TileGeometry.cornerTarget(side, padding(side), cell)
-        corner.measure(
-            MeasureSpec.makeMeasureSpec(target.width, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(target.height, MeasureSpec.EXACTLY)
-        )
         val inner = side - 2 * padding(side)
+        val largeSlots = slots.filter { it.large }
+        val miniSlots = slots.filter { !it.large }
+        fun measureIcon(view: View, slot: TileSlots.Slot?) {
+            val size = if (slot == null) 0 else (slot.size * inner * ICON_FILL).toInt()
+            val spec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY)
+            view.measure(spec, spec)
+        }
+        large.forEachIndexed { index, view -> measureIcon(view, largeSlots.getOrNull(index)) }
+        mini.forEachIndexed { index, view -> measureIcon(view, miniSlots.getOrNull(index)) }
+        val target = cornerTarget(side)
+        corner.measure(
+            MeasureSpec.makeMeasureSpec(target?.width ?: 0, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(target?.height ?: 0, MeasureSpec.EXACTLY)
+        )
         empty.measure(
             MeasureSpec.makeMeasureSpec(inner, MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(inner, MeasureSpec.AT_MOST)
@@ -123,19 +137,30 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val side = r - l
         val pad = padding(side)
-        val cell = cellSize(side)
-        large.forEachIndexed { index, view ->
-            centre(view, pad + (index % 2) * cell, pad + (index / 2) * cell, cell)
+        val inner = side - 2 * pad
+        val largeSlots = slots.filter { it.large }
+        val miniSlots = slots.filter { !it.large }
+        large.forEachIndexed { index, view -> place(view, largeSlots.getOrNull(index), pad, inner) }
+        mini.forEachIndexed { index, view -> place(view, miniSlots.getOrNull(index), pad, inner) }
+        val target = cornerTarget(side)
+        corner.layout(target?.left ?: 0, target?.top ?: 0, target?.right ?: 0, target?.bottom ?: 0)
+        centre(empty, pad, pad, inner)
+    }
+
+    // The corner of small icons has a target of its own only in the usual layout
+    // (three large icons); in the others a tap off an icon is the card's.
+    private fun cornerTarget(side: Int): TileGeometry.Rect? {
+        if (TileSlots.largeCount(slots) != CategoryLayout.LARGE_SLOTS) return null
+        val pad = padding(side)
+        return TileGeometry.cornerTarget(side, pad, (side - 2 * pad) / 2)
+    }
+
+    private fun place(view: View, slot: TileSlots.Slot?, pad: Int, inner: Int) {
+        if (slot == null) {
+            view.layout(0, 0, 0, 0)
+            return
         }
-        val cornerX = pad + cell
-        val cornerY = pad + cell
-        val target = TileGeometry.cornerTarget(side, pad, cell)
-        corner.layout(target.left, target.top, target.right, target.bottom)
-        centre(empty, pad, pad, side - 2 * pad)
-        val half = cell / 2
-        mini.forEachIndexed { index, view ->
-            centre(view, cornerX + (index % 2) * half, cornerY + (index / 2) * half, half)
-        }
+        centre(view, pad + (slot.x * inner).toInt(), pad + (slot.y * inner).toInt(), (slot.size * inner).toInt())
     }
 
     private fun centre(view: View, left: Int, top: Int, cell: Int) {
@@ -145,8 +170,6 @@ internal class CategoryTileCard(context: Context) : ViewGroup(context) {
     }
 
     private fun padding(side: Int): Int = (side * PADDING_SHARE).toInt()
-
-    private fun cellSize(side: Int): Int = (side - 2 * padding(side)) / 2
 
     companion object {
         private const val CORNER_DP = 24f
