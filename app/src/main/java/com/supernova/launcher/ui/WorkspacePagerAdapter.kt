@@ -375,6 +375,7 @@ class WorkspacePagerAdapter(private val host: Host) : RecyclerView.Adapter<Recyc
             // and nothing in the prefs announces it.
             "${host.landscape()}|" +
             "${prefs.folderPreviewStyle}|${prefs.badgeColor},${prefs.badgePosition},${prefs.badgeScale}|" +
+            "${prefs.folderOptions.hashCode()}|" + // Fork: a folder's own icon look
             // Folder icon appearance: the dock's signature takes every pref,
             // and without these a page kept its old plates until a restart.
             "${prefs.folderIconShape},${prefs.folderIconOutline}," +

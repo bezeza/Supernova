@@ -36,4 +36,14 @@
     <string name="fork_add_apps">Добавить приложения</string>
     <string name="fork_folder_screen">Папки на весь экран</string>
     <string name="fork_folder_screen_summary">Папка меню открывается на весь экран, как категория, вместо окна</string>
+    <string name="fork_folder_columns">Колонки в окне</string>
+    <string name="fork_folder_tint">Прозрачность окна</string>
+    <string name="fork_folder_title">Название в окне</string>
+    <string name="fork_folder_look">Иконка папки</string>
+    <string name="fork_folder_default">Как в настройках</string>
+    <string name="fork_folder_title_shown">Показывать</string>
+    <string name="fork_folder_title_hidden">Скрыто</string>
+    <string name="fork_look_grid">2 × 2</string>
+    <string name="fork_look_grid3">3 × 3</string>
+    <string name="fork_look_single">Только первое приложение</string>
 </resources>
