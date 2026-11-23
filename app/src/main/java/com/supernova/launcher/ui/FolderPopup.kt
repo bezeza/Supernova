@@ -18,6 +18,7 @@ import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import com.supernova.launcher.data.LauncherItem
 import com.supernova.launcher.databinding.PopupFolderBinding
+import com.supernova.launcher.fork.folders.ForkFolders
 import kotlin.math.ceil
 import kotlin.math.min
 
@@ -79,6 +80,13 @@ class FolderPopup(private val context: Context) {
         // the card takes focus and would drop it a step late otherwise.
         anchor.hideKeyboardForWindow()
 
+        // Fork: the folder's own options, when its opener named it.
+        val own = ForkFolders.take()
+        val columnsUsed = own?.columns?.takeIf { it > 0 } ?: columnsOverride
+        val surfaceBase = surfaceColor ?: context.getColor(com.supernova.launcher.R.color.drawerBackground)
+        val surfaceUsed = if (own?.tint != null) ForkFolders.surface(own, surfaceBase) else surfaceColor
+        val titleShown = showTitle && own?.hideTitle != true
+
         val binding = PopupFolderBinding.inflate(LayoutInflater.from(context))
         binding.folderTitle.setText(title)
 
@@ -86,12 +94,12 @@ class FolderPopup(private val context: Context) {
             // Style-engine corners replace the stock drawable outright.
             val density = context.resources.displayMetrics.density
             binding.folderCard.background = com.supernova.launcher.ui.theme.SurfaceShapes.background(
-                surfaceColor ?: context.getColor(com.supernova.launcher.R.color.drawerBackground),
+                surfaceUsed ?: context.getColor(com.supernova.launcher.R.color.drawerBackground),
                 FloatArray(4) { cornerRadiiDp[it] * density },
                 context.dp(24).toFloat()
             )
         } else {
-            surfaceColor?.let { color ->
+            surfaceUsed?.let { color ->
                 // The card shares bg_drawer's constant state with the drawer
                 // sheet; mutate before recoloring so the sheet keeps its color.
                 (binding.folderCard.background?.mutate() as? GradientDrawable)?.setColor(color)
@@ -105,7 +113,7 @@ class FolderPopup(private val context: Context) {
         binding.folderCount.setTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(text, COUNT_ALPHA))
         binding.folderEditButton.imageTintList = android.content.res.ColorStateList.valueOf(text)
         binding.folderAction.setTextColor(text)
-        binding.folderTitle.visibility = if (showTitle) View.VISIBLE else View.GONE
+        binding.folderTitle.visibility = if (titleShown) View.VISIBLE else View.GONE
         if (!titleEditable) {
             binding.folderTitle.apply {
                 isFocusable = false
@@ -118,7 +126,7 @@ class FolderPopup(private val context: Context) {
 
         val immersive = mode == FolderMode.IMMERSIVE
         val metrics = context.resources.displayMetrics
-        val columns = columnsFor(context, members.size, columnsOverride, immersive, adapter.iconScale)
+        val columns = columnsFor(context, members.size, columnsUsed, immersive, adapter.iconScale)
 
         // Cells are wide enough for a typical label at 12sp, and the grid
         // width is fixed so GridLayoutManager centres each tile in its span
@@ -132,7 +140,7 @@ class FolderPopup(private val context: Context) {
         val screenTop = IntArray(2).also(anchor.rootView::getLocationOnScreen)[1]
         val roomAboveDock = keepAboveScreenY?.let { y ->
             y - screenTop - context.dp(STATUS_ROOM_DP) - context.dp(DOCK_GAP_DP) - 2 * context.dp(CARD_MARGIN_DP) -
-                context.dp(if (showTitle) CARD_CHROME_DP else CARD_PADDING_DP)
+                context.dp(if (titleShown) CARD_CHROME_DP else CARD_PADDING_DP)
         }
         val maxGridHeight = minOf(
             (metrics.heightPixels * if (immersive) 0.72f else 0.6f).toInt(),
@@ -172,7 +180,7 @@ class FolderPopup(private val context: Context) {
 
         binding.folderGrid.adapter = adapter
         adapter.submit(members)
-        if (showTitle && showCount) {
+        if (titleShown && showCount) {
             // Kept to the folder's contents as apps leave or are added.
             fun showCount() {
                 binding.folderCount.text = java.text.NumberFormat.getIntegerInstance().format(adapter.itemCount)
@@ -186,13 +194,13 @@ class FolderPopup(private val context: Context) {
             )
         }
 
-        if (actionLabel != null && onAction != null && showTitle) {
+        if (actionLabel != null && onAction != null && titleShown) {
             binding.folderAction.text = actionLabel
             binding.folderAction.visibility = View.VISIBLE
             binding.folderAction.setOnClickListener { onAction(it) }
         }
 
-        if (onMenu != null && showTitle) {
+        if (onMenu != null && titleShown) {
             binding.folderEditButton.visibility = View.VISIBLE
             binding.folderEditButton.setOnClickListener { onMenu(it) }
         }

@@ -11,6 +11,7 @@ import com.supernova.launcher.data.ItemType
 import com.supernova.launcher.data.LaunchableApp
 import com.supernova.launcher.data.LauncherItem
 import com.supernova.launcher.databinding.SheetAppEditBinding
+import com.supernova.launcher.fork.folders.ForkFolderRows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -106,6 +107,7 @@ object FolderEditSheet {
             dialog.dismiss()
         }
 
+        if (isFolder) ForkFolderRows.add(binding.swipeDownRow, viewModel, folder.id) // Fork: this folder's own options
         dialog.show()
     }
 
@@ -147,6 +149,7 @@ object FolderEditSheet {
             dialog.dismiss()
         }
 
+        ForkFolderRows.add(binding.swipeDownRow, viewModel, group.id) // Fork: this folder's own options
         dialog.show()
     }
 

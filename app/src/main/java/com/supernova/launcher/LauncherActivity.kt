@@ -4289,6 +4289,7 @@ class LauncherActivity :
     }
 
     private fun showFolderPopup(anchor: View, folder: LauncherItem) {
+        com.supernova.launcher.fork.folders.ForkFolders.opening(viewModel, folder.id) // Fork: this folder's own options
         var folderAdapter: FolderMemberAdapter? = null
         var popup: android.widget.PopupWindow? = null
         // Moving an app inside the card, before it is taken out past the
@@ -4524,6 +4525,7 @@ class LauncherActivity :
     // Drawer folders (FOLDER-type groups): the same popup chrome fed from
     // LaunchableApps via transient items - nothing here touches the model.
     private fun showDrawerFolderPopup(anchor: View, group: DrawerGroup, members: List<LaunchableApp>) {
+        com.supernova.launcher.fork.folders.ForkFolders.opening(viewModel, group.id) // Fork: this folder's own options
         val prefs = viewModel.state.value.prefs
         // Its apps, and the drawer folders inside it (#229) as folder tiles.
         val held = HashMap<String, DrawerGroup>()

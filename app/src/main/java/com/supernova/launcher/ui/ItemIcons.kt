@@ -14,6 +14,7 @@ import com.supernova.launcher.data.GroupPick
 import com.supernova.launcher.data.ItemType
 import com.supernova.launcher.data.LaunchableApp
 import com.supernova.launcher.data.LauncherItem
+import com.supernova.launcher.fork.folders.ForkFolders
 import com.supernova.launcher.gesture.ActionShortcut
 import com.supernova.launcher.notification.SupernovaNotificationListener
 import com.supernova.launcher.ui.theme.Styles
@@ -148,11 +149,11 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
         )
             ?.let { return it }
         val late = onLate?.let { LateIcons() }
-        val memberIcons = previewMembers(viewModel.folderMembers(folder.id)).mapNotNull { member ->
+        val memberIcons = previewMembers(viewModel.folderMembers(folder.id), folder.id).mapNotNull { member ->
             PausedIcon.of(previewMemberIcon(member, onLate, late), viewModel.state.value, member.userSerial)
         }
         val pending = onLate != null && late?.start(viewModel.appCatalog(), onLate) == true
-        return if (pending && pendingAsNull) null else composedFolderIcon(memberIcons)
+        return if (pending && pendingAsNull) null else composedFolderIcon(memberIcons, folder.id)
     }
 
     // One member's place in a folder preview: rendered now without `late`,
@@ -221,7 +222,8 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
         customFolderIcon(group.iconBase64, group.iconPack, group.iconName, group.iconRaw, isFolder = true)
             ?: composedFolderIcon(
                 previewMembers(
-                    if (nested) viewModel.drawerFolderContents(group, members) else members.map(GroupPick::App)
+                    if (nested) viewModel.drawerFolderContents(group, members) else members.map(GroupPick::App),
+                    group.id // Fork
                 ).mapNotNull { pick ->
                     when (pick) {
                         is GroupPick.App -> PausedIcon.of(
@@ -235,7 +237,8 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
                         is GroupPick.Folder ->
                             drawerFolderIcon(pick.group, viewModel.drawerFolderApps(pick.group), false, late)
                     }
-                }
+                },
+                group.id // Fork
             )
 
     // A member's place in a preview while its icon renders.
@@ -244,15 +247,18 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
     // The members a folder's preview draws: the window's own order, picked
     // as the window lays them out (FolderPreviewPick). The dense styles
     // (3x3, dense ring) show up to nine.
-    private fun <T> previewMembers(members: List<T>): List<T> {
+    private fun <T> previewMembers(members: List<T>, key: String? = null): List<T> {
         val prefs = viewModel.state.value.prefs
+        val own = key?.let { ForkFolders.preview(prefs, it) } // Fork
         val columns = FolderPopup.columnsFor(
             context, members.size, prefs.folderColumns, prefs.folderMode == FolderMode.IMMERSIVE,
             if (prefs.folderMatchDesktop) prefs.iconScale else prefs.folderIconScale
         )
-        return FolderPreviewPick.shown(
-            members, columns, prefs.folderPreviewStyle, prefs.folderPrioritizeFirst, PREVIEW_MEMBERS
+        val shown = FolderPreviewPick.shown(
+            members, columns, own?.style ?: prefs.folderPreviewStyle,
+            own?.prioritizeFirst ?: prefs.folderPrioritizeFirst, PREVIEW_MEMBERS
         )
+        return own?.limit?.let { shown.take(it) } ?: shown // Fork
     }
 
     fun customFolderIcon(
@@ -284,8 +290,9 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
     // The one FolderIconDrawable factory: workspace/dock previews and drawer
     // folder entries all run through it so the folder-icon appearance prefs
     // (shape, outline, clip, window color) apply everywhere.
-    fun composedFolderIcon(icons: List<Drawable>): Drawable {
+    fun composedFolderIcon(icons: List<Drawable>, key: String? = null): Drawable {
         val prefs = viewModel.state.value.prefs
+        val own = key?.let { ForkFolders.preview(prefs, it) } // Fork
         val resolvedFolder = Styles.resolve(context, prefs)
             .of(SurfaceId.FOLDER)
         return FolderIconDrawable(
@@ -296,7 +303,7 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
                 icon.constantState?.newDrawable(context.resources)?.mutate() ?: icon
             },
             context.dp(ICON_DP),
-            style = prefs.folderPreviewStyle,
+            style = own?.style ?: prefs.folderPreviewStyle,
             plateColor = FolderIconDrawable.plateColor(
                 prefs.folderMatchWindowColor, prefs.folderPlateColor, resolvedFolder.surface
             ),
@@ -304,7 +311,7 @@ class ItemIcons(private val context: Context, private val viewModel: LauncherVie
             customSpec = CustomShapeSpec.decode(prefs.iconShapeCustom),
             outlineColor = if (prefs.folderIconOutline) resolvedFolder.accent else 0,
             outlineWidthPx = 2f * context.resources.displayMetrics.density,
-            prioritizeFirst = prefs.folderPrioritizeFirst,
+            prioritizeFirst = own?.prioritizeFirst ?: prefs.folderPrioritizeFirst,
             glass = FolderIconDrawable.glassFor(prefs),
             shadow = prefs.iconShadow
         )
