@@ -9,6 +9,9 @@ internal object TileGeometry {
     // the corner of small icons lands on it, not on a large icon by mistake.
     const val CORNER_REACH = 0.3f
 
+    // A wide tile is a strip this high.
+    const val WIDE_HEIGHT_DP = 76f
+
     class Rect(val left: Int, val top: Int, val right: Int, val bottom: Int) {
         val width: Int get() = right - left
         val height: Int get() = bottom - top
@@ -21,5 +24,13 @@ internal object TileGeometry {
         val reach = (cell * CORNER_REACH).toInt()
         val start = pad + cell
         return Rect(start - reach, start - reach, side, side)
+    }
+
+    // The outline that follows a corner being dragged: [width] wide, square up to a normal tile, then
+    // growing flatter to the strip of a wide one. Plain arithmetic, so it is testable without a view.
+    fun outlineHeight(width: Float, normal: Float, wide: Float, wideHeight: Float): Float {
+        if (width <= normal || wide <= normal) return width.coerceAtMost(normal)
+        val share = ((width - normal) / (wide - normal)).coerceIn(0f, 1f)
+        return normal + (wideHeight - normal) * share
     }
 }

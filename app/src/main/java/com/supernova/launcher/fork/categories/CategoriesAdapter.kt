@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.LaunchableApp
@@ -115,17 +116,27 @@ internal class CategoriesAdapter(
 
     // A corner dragged to another size: the tile takes it at once, without waiting for the saved setting to
     // come back round, and the setting is saved. What comes back the same changes nothing.
-    private fun resize(row: CategoryRow.Tile, dx: Float, step: Float) {
-        val size = TileResize.resize(row.options.size, dx, step)
-        if (size == row.options.size) return
+    private fun resize(row: CategoryRow.Tile, width: Float, target: ResizeTargets?) {
+        val size = target?.let { TileResize.sizeFor(width, it.small, it.normal, it.wide) }
         val id = row.entry.group.id
         val at = items.indexOfFirst { it is CategoryRow.Tile && it.entry.group.id == id }
-        if (at < 0) return
+        if (size == null || size == row.options.size || at < 0) return
         val sized = CategoryRow.Tile(row.entry, row.options.copy(size = size))
         items = items.toMutableList().also { it[at] = sized }
         base = items.filter { it !is CategoryRow.Done }
         notifyItemChanged(at)
         editHandlers.onResize(id, size)
+    }
+
+    // The widths a tile of this list can be dragged to: one, two and all the spans, less the tile's margins.
+    private fun targets(item: View): ResizeTargets? {
+        val list = item.parent as? RecyclerView
+        val spans = (list?.layoutManager as? GridLayoutManager)?.spanCount
+        if (list == null || spans == null) return null
+        val unit = (list.width - list.paddingLeft - list.paddingRight).toFloat() / spans
+        val margins = 2 * dp(list.context, TILE_MARGIN_DP)
+        val wideHeight = TileGeometry.WIDE_HEIGHT_DP * list.resources.displayMetrics.density
+        return ResizeTargets(unit - margins, unit * SPAN_TILE - margins, unit * spans - margins, wideHeight)
     }
 
     // The folders' ids in the order the tiles are in now.
@@ -267,7 +278,8 @@ internal class CategoriesAdapter(
                 if (editing) editHandlers.onTap(view, entry) else actions.onCategory(view, entry.group, entry.apps)
             }
             val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
-            card.edit.onResize = { dx -> resize(row, dx, card.edit.stepPx(itemView.parent as? View)) }
+            card.edit.targets = { targets(itemView) }
+            card.edit.onResize = { width -> resize(row, width, targets(itemView)) }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)
             // A small tile's name is smaller too, to fit its narrower column.
@@ -305,7 +317,8 @@ internal class CategoriesAdapter(
             showGlyph(card.nameView, entry.group.name)
             card.contentDescription = card.context.getString(R.string.folder_desc, entry.group.name)
             card.launchFromIcons = look.launchFromIcons
-            card.edit.onResize = { dx -> resize(row, dx, card.edit.stepPx(itemView.parent as? View)) }
+            card.edit.targets = { targets(itemView) }
+            card.edit.onResize = { width -> resize(row, width, targets(itemView)) }
             card.bind(
                 entry.apps, icons, actions,
                 open = { view ->

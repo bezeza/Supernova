@@ -141,7 +141,7 @@ internal class CategoryWideCard(context: Context) : EditableCard(context) {
     }
 
     private companion object {
-        const val HEIGHT_DP = 76f
+        const val HEIGHT_DP = TileGeometry.WIDE_HEIGHT_DP
         const val PAD_DP = 14f
         const val GAP_DP = 4f
         const val MIN_ICON_DP = 28f

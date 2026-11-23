@@ -1,19 +1,14 @@
 package com.supernova.launcher.fork.categories
 
-import kotlin.math.roundToInt
+import kotlin.math.abs
 
-// What dragging a tile's corner does to its size: one step to the right of the
-// span of a normal tile for each [unit] dragged, to the left a step back, over
-// SMALL, NORMAL and WIDE. Plain arithmetic, so it is testable without a view.
+// What dragging a tile's corner does to its size: the size whose width is
+// nearest to where the finger has taken the tile's edge. Plain arithmetic, so
+// it is testable without a view.
 internal object TileResize {
 
-    private val ORDER = listOf(CategorySize.SMALL, CategorySize.NORMAL, CategorySize.WIDE)
-
-    // [dx] is how far the finger moved right (left is negative), [unit] how far is one step.
-    fun resize(current: CategorySize, dx: Float, unit: Float): CategorySize {
-        if (unit <= 0f) return current
-        val steps = (dx / unit).roundToInt()
-        val at = ORDER.indexOf(current) + steps
-        return ORDER[at.coerceIn(0, ORDER.lastIndex)]
-    }
+    // [width] is how wide the tile is dragged; the three are the widths of a small, a normal and a wide tile.
+    fun sizeFor(width: Float, small: Float, normal: Float, wide: Float): CategorySize =
+        listOf(CategorySize.SMALL to small, CategorySize.NORMAL to normal, CategorySize.WIDE to wide)
+            .minByOrNull { abs(it.second - width) }?.first ?: CategorySize.NORMAL
 }

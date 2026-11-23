@@ -1,20 +1,26 @@
 package com.supernova.launcher.fork.categories
 
 import android.graphics.Canvas
+import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
 import android.graphics.PorterDuff
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import androidx.core.content.ContextCompat
 import com.supernova.launcher.R
 import kotlin.math.hypot
 
+// The widths a tile can be dragged to, in pixels, and how high a wide one is.
+internal class ResizeTargets(val small: Float, val normal: Float, val wide: Float, val wideHeight: Float)
+
 // What a tile's card does while the tiles are being arranged. Its icons stop
 // taking taps (the card keeps every touch), a tap on the card is its click
 // (its settings), and a drag that starts on the grip in its corner is a
-// resize, told to [onResize] as the distance the finger went to the right
-// once it lets go. A hold is left to the list, which drags the tile.
+// resize: an outline follows the finger over the list, one width and as flat as
+// that width asks, and [onResize] is told how wide it was once the finger lets
+// go. A hold is left to the list, which drags the tile.
 internal class EditGestures(private val card: ViewGroup) {
 
     private val density = card.resources.displayMetrics.density
@@ -28,7 +34,15 @@ internal class EditGestures(private val card: ViewGroup) {
             card.invalidate()
         }
 
+    // The widths a tile can be dragged to, asked when a drag of the grip begins.
+    var targets: () -> ResizeTargets? = { null }
+
+    // Told how wide the tile was dragged, in pixels.
     var onResize: (Float) -> Unit = {}
+
+    private val outline = GradientDrawable().apply { cornerRadius = density * OUTLINE_CORNER_DP }
+    private var outlineColor = 0
+    private var dragged = 0f
 
     private var downX = 0f
     private var downY = 0f
@@ -38,6 +52,7 @@ internal class EditGestures(private val card: ViewGroup) {
     private var tracking = false
 
     fun setColor(color: Int) {
+        outlineColor = color
         grip?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
         card.invalidate()
     }
@@ -57,7 +72,7 @@ internal class EditGestures(private val card: ViewGroup) {
                 if (!moved && hypot(event.x - downX, event.y - downY) > slop) moved = true
                 if (onGrip && moved) follow(event.x - downX)
             }
-            MotionEvent.ACTION_UP -> finish(event)
+            MotionEvent.ACTION_UP -> finish()
             MotionEvent.ACTION_CANCEL -> {
                 tracking = false
                 settle()
@@ -66,10 +81,10 @@ internal class EditGestures(private val card: ViewGroup) {
         return true
     }
 
-    private fun finish(event: MotionEvent) {
+    private fun finish() {
         when {
             !tracking -> Unit
-            onGrip && moved -> onResize(event.x - downX)
+            onGrip && moved -> onResize(dragged)
             !moved -> card.performClick()
         }
         onGrip = false
@@ -77,19 +92,35 @@ internal class EditGestures(private val card: ViewGroup) {
         settle()
     }
 
-    // The card stretches or shrinks a little as the corner is dragged, so the drag answers at once.
+    // The outline over the list takes the width the finger gives the tile's edge, at once.
     private fun follow(dx: Float) {
-        val width = card.width.coerceAtLeast(1)
-        val scale = (1f + dx / width * FOLLOW).coerceIn(1f - FOLLOW_MAX, 1f + FOLLOW_MAX)
-        card.pivotX = 0f
-        card.pivotY = 0f
-        card.scaleX = scale
-        card.scaleY = scale
+        val target = targets() ?: return
+        val list = list() ?: return
+        dragged = (card.width + dx).coerceIn(target.small, target.wide)
+        val height = TileGeometry.outlineHeight(dragged, target.normal, target.wide, target.wideHeight)
+        val at = Rect(0, 0, card.width, card.height)
+        list.offsetDescendantRectToMyCoords(card, at)
+        outline.setColor((outlineColor and COLOR_MASK) or (OUTLINE_FILL_ALPHA shl ALPHA_SHIFT))
+        val stroke = (outlineColor and COLOR_MASK) or (OUTLINE_STROKE_ALPHA shl ALPHA_SHIFT)
+        outline.setStroke((OUTLINE_STROKE_DP * density).toInt(), stroke)
+        outline.setBounds(at.left, at.top, at.left + dragged.toInt(), at.top + height.toInt())
+        if (!shown) {
+            list.overlay.add(outline)
+            shown = true
+        }
+        list.invalidate()
     }
 
+    private var shown = false
+
+    // The list the card is in: the outline is drawn over it, outside the card's own bounds.
+    private fun list(): RecyclerView? =
+        generateSequence(card.parent) { it.parent }.filterIsInstance<RecyclerView>().firstOrNull()
+
     private fun settle() {
-        card.scaleX = 1f
-        card.scaleY = 1f
+        if (!shown) return
+        list()?.overlay?.remove(outline)
+        shown = false
     }
 
     // The grip's target: the card's bottom right corner.
@@ -109,14 +140,15 @@ internal class EditGestures(private val card: ViewGroup) {
         drawable.draw(canvas)
     }
 
-    // The grip of a card whose parent is [view]: one step of a resize is the width of a normal tile.
-    fun stepPx(list: View?): Float = (list?.width ?: 0) / 2f
-
     private companion object {
         const val GRIP_DP = 18f
         const val GRIP_INSET_DP = 8f
         const val GRIP_TARGET_DP = 44f
-        const val FOLLOW = 0.4f
-        const val FOLLOW_MAX = 0.12f
+        const val OUTLINE_CORNER_DP = 24f
+        const val OUTLINE_STROKE_DP = 2f
+        const val OUTLINE_FILL_ALPHA = 0x30
+        const val OUTLINE_STROKE_ALPHA = 0xB0
+        const val COLOR_MASK = 0xFFFFFF
+        const val ALPHA_SHIFT = 24
     }
 }
