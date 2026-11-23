@@ -1,9 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols Outlined "checklist", weight 300 (Apache License 2.0, see FORK.md). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportWidth="960"
+    android:viewportHeight="960">
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M14,10L2,10v2h12v-2zM14,6L2,6v2h12L14,6zM18,14v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2,16h8v-2L2,14v2z" />
+        android:pathData="M227.77,738.08L100,610.31L141.77,568.54L226.77,653.54L396.77,483.54L438.54,526.31L227.77,738.08ZM227.77,433.46L100,305.69L141.77,263.92L226.77,348.92L396.77,178.92L438.54,221.69L227.77,433.46ZM520.38,662.31L520.38,602.31L860.38,602.31L860.38,662.31L520.38,662.31ZM520.38,357.69L520.38,297.69L860.38,297.69L860.38,357.69L520.38,357.69Z" />
 </vector>

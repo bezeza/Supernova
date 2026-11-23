@@ -231,7 +231,7 @@ class PrivateSpaceCard(
             }
         }
         catalog.privateSpaceSettings()?.let { sender ->
-            menu.addRow(activity.getString(R.string.private_space_open_settings), R.drawable.ic_tab_settings) {
+            menu.addRow(activity.getString(R.string.private_space_open_settings), R.drawable.ic_menu_settings) {
                 start(sender)
             }
         }

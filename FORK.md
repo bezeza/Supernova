@@ -185,6 +185,14 @@ PR маленькі: одна тема на один PR. Перед PR:
 - **Перевірки.** На `main` проходить `./gradlew testDebugUnitTest detekt lintDebug assembleDebug` без змін baseline. Нові файли форка пройшли detekt без baseline; не додавайте записів у `detekt-baseline.xml` і `lint-baseline.xml`, а виправляйте код. Release-збірка (R8) збирається; на пристрої нічого з фіч форка не запускалось.
 - **«Скинути порядок папки» дублюється.** На `main` вона вже є з PR #5 (простий варіант). Коміт `443a1d8` з [PR #1](https://github.com/bezeza/Supernova/pull/1) (живе оновлення картки, Undo) з нею конфліктує у 7 файлах і змінює `detekt-baseline.xml`; рішення за власником.
 
+## Іконки меню
+
+Іконки меню (контекстні меню застосунку, папки, віджета, вкладки, порожнього місця й пошуку, шапка екрана категорії, панель цілей перетягування) замінено на **Material Symbols Outlined, вага 300**: тонкі контурні, 24dp, `VectorDrawable`. Файли в `res/drawable` лишились під своїми іменами (`ic_menu_*`, `ic_fork_add`, `ic_fork_pick_large`), тож код меню не змінювався; єдиний виняток: новий `ic_menu_settings` для п'яти рядків меню «Налаштування» (старий `ic_tab_settings` лишається в налаштуваннях і чипах пошуку). Колір дає сама меню (`imageTintList` у `SupernovaPopupMenu`), у файлах заливка біла.
+
+Відповідність: `add` (додати, `ic_fork_add`), `edit`, `info`, `visibility` / `visibility_off` (показати / сховати), `checklist` (вибрати застосунки; раніше був «список із плюсом»), `do_not_disturb_on` (Видалити), `close` (скинути, хрестик панелі), `delete` (видалити застосунок), `open_in_full` (розмір), `padding`, `sort`, `flip_to_front` / `flip_to_back`, `widgets`, `upload` (експорт, у шухляду), `download` (зберегти APK), `open_in_new`, `notifications`, `content_paste`, `restart_alt`, `close` (закрити застосунок), `settings`, `photo_size_select_large` (великі іконки).
+
+**Ліцензія.** Іконки: Material Symbols © Google, [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0), репозиторій [google/material-design-icons](https://github.com/google/material-design-icons) (`symbols/android/<ім'я>/materialsymbolsoutlined/<ім'я>_wght300_24px.xml`, завантажено 2026-11-23). У кожному файлі є рядок-коментар із назвою символу. Логотипи (`ic_play_store`) і значки категорій плиток (`ic_fork_cat_*`) не змінювались.
+
 ## Відкладене
 
 Пауза на нові функції знята власником (2026-11-23). Нижче те, що відкладено на потім: кожен пункт починається лише після ОК власника на попередній PR. Рефакторинг `CategoryScreen` і сторінка категорій на робочому столі зараз у роботі двома етапами (другий лише після ОК на перший), тому з цього розділу підуть, коли вийдуть.
