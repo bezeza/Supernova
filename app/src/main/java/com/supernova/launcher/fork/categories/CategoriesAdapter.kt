@@ -35,6 +35,10 @@ internal sealed class CategoryRow(val key: String, val content: String) {
         val layout = CategoryLayout.tile(entry.apps, slots)
     }
 
+    // Two small tiles one over the other, in the space of a normal tile.
+    class Pair(val first: Tile, val second: Tile) :
+        CategoryRow("pair/${first.entry.group.id}/${second.entry.group.id}", first.content + "||" + second.content)
+
     class Header(val text: String) : CategoryRow("header", text)
 
     class Loose(val app: LaunchableApp) : CategoryRow("app/${appKey(app)}", appKey(app))
@@ -79,8 +83,19 @@ internal class CategoriesAdapter(
     // A new list: only the rows that changed are rebound.
     fun submitList(list: List<CategoryRow>) {
         base = list
-        show(withBar(list))
+        show(withBar(grouped(list)))
     }
+
+    // The rows with each two small tiles in a row made a pair.
+    private fun grouped(list: List<CategoryRow>): List<CategoryRow> =
+        TilePairs.group(list, { it is CategoryRow.Tile && it.options.size == CategorySize.SMALL }) { a, b ->
+            CategoryRow.Pair(a as CategoryRow.Tile, b as CategoryRow.Tile)
+        }
+
+    // The rows as the controller gave them: pairs taken apart, the bar left out.
+    private fun flat(list: List<CategoryRow>): List<CategoryRow> =
+        TilePairs.split(list) { (it as? CategoryRow.Pair)?.let { pair -> listOf(pair.first, pair.second) } }
+            .filter { it !is CategoryRow.Done }
 
     private fun withBar(list: List<CategoryRow>): List<CategoryRow> =
         if (editing) listOf(CategoryRow.Done) + list else list
@@ -105,39 +120,51 @@ internal class CategoriesAdapter(
     fun setEditing(on: Boolean) {
         if (editing == on) return
         editing = on
-        show(withBar(base))
+        show(withBar(grouped(base)))
         notifyItemRangeChanged(0, itemCount, PAYLOAD_EDIT)
     }
 
     // A drag moved the tile at [from] to [to]: only over another tile.
     fun move(from: Int, to: Int): Boolean {
-        if (items.getOrNull(from) !is CategoryRow.Tile || items.getOrNull(to) !is CategoryRow.Tile) return false
+        if (!isTile(from) || !isTile(to)) return false
         items = CategoryReorder.moved(items, from, to)
-        base = items.filter { it !is CategoryRow.Done }
+        base = flat(items)
         notifyItemMoved(from, to)
         return true
     }
 
-    fun isTile(position: Int): Boolean = items.getOrNull(position) is CategoryRow.Tile
+    // A tile, or a pair of small ones: what can be dragged.
+    fun isTile(position: Int): Boolean =
+        items.getOrNull(position).let { it is CategoryRow.Tile || it is CategoryRow.Pair }
 
-    // A corner dragged to another size: the tile takes it at once, so the others make way while the finger is
-    // still down, and [save] writes the setting (once, when the finger lets go).
+    // A corner dragged to another size. While the finger is down the tile takes the size at once, in its own place,
+    // so the others make way; a tile in a pair waits, a change there regroups the pairs and would take the tile
+    // out from under the finger. When the finger lets go ([save]) the rows regroup and the setting is written.
     private fun resize(id: String, width: Float, height: Float, target: ResizeTargets?, save: Boolean) {
-        val size = target?.let { TileResize.sizeFor(width, height, it.small, it.normal, it.wide) }
+        val size = target?.let { TileResize.sizeFor(width, height, it.small, it.normal, it.wide) } ?: return
+        if (save) {
+            base = flat(items).map { row ->
+                if (row is CategoryRow.Tile && row.entry.group.id == id) row.sized(size) else row
+            }
+            show(withBar(grouped(base)))
+            editHandlers.onResize(id, size)
+            return
+        }
         val at = items.indexOfFirst { it is CategoryRow.Tile && it.entry.group.id == id }
-        if (size == null || at < 0) return
-        val row = items[at] as CategoryRow.Tile
-        if (size != row.options.size) {
-            items = items.toMutableList().also { it[at] = CategoryRow.Tile(row.entry, row.options.copy(size = size)) }
-            base = items.filter { it !is CategoryRow.Done }
+        val row = items.getOrNull(at) as? CategoryRow.Tile
+        if (row != null && row.options.size != size) {
+            items = items.toMutableList().also { it[at] = row.sized(size) }
+            base = flat(items)
             notifyItemChanged(at)
         }
-        if (save) editHandlers.onResize(id, size)
     }
+
+    private fun CategoryRow.Tile.sized(size: CategorySize) =
+        CategoryRow.Tile(entry, options.copy(size = size))
 
     // The widths a tile of this list can be dragged to: one, two and all the spans, less the tile's margins.
     private fun targets(item: View): ResizeTargets? {
-        val list = item.parent as? RecyclerView
+        val list = generateSequence(item.parent) { it.parent }.filterIsInstance<RecyclerView>().firstOrNull()
         val spans = (list?.layoutManager as? GridLayoutManager)?.spanCount
         if (list == null || spans == null) return null
         val unit = (list.width - list.paddingLeft - list.paddingRight).toFloat() / spans
@@ -160,6 +187,7 @@ internal class CategoriesAdapter(
     override fun getItemViewType(position: Int): Int = when (val row = getItem(position)) {
         is CategoryRow.Recent -> TYPE_RECENT
         is CategoryRow.Tile -> TYPE_TILE
+        is CategoryRow.Pair -> TYPE_PAIR
         is CategoryRow.Header -> TYPE_HEADER
         is CategoryRow.Loose -> TYPE_LOOSE
         is CategoryRow.Hidden -> TYPE_HIDDEN
@@ -174,7 +202,7 @@ internal class CategoriesAdapter(
             CategorySize.SMALL -> 1
             CategorySize.WIDE, CategorySize.LARGE -> minOf(SPAN_DOUBLE, spanCount)
         }
-        is CategoryRow.Loose -> 1
+        is CategoryRow.Loose, is CategoryRow.Pair -> 1
         else -> spanCount
     }
 
@@ -182,10 +210,11 @@ internal class CategoriesAdapter(
         val context = parent.context
         return when (viewType) {
             TYPE_RECENT -> RecentHolder(context)
-            TYPE_TILE -> TileHolder(context)
+            TYPE_TILE -> TileHolder(TileCell(context))
             TYPE_HEADER -> HeaderHolder(context)
             TYPE_HIDDEN -> HiddenHolder(context)
             TYPE_DONE -> DoneHolder(context)
+            TYPE_PAIR -> PairHolder(context)
             else -> LooseHolder(context)
         }
     }
@@ -194,6 +223,7 @@ internal class CategoriesAdapter(
         when (val row = getItem(position)) {
             is CategoryRow.Recent -> (holder as RecentHolder).bind(row)
             is CategoryRow.Tile -> (holder as TileHolder).bind(row)
+            is CategoryRow.Pair -> (holder as PairHolder).bind(row)
             is CategoryRow.Header -> (holder as HeaderHolder).bind(row)
             is CategoryRow.Loose -> (holder as LooseHolder).bind(row)
             is CategoryRow.Hidden -> (holder as HiddenHolder).bind(row)
@@ -251,24 +281,21 @@ internal class CategoriesAdapter(
         title.compoundDrawablePadding = dp(context, GLYPH_GAP_DP)
     }
 
-    private inner class TileHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)), Arrangeable {
+    // A tile's card with its name under it: the whole of a tile in the list, or one of the two of a pair.
+    private inner class TileCell(context: Context) {
+        val view = LinearLayout(context)
         private val card = CategoryTileCard(context)
-        private val wobble = Wobble(itemView)
         private val title = label(context, TILE_LABEL_SP, centred = true, lines = TITLE_LINES)
 
         init {
-            val column = itemView as LinearLayout
-            column.orientation = LinearLayout.VERTICAL
+            view.orientation = LinearLayout.VERTICAL
             val margin = dp(context, TILE_MARGIN_DP)
             card.gapPx = margin
-            column.layoutParams = RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            column.setPadding(margin, margin, margin, margin)
-            column.addView(card, LinearLayout.LayoutParams(
+            view.setPadding(margin, margin, margin, margin)
+            view.addView(card, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ))
-            column.addView(title, LinearLayout.LayoutParams(
+            view.addView(title, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply { topMargin = dp(context, TITLE_GAP_DP) })
         }
@@ -279,13 +306,13 @@ internal class CategoriesAdapter(
             title.text = entry.group.name
             title.setTextColor(textColor)
             showGlyph(title, entry.group.name)
-            itemView.contentDescription = itemView.context.getString(R.string.folder_desc, entry.group.name)
+            view.contentDescription = view.context.getString(R.string.folder_desc, entry.group.name)
             // While arranging, a tap on the tile does nothing: its settings are behind the gear.
-            val open = { view: View -> if (!editing) actions.onCategory(view, entry.group, entry.apps) }
-            val openLongPress = { view: View -> actions.onCategoryLongPress(view, entry.group, entry.apps) }
-            card.edit.targets = { targets(itemView) }
-            card.edit.onPreview = { w, h -> resize(entry.group.id, w, h, targets(itemView), save = false) }
-            card.edit.onResize = { w, h -> resize(entry.group.id, w, h, targets(itemView), save = true) }
+            val open = { target: View -> if (!editing) actions.onCategory(target, entry.group, entry.apps) }
+            val openLongPress = { target: View -> actions.onCategoryLongPress(target, entry.group, entry.apps) }
+            card.edit.targets = { targets(view) }
+            card.edit.onPreview = { w, h -> resize(entry.group.id, w, h, targets(view), save = false) }
+            card.edit.onResize = { w, h -> resize(entry.group.id, w, h, targets(view), save = true) }
             card.edit.onGear = { editHandlers.onTap(card, entry) }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)
@@ -294,14 +321,63 @@ internal class CategoriesAdapter(
             title.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSp)
             card.bind(row.layout, icons, actions, open = open, openLongPress = openLongPress)
             // The name under the tile opens it too.
-            itemView.setOnClickListener(open)
+            view.setOnClickListener(open)
             // While arranging a hold is the list's: it drags the tile.
-            itemView.setOnLongClickListener { if (editing) false else { openLongPress(it); true } }
+            view.setOnLongClickListener { if (editing) false else { openLongPress(it); true } }
+            setEditing(editing)
+        }
+
+        fun setEditing(on: Boolean) {
+            card.edit.editing = on
+        }
+    }
+
+    private inner class TileHolder(private val cell: TileCell) : RecyclerView.ViewHolder(cell.view), Arrangeable {
+        private val wobble = Wobble(itemView)
+
+        init {
+            itemView.layoutParams = RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        fun bind(row: CategoryRow.Tile) {
+            cell.bind(row)
             applyEditing(editing)
         }
 
         override fun applyEditing(on: Boolean) {
-            card.edit.editing = on
+            cell.setEditing(on)
+            if (on) wobble.start() else wobble.stop()
+        }
+    }
+
+    // Two small tiles one over the other, in the space of a normal tile.
+    private inner class PairHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)), Arrangeable {
+        private val cells = List(2) { TileCell(context) }
+        private val wobble = Wobble(itemView)
+
+        init {
+            val column = itemView as LinearLayout
+            column.orientation = LinearLayout.VERTICAL
+            column.layoutParams = RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            cells.forEach {
+                column.addView(it.view, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                ))
+            }
+        }
+
+        fun bind(row: CategoryRow.Pair) {
+            cells[0].bind(row.first)
+            cells[1].bind(row.second)
+            applyEditing(editing)
+        }
+
+        override fun applyEditing(on: Boolean) {
+            cells.forEach { it.setEditing(on) }
             if (on) wobble.start() else wobble.stop()
         }
     }
@@ -478,6 +554,7 @@ internal class CategoriesAdapter(
         const val TYPE_LOOSE = 3
         const val TYPE_HIDDEN = 4
         const val TYPE_DONE = 6
+        const val TYPE_PAIR = 7
         const val PAYLOAD_EDIT = "edit"
         const val HINT_SP = 11f
         const val HINT_LINES = 3
