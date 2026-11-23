@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +31,7 @@ internal class EditGestures(private val card: ViewGroup) {
         set(value) {
             if (field == value) return
             field = value
+            if (!value) settle()
             card.invalidate()
             keepGestureOff()
         }
@@ -37,6 +39,12 @@ internal class EditGestures(private val card: ViewGroup) {
     init {
         // The card's size changes as the others make way, and so do its corners.
         card.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepGestureOff() }
+        // A card taken off the screen mid-drag takes its outline with it.
+        card.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) = Unit
+
+            override fun onViewDetachedFromWindow(view: View) = settle()
+        })
     }
 
     // The widths a tile can be dragged to, asked when a drag of the grip begins.
@@ -48,6 +56,9 @@ internal class EditGestures(private val card: ViewGroup) {
 
     // A tap on the gear.
     var onGear: () -> Unit = {}
+
+    // Told when a finger takes the grip and when it lets it go: the list must not take the hold for a tile drag.
+    var onGripHeld: (Boolean) -> Unit = {}
 
     private val outline = GradientDrawable().apply { cornerRadius = density * OUTLINE_CORNER_DP }
     private var color = 0
@@ -63,6 +74,10 @@ internal class EditGestures(private val card: ViewGroup) {
     private var onGrip = false
     private var gearHit = false
     private var shown = false
+
+    // The list the outline was put over: the card may be gone from it (rebound, recycled) before the finger lets
+    // go, and then the outline could not be found again from the card.
+    private var shownIn: RecyclerView? = null
 
     // A gesture this card saw from its DOWN: the hold that started the arranging goes on past it, and is no tap.
     private var tracking = false
@@ -90,6 +105,8 @@ internal class EditGestures(private val card: ViewGroup) {
             MotionEvent.ACTION_UP -> finish()
             MotionEvent.ACTION_CANCEL -> {
                 tracking = false
+                onGrip = false
+                onGripHeld(false)
                 settle()
             }
         }
@@ -109,18 +126,25 @@ internal class EditGestures(private val card: ViewGroup) {
         gearHit = marks.onGear(event.x, event.y)
         onGrip = !gearHit && marks.onGrip(event.x, event.y)
         // A drag of the grip is the card's: the list must not take it for a tile drag.
-        if (onGrip) card.parent?.requestDisallowInterceptTouchEvent(true)
+        if (onGrip) {
+            card.parent?.requestDisallowInterceptTouchEvent(true)
+            onGripHeld(true)
+        }
     }
 
     private fun finish() {
         when {
             !tracking -> Unit
-            onGrip && moved -> onResize(dragged, draggedHeight)
+            onGrip && moved -> {
+                onResize(dragged, draggedHeight)
+                relayoutList()
+            }
             !moved && gearHit -> onGear()
         }
         onGrip = false
         gearHit = false
         tracking = false
+        onGripHeld(false)
         settle()
     }
 
@@ -134,6 +158,16 @@ internal class EditGestures(private val card: ViewGroup) {
 
     fun draw(canvas: Canvas) {
         if (editing) marks.draw(canvas)
+    }
+
+    // A tile that changed its size in place leaves the tiles below it where they were until the list lays out
+    // again: end what the list is animating and make it lay out now.
+    private fun relayoutList() {
+        val list = list() ?: return
+        list.post {
+            list.itemAnimator?.endAnimations()
+            list.requestLayout()
+        }
     }
 
     // The outline over the list takes the width and height the finger gives the tile's corner, at once.
@@ -151,6 +185,7 @@ internal class EditGestures(private val card: ViewGroup) {
         outline.setBounds(at.left, at.top, at.left + dragged.toInt(), at.top + height.toInt())
         if (!shown) {
             list.overlay.add(outline)
+            shownIn = list
             shown = true
         }
         list.invalidate()
@@ -159,7 +194,9 @@ internal class EditGestures(private val card: ViewGroup) {
 
     private fun settle() {
         if (!shown) return
-        list()?.overlay?.remove(outline)
+        shownIn?.overlay?.remove(outline)
+        shownIn?.invalidate()
+        shownIn = null
         shown = false
     }
 

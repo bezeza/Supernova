@@ -276,6 +276,8 @@ data class LauncherPrefs(
     val categoriesOptions: String = "",
     // Fork: a drawer folder opens on a screen like a category's, in the other drawer styles.
     val folderScreen: Boolean = false,
+    // Fork: the last page of the home screen shows the category tiles.
+    val categoriesHomePage: Boolean = false,
     // Each folder's own options as JSON by id (fork/folders/FolderOptions).
     val folderOptions: String = "",
     val categoriesSearchBottom: Boolean = false,

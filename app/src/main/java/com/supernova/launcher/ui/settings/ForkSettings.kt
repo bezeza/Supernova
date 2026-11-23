@@ -19,7 +19,9 @@ object ForkSettings {
         actions: SettingsCatalogue.Actions
     ): List<SettingsSection> =
         SettingsCatalogue.sections(context, viewModel, actions).map { section ->
-            if (section.title == R.string.settings_section_drawer) {
+            if (section.title == R.string.settings_section_home) {
+                SettingsSection(section.title, afterInfiniteScroll(section.items, listOf(homePageRow(viewModel))))
+            } else if (section.title == R.string.settings_section_drawer) {
                 val extra = autoSortRows(context, viewModel, actions)
                 val extraRows = categoriesRows(viewModel) + folderScreenRow(viewModel)
                 val withStyleRows = afterDrawerStyle(section.items, extraRows)
@@ -28,6 +30,19 @@ object ForkSettings {
                 section
             }
         }
+
+    private fun afterInfiniteScroll(items: List<SettingItem>, extra: List<SettingItem>): List<SettingItem> {
+        val at = items.indexOfFirst { it.title == R.string.infinite_scroll }
+        return if (at < 0) items + extra else items.take(at + 1) + extra + items.drop(at + 1)
+    }
+
+    // The last page of the home screen: the category tiles, as in the Categories drawer.
+    private fun homePageRow(viewModel: LauncherViewModel): SettingItem = SettingItem.Toggle(
+        R.string.fork_home_page,
+        get = { it.categoriesHomePage },
+        set = { viewModel.set(Pref.categoriesHomePage, it) },
+        subtitle = R.string.fork_home_page_summary
+    )
 
     private fun afterDrawerStyle(items: List<SettingItem>, extra: List<SettingItem>): List<SettingItem> {
         val at = items.indexOfFirst { it.title == R.string.drawer_style }
