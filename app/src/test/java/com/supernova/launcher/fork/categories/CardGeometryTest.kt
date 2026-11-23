@@ -34,6 +34,13 @@ class CardGeometryTest {
     }
 
     @Test
+    fun aSmallTileStaysSquareWithItsNameInTheCard() {
+        // A span of 100 less margins of 6 each side: 88. Its icons run 0.78 of a height across, still not a tall tile.
+        val width = 88
+        assertEquals(width, CardGeometry({ TileSlots.small() }, { gap }).height(width))
+    }
+
+    @Test
     fun aDoubleTileIsAsHighAsANormalOne() {
         val geometry = CardGeometry({ TileSlots.double() }, { gap })
         assertEquals(normal, geometry.height(2 * normal + 2 * gap))
@@ -52,5 +59,30 @@ class CardGeometryTest {
         val width = 2 * normal + 2 * gap
         assertEquals(width, CardGeometry({ TileSlots.big() }, { gap }).height(width))
         check(TileSlots.big(), width)
+    }
+
+    @Test
+    fun aSmallCardIsAsHighAsItIsWideAndTwoOfThemWithTheirGapAreANormalCard() {
+        // A span of 100 and margins of 6: the card of a small tile is 88 wide, the card of a normal one 188. A pair
+        // is two small cards, each with a margin above and below, so the gap between them is two margins.
+        val smallWidth = 100 - 2 * gap
+        val normalWidth = 2 * 100 - 2 * gap
+        val small = CardGeometry({ TileSlots.small() }, { gap }).height(smallWidth)
+        val normalCard = CardGeometry({ TileSlots.normal(3) }, { gap }).height(normalWidth)
+        assertEquals(smallWidth, small)
+        assertEquals(normalCard, 2 * small + 2 * gap)
+    }
+
+    @Test
+    fun theNameOfASmallTileTakesAStripAndItsIconsStillFit() {
+        val slots = TileSlots.small()
+        val geometry = CardGeometry({ slots }, { gap })
+        val width = 100 - 2 * gap
+        val height = geometry.height(width)
+        val ref = geometry.reference(width, height)
+        val strip = (TileSlots.nameShare(slots) * ref).toInt()
+        // The strip and the two rows of icons together are the card's inner height.
+        assertTrue(strip > 0)
+        assertTrue(ref <= height)
     }
 }

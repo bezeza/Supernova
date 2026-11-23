@@ -18,6 +18,15 @@ internal class EditMarks(private val card: ViewGroup) {
     private val gear = ContextCompat.getDrawable(card.context, R.drawable.ic_fork_cat_settings)?.mutate()
     private val backing = GradientDrawable().apply { shape = GradientDrawable.OVAL }
 
+    // A small tile has its gear in the bottom right corner, out of the way of its name along the top, and
+    // its grip in the bottom left one.
+    var small = false
+        set(value) {
+            if (field == value) return
+            field = value
+            card.invalidate()
+        }
+
     fun setColor(color: Int) {
         grip?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
         gear?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
@@ -25,29 +34,33 @@ internal class EditMarks(private val card: ViewGroup) {
         card.invalidate()
     }
 
-    // The grip's target: the card's bottom right corner.
+    // The grip's target: the card's bottom right corner, the bottom left one on a small tile.
     fun onGrip(x: Float, y: Float): Boolean {
         val size = TARGET_DP * density
-        return x >= card.width - size && y >= card.height - size
+        val across = if (small) x <= size else x >= card.width - size
+        return across && y >= card.height - size
     }
 
-    // The gear's target: the card's top right corner.
+    // The gear's target: the card's top right corner, the bottom right one on a small tile.
     fun onGear(x: Float, y: Float): Boolean {
         val size = TARGET_DP * density
-        return x >= card.width - size && y <= size
+        val down = if (small) y >= card.height - size else y <= size
+        return x >= card.width - size && down
     }
 
     fun draw(canvas: Canvas) {
         val gearInset = (GEAR_INSET_DP * density).toInt()
         val circle = (GEAR_BACKING_DP * density).toInt()
         val circleLeft = card.width - gearInset - circle
-        backing.setBounds(circleLeft, gearInset, circleLeft + circle, gearInset + circle)
+        val circleTop = if (small) card.height - gearInset - circle else gearInset
+        backing.setBounds(circleLeft, circleTop, circleLeft + circle, circleTop + circle)
         backing.draw(canvas)
         val mark = (GEAR_DP * density).toInt()
-        place(canvas, gear, circleLeft + (circle - mark) / 2, gearInset + (circle - mark) / 2, mark)
+        place(canvas, gear, circleLeft + (circle - mark) / 2, circleTop + (circle - mark) / 2, mark)
         val gripInset = (GRIP_INSET_DP * density).toInt()
         val gripSize = (GRIP_DP * density).toInt()
-        place(canvas, grip, card.width - gripInset - gripSize, card.height - gripInset - gripSize, gripSize)
+        val gripLeft = if (small) gripInset else card.width - gripInset - gripSize
+        place(canvas, grip, gripLeft, card.height - gripInset - gripSize, gripSize)
     }
 
     private fun place(canvas: Canvas, drawable: Drawable?, left: Int, top: Int, size: Int) {

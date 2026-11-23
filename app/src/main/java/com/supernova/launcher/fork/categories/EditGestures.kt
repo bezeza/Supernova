@@ -60,6 +60,13 @@ internal class EditGestures(private val card: ViewGroup) {
     // A gesture this card saw from its DOWN: the hold that started the arranging goes on past it, and is no tap.
     private var tracking = false
 
+    // A small tile wears its marks in the bottom corners, the gear at the right.
+    var small: Boolean
+        get() = marks.small
+        set(value) {
+            marks.small = value
+        }
+
     fun setColor(color: Int) {
         this.color = color
         marks.setColor(color)

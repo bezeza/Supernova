@@ -65,7 +65,9 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
     fun setSlots(layout: List<TileSlots.Slot>) {
         if (layout === slots) return
         slots = layout
-        name.visibility = if (TileSlots.nameShare(layout) > 0f) VISIBLE else GONE
+        val named = TileSlots.nameShare(layout) > 0f
+        name.visibility = if (named) VISIBLE else GONE
+        edit.small = named
         requestLayout()
     }
 

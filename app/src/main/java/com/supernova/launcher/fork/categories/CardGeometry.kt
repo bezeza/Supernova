@@ -9,9 +9,11 @@ internal class CardGeometry(private val slots: () -> List<TileSlots.Slot>, priva
     // How many heights of the card the icons run across: 1, 2 for a double tile, a half for a tall one.
     private fun content(): Float = TileSlots.contentWidth(slots())
 
+    // A small tile's icons run a little under one height across (its name takes a strip on top), and it is still
+    // square: only a layout that runs about half a height across is a tall tile.
     fun height(width: Int): Int = when {
         content() > 1f -> TileGeometry.doubleHeight(width, gap())
-        content() < 1f -> TileGeometry.tallHeight(width, gap())
+        content() < TALL_CONTENT_MAX -> TileGeometry.tallHeight(width, gap())
         else -> width
     }
 
@@ -44,5 +46,6 @@ internal class CardGeometry(private val slots: () -> List<TileSlots.Slot>, priva
 
     private companion object {
         const val PADDING_SHARE = 0.07f
+        const val TALL_CONTENT_MAX = 0.6f
     }
 }
