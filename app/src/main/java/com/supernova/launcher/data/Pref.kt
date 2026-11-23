@@ -222,6 +222,7 @@ object Pref {
     val categoriesLaunchLarge = bool("categories_launch_large")
     val categoriesRecentCount = int("categories_recent_count", CategoryLayout.RECENT_MIN..CategoryLayout.RECENT_MAX)
     val categoriesOptions = text("categories_options")
+    val folderScreen = bool("folder_screen")
     val categoriesSearchBottom = bool("categories_search_bottom")
     val smartFoldersDismissed = textSet("smart_folders_dismissed")
     val drawerIconScale = float("drawer_icon_scale", ICON_SCALE_MIN..ICON_SCALE_MAX)

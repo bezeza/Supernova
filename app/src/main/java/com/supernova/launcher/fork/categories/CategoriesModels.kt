@@ -47,9 +47,17 @@ class CategoriesActions(
     val onCategoryLongPress: (View, DrawerGroup, List<LaunchableApp>) -> Unit,
     // The apps tapped as the category's large icons, in the order tapped: the
     // folder takes them as its first apps.
+    val edits: CategoryEdits
+)
+
+// What changes a category: the large icons chosen, its settings, and the "+" on its screen.
+class CategoryEdits(
+    // The apps tapped as the category's large icons, in the order tapped: the folder takes them as its first apps.
     val onPlaceLarge: (DrawerGroup, List<LaunchableApp>) -> Unit,
     // A category's settings changed: its folder id and the change.
-    val onOptions: (String, (CategoryOptions) -> CategoryOptions) -> Unit
+    val onOptions: (String, (CategoryOptions) -> CategoryOptions) -> Unit,
+    // The "+" on a category's screen: pick the apps of the folder.
+    val onAddApps: (DrawerGroup) -> Unit
 )
 
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

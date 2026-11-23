@@ -274,6 +274,8 @@ data class LauncherPrefs(
     // options as JSON by folder id (fork/categories/CategoryOptions).
     val categoriesRecentCount: Int = 4,
     val categoriesOptions: String = "",
+    // Fork: a drawer folder opens on a screen like a category's, in the other drawer styles.
+    val folderScreen: Boolean = false,
     val categoriesSearchBottom: Boolean = false,
     // Smart folders the user deleted, or a fresh install left out as too big,
     // by name: regenerating on an install leaves them out. Turning Smart

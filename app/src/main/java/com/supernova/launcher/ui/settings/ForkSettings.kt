@@ -21,7 +21,8 @@ object ForkSettings {
         SettingsCatalogue.sections(context, viewModel, actions).map { section ->
             if (section.title == R.string.settings_section_drawer) {
                 val extra = autoSortRows(context, viewModel, actions)
-                val withStyleRows = afterDrawerStyle(section.items, categoriesRows(viewModel))
+                val extraRows = categoriesRows(viewModel) + folderScreenRow(viewModel)
+                val withStyleRows = afterDrawerStyle(section.items, extraRows)
                 SettingsSection(section.title, afterSmartFolders(withStyleRows, extra))
             } else {
                 section
@@ -67,6 +68,17 @@ object ForkSettings {
             { it.categoriesSearchBottom }
         ) { viewModel.set(Pref.categoriesSearchBottom, it) }
     )
+
+    // Another drawer style: a folder of the drawer opens on a screen like a category's, with its "+".
+    private fun folderScreenRow(viewModel: LauncherViewModel): SettingItem = SettingItem.Toggle(
+        R.string.fork_folder_screen,
+        get = { it.folderScreen },
+        set = { viewModel.set(Pref.folderScreen, it) },
+        subtitle = R.string.fork_folder_screen_summary
+    ).hiddenWhen {
+        SettingItem.HiddenBy(R.string.drawer_style, SettingItem.HiddenBy.Needs.OTHER)
+            .takeIf { _ -> it.drawerStyle == DrawerStyle.CATEGORIES }
+    }
 
     private fun categoriesToggle(
         title: Int,

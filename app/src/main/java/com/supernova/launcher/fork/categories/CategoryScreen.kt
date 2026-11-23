@@ -29,7 +29,9 @@ internal class CategoryScreen(
     private val cells: AppDrawerAdapter,
     private val onBack: () -> Unit,
     // The apps chosen as large icons, in the order chosen.
-    private val onPicked: (List<LaunchableApp>) -> Unit
+    private val onPicked: (List<LaunchableApp>) -> Unit,
+    // The header's "+": add apps to the category.
+    private val onAdd: () -> Unit
 ) {
 
     private val context = container.context
@@ -40,6 +42,7 @@ internal class CategoryScreen(
     private val header = CategoryHeader(context).also {
         it.onBack = { onBack() }
         it.onPick = { startPicking() }
+        it.onAdd = { onAdd() }
     }
 
     // The apps' grid; the controller hangs the drawer's tab swipe on it.
