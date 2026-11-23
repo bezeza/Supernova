@@ -21,7 +21,7 @@ import com.supernova.launcher.data.LaunchableApp
 internal class CategoryTileCard(context: Context) : EditableCard(context) {
 
     private val corner = View(context)
-    private val large = List(CategoryLayout.LARGE_SLOTS) { ImageView(context) }
+    private val large = List(CategoryLayout.LARGE_MAX) { ImageView(context) }
     private val mini = List(CategoryLayout.MINI_MAX) { ImageView(context) }
     private val shape = GradientDrawable()
     private var slots: List<TileSlots.Slot> = TileSlots.normal(CategoryLayout.LARGE_SLOTS)
