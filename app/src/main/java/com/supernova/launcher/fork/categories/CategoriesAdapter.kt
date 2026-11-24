@@ -134,10 +134,10 @@ internal class CategoriesAdapter(
     override fun kindAt(position: Int): Int = getItemViewType(position)
 
     // A row of the mosaic is half of a normal tile's height: its square card (two columns across) and its name under
-    // it, which may take two lines.
+    // it, on one line (a longer name is cut short, as the tile has no room for a second).
     override fun unitHeight(context: Context, columnWidth: Int): Int {
         val line = TextView(context).apply { setTextSize(TypedValue.COMPLEX_UNIT_SP, TILE_LABEL_SP) }.lineHeight
-        return columnWidth + (dp(context, TITLE_GAP_DP) + TITLE_LINES * line) / 2
+        return columnWidth + (dp(context, TITLE_GAP_DP) + line) / 2
     }
 
     // What is on screen for the rows: while arranging every tile is its own item, so one small tile can be dragged;
@@ -397,7 +397,7 @@ internal class CategoriesAdapter(
     private inner class TileCell(context: Context) {
         val view = LinearLayout(context)
         private val card = CategoryTileCard(context)
-        private val title = label(context, TILE_LABEL_SP, centred = true, lines = TITLE_LINES)
+        private val title = label(context, TILE_LABEL_SP, centred = true, lines = if (MOSAIC) 1 else TITLE_LINES)
 
         init {
             view.orientation = LinearLayout.VERTICAL

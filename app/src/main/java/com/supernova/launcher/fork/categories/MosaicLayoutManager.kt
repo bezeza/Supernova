@@ -104,11 +104,14 @@ internal class MosaicLayoutManager(private val source: MosaicSource) : RecyclerV
         return heights.getOrPut(type) {
             val view = recycler.getViewForPosition(position)
             addView(view)
+            val params = view.layoutParams as RecyclerView.LayoutParams
             view.measure(
-                View.MeasureSpec.makeMeasureSpec(width * span / spanCount, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(
+                    width * span / spanCount - params.leftMargin - params.rightMargin, View.MeasureSpec.EXACTLY
+                ),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             )
-            val measured = view.measuredHeight
+            val measured = view.measuredHeight + params.topMargin + params.bottomMargin
             removeAndRecycleView(view, recycler)
             measured
         }
@@ -139,19 +142,19 @@ internal class MosaicLayoutManager(private val source: MosaicSource) : RecyclerV
     private fun place(recycler: RecyclerView.Recycler, position: Int) {
         val view = recycler.getViewForPosition(position)
         addView(view)
-        val boxWidth = geometry.right(position) - geometry.left(position)
-        val boxHeight = geometry.bottom(position) - geometry.top(position)
+        val params = view.layoutParams as RecyclerView.LayoutParams
+        val boxWidth = geometry.right(position) - geometry.left(position) - params.leftMargin - params.rightMargin
+        val boxHeight = geometry.bottom(position) - geometry.top(position) - params.topMargin - params.bottomMargin
         val isTile = source.cellAt(position) != null
         view.measure(
             View.MeasureSpec.makeMeasureSpec(boxWidth, View.MeasureSpec.EXACTLY),
-            if (isTile) {
-                View.MeasureSpec.makeMeasureSpec(boxHeight, View.MeasureSpec.AT_MOST)
-            } else {
-                View.MeasureSpec.makeMeasureSpec(boxHeight, View.MeasureSpec.EXACTLY)
-            }
+            View.MeasureSpec.makeMeasureSpec(
+                boxHeight, if (isTile) View.MeasureSpec.AT_MOST else View.MeasureSpec.EXACTLY
+            )
         )
-        val top = geometry.top(position) - scrolled
-        layoutDecorated(view, geometry.left(position), top, geometry.right(position), top + view.measuredHeight)
+        val left = geometry.left(position) + params.leftMargin
+        val top = geometry.top(position) - scrolled + params.topMargin
+        layoutDecorated(view, left, top, left + view.measuredWidth, top + view.measuredHeight)
     }
 
     override fun scrollVerticallyBy(dy: Int, recycler: RecyclerView.Recycler, state: RecyclerView.State): Int {
