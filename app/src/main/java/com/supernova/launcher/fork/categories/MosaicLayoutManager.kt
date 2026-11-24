@@ -10,8 +10,8 @@ internal interface MosaicSource {
     fun cellAt(position: Int): Placed?
     fun spanAt(position: Int, spanCount: Int): Int
 
-    // How high a row of the mosaic is for columns [columnWidth] wide.
-    fun unitHeight(context: Context, columnWidth: Int): Int
+    // How high the tile at [position] is on its own, standing [boxWidth] wide: its card, its name and its margins.
+    fun naturalHeight(context: Context, position: Int, boxWidth: Int): Int
 
     // The kind of the row: rows of one kind are as high as each other.
     fun kindAt(position: Int): Int
@@ -70,7 +70,7 @@ internal class MosaicLayoutManager(private val source: MosaicSource) : RecyclerV
             if (itemCount == 0) scrolled = 0
             return
         }
-        val unit = source.unitHeight(context, width / spanCount).coerceAtLeast(1)
+        val pitch = (width / spanCount).coerceAtLeast(1)
         if (measuredFor != width / spanCount) {
             heights.clear()
             measuredFor = width / spanCount
@@ -83,7 +83,8 @@ internal class MosaicLayoutManager(private val source: MosaicSource) : RecyclerV
                 heightAt = { rowHeight(recycler, it, width) },
                 width = width,
                 columns = spanCount,
-                unit = unit,
+                pitch = pitch,
+                natural = { position, boxWidth -> source.naturalHeight(context, position, boxWidth) },
                 top = paddingTop,
                 left = paddingLeft,
                 bottom = paddingBottom

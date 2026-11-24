@@ -133,11 +133,29 @@ internal class CategoriesAdapter(
 
     override fun kindAt(position: Int): Int = getItemViewType(position)
 
-    // A row of the mosaic is half of a normal tile's height: its square card (two columns across) and its name under
-    // it, on one line (a longer name is cut short, as the tile has no room for a second).
-    override fun unitHeight(context: Context, columnWidth: Int): Int {
-        val line = TextView(context).apply { setTextSize(TypedValue.COMPLEX_UNIT_SP, TILE_LABEL_SP) }.lineHeight
-        return columnWidth + (dp(context, TITLE_GAP_DP) + line) / 2
+    // The name under a tile, on one line (a longer name is cut short: the cell has no room for a second), and the
+    // gap before it. Measured as the name is, with the font's own padding: lineHeight alone is a little less.
+    private fun titleBlock(context: Context): Int {
+        val probe = TextView(context).apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, TILE_LABEL_SP)
+            maxLines = 1
+            text = NAME_PROBE
+            measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+        }
+        return dp(context, TITLE_GAP_DP) + probe.measuredHeight
+    }
+
+    // How high the tile is on its own at [boxWidth]: the card the card's own geometry gives for the width the margins
+    // leave, the margins, and the name under it (a small tile has its name inside its card).
+    override fun naturalHeight(context: Context, position: Int, boxWidth: Int): Int {
+        val row = items.getOrNull(position) as? CategoryRow.Tile ?: return 0
+        val margin = dp(context, TILE_MARGIN_DP)
+        val card = CardGeometry({ row.slots }, { margin }).height(boxWidth - 2 * margin)
+        val name = if (row.options.size == CategorySize.SMALL) 0 else titleBlock(context)
+        return card + 2 * margin + name
     }
 
     // What is on screen for the rows: while arranging every tile is its own item, so one small tile can be dragged;
@@ -677,6 +695,9 @@ internal class CategoriesAdapter(
         // The tiles stand in a mosaic. The pairs, blocks and gaps below are what stood before it, kept until it is
         // checked, and gone with the next commit.
         const val MOSAIC = true
+
+        // The text a name under a tile is measured with: only its height is wanted.
+        const val NAME_PROBE = "Ag"
         const val TYPE_RECENT = 0
         const val TYPE_TILE = 1
         const val TYPE_HEADER = 2
