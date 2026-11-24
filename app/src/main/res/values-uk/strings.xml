@@ -456,7 +456,6 @@
     <string name="folder_show_name">Показувати назву папки</string>
     <string name="folder_show_count">Показувати кількість застосунків</string>
     <string name="folder_window_radius">Радіус кутів вікна</string>
-    <string name="placement_hidden">Приховано</string>
     <string name="drawer_bar_filled">Заповнений фон</string>
     <string name="drawer_search_bar">Рядок пошуку шухляди</string>
     <string name="drawer_scrubber_color">Колір швидкої прокрутки</string>
@@ -673,6 +672,8 @@
     <string name="reshape_legacy">Змінювати форму старих іконок</string>
     <string name="reshape_legacy_auto">Лише масштабувати</string>
     <string name="reshape_legacy_on">Масштабувати й додавати фон</string>
+    <string name="normalize_icon_size">Нормалізувати розмір іконок</string>
+    <string name="normalize_icon_size_summary">Зменшувати великі іконки за рекомендаціями Material</string>
     <string name="drawer_pull_to_search">Потягнути для пошуку</string>
     <string name="folder_prioritize_first">Виділяти першу іконку</string>
     <string name="folder_prioritize_first_summary">Перший застосунок великий в іконці папки, решта дрібні</string>
@@ -706,6 +707,8 @@
     <string name="auto_add_apps">Додавати нові застосунки на головний екран</string>
     <string name="label_font">Шрифт підпису</string>
     <string name="label_single_line">Підписи в один рядок</string>
+    <string name="label_even_rows">Рівні проміжки між рядами</string>
+    <string name="label_even_rows_summary">У меню застосунків і папках ряди залишають місце для підписів у два рядки</string>
     <string name="icon_size">Розмір іконок</string>
     <string name="icon_size_fitted">Іконки найбільші, що вміщує ця сітка. Щоб вони були більші, зменште кількість рядків чи стовпців або вимкніть підписи.</string>
     <string name="label_group">Підпис</string>
@@ -829,6 +832,7 @@
     <string name="search_bar_shadow">Тінь</string>
     <string name="search_bar_hint_text">Показувати текст «Пошук»</string>
     <string name="drawer_bar_hint_text">Показувати текст «Пошук»</string>
+    <string name="search_window_hint_text">Показувати текст «Пошук»</string>
     <string name="search_bar_chips">Кнопки</string>
     <string name="search_bar_chip_voice">Голосовий пошук</string>
     <string name="search_bar_chip_assistant">Асистент</string>
