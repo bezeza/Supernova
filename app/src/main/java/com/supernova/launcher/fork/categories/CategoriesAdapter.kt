@@ -18,8 +18,8 @@ import com.supernova.launcher.data.LaunchableApp
 // The rows of the Categories drawer. A row's key says which row it is, its
 // content whether it changed, so a new list only rebinds what moved.
 internal sealed class CategoryRow(val key: String, val content: String) {
-    class Recent(val apps: List<LaunchableApp>, val slots: Int) :
-        CategoryRow("recent", slots.toString() + ":" + apps.joinToString(",") { appKey(it) })
+    class Recent(val apps: List<LaunchableApp>, val slots: Int, val size: CategorySize = RecentLayout.DEFAULT) :
+        CategoryRow("recent", "$slots:$size:" + apps.joinToString(",") { appKey(it) })
 
     class Tile(val entry: CategoryEntry, val options: CategoryOptions = CategoryOptions()) : CategoryRow(
         "tile/${entry.group.id}",
@@ -66,6 +66,8 @@ internal class CategoriesAdapter(
     private val icons: CategoryIcons,
     private val actions: CategoriesActions,
     private val editHandlers: EditHandlers,
+    // The row of the newest installs held: its menu, for the row's own view.
+    private val onRecentHold: (View) -> Unit,
     private val onShowHidden: (Context, List<HiddenCategory>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), MosaicSource {
 
@@ -152,7 +154,13 @@ internal class CategoriesAdapter(
     override fun cellAt(position: Int): Placed? =
         (items.getOrNull(position) as? CategoryRow.Tile)?.let { cells[it.entry.group.id] }
 
-    override fun kindAt(position: Int): Int = getItemViewType(position)
+    // Rows of one kind are as high as each other, measured once: the row of the newest installs is a kind for each
+    // of its sizes, as a strip, a half-width card and a full-width one are not as high.
+    override fun kindAt(position: Int): Int {
+        val type = getItemViewType(position)
+        val size = (items.getOrNull(position) as? CategoryRow.Recent)?.size ?: return type
+        return type + (size.ordinal + 1) * KIND_STEP
+    }
 
     // The name under a tile, on one line (a longer name is cut short: the cell has no room for a second), and the
     // gap before it. Measured as the name is, with the font's own padding: lineHeight alone is a little less.
@@ -348,6 +356,7 @@ internal class CategoriesAdapter(
             CategorySize.WIDE, CategorySize.LARGE, CategorySize.STRIP -> minOf(SPAN_DOUBLE, spanCount)
         }
         is CategoryRow.Block -> SPAN_TILE
+        is CategoryRow.Recent -> RecentLayout.span(row.size, spanCount)
         is CategoryRow.Loose, is CategoryRow.Pair, is CategoryRow.Gap -> 1
         else -> spanCount
     }
@@ -586,8 +595,9 @@ internal class CategoriesAdapter(
     private inner class RecentHolder(context: Context) : RecyclerView.ViewHolder(LinearLayout(context)) {
         private val shape = GradientDrawable()
         private val title = label(context, TILE_LABEL_SP, centred = false, lines = TITLE_LINES)
-        private val row = LinearLayout(context)
+        private val lines = List(2) { LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL } }
         private val slots = List(CategoryLayout.RECENT_MAX) { ImageView(context) }
+        private val iconSize = dp(context, RECENT_ICON_DP)
 
         init {
             val column = itemView as LinearLayout
@@ -602,24 +612,30 @@ internal class CategoriesAdapter(
             column.setPadding(inner, inner, inner, inner)
             title.text = context.getString(R.string.fork_recent_installs_title)
             column.addView(title)
-            row.orientation = LinearLayout.HORIZONTAL
-            val iconSize = dp(context, RECENT_ICON_DP)
-            slots.forEach { slot ->
-                row.addView(slot, LinearLayout.LayoutParams(0, iconSize, 1f))
+            lines.forEachIndexed { index, line ->
+                val top = if (index == 0) dp(context, TITLE_GAP_DP) else 0
+                column.addView(line, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = top })
             }
-            column.addView(row, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(context, TITLE_GAP_DP) })
+            // A hold on the card itself (the icons have their own) is its menu.
+            column.setOnLongClickListener { onRecentHold(it); true }
         }
 
         fun bind(item: CategoryRow.Recent) {
             shape.setColor(cardColor())
             title.setTextColor(textColor)
+            val across = RecentLayout.columns(item.size, item.slots)
+            val rowsOfCard = RecentLayout.rows(item.size)
+            // The slots go into the rows of the size: [across] to a row, each as wide as a column.
+            lines.forEach { it.removeAllViews() }
             slots.forEachIndexed { index, slot ->
+                val line = index / across
+                if (line < rowsOfCard) lines[line].addView(slot, LinearLayout.LayoutParams(0, iconSize, 1f))
                 val app = item.apps.getOrNull(index)
-                // Slots past the chosen count are not in the row at all.
+                // Slots past the size's room are not in a row at all.
                 slot.visibility = when {
-                    index >= item.slots -> View.GONE
+                    line >= rowsOfCard || index >= RecentLayout.capacity(item.size, item.slots) -> View.GONE
                     app == null -> View.INVISIBLE
                     else -> View.VISIBLE
                 }
@@ -635,6 +651,7 @@ internal class CategoriesAdapter(
                     slot.setOnLongClickListener { actions.onAppLongPress(it, app); true }
                 }
             }
+            lines[1].visibility = if (rowsOfCard > 1) View.VISIBLE else View.GONE
         }
     }
 
@@ -722,6 +739,9 @@ internal class CategoriesAdapter(
         // The text a name under a tile is measured with: only its height is wanted.
         const val NAME_PROBE = "Ag"
         const val TYPE_RECENT = 0
+
+        // View types are small: a size of the recent row adds a multiple of this to its own.
+        private const val KIND_STEP = 100
         const val TYPE_TILE = 1
         const val TYPE_HEADER = 2
         const val TYPE_LOOSE = 3

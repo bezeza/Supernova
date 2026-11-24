@@ -117,7 +117,8 @@ object CategoryOptionsStore {
 
     // Defaults are not written, so a category set back to them leaves no trace.
     fun encode(options: Map<String, CategoryOptions>): String {
-        val stored = options.filterValues { !it.isDefault }
+        // The row of the newest installs keeps its entry whatever it holds: its default size is not a category's.
+        val stored = options.filter { (id, v) -> !v.isDefault || id == RECENT_KEY }
             .mapValues { (_, v) ->
                 StoredOptions(v.sort.name, v.hidden, v.size.name, v.large, v.col ?: NO_CELL, v.row ?: NO_CELL)
             }

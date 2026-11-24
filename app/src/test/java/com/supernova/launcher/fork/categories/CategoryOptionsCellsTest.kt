@@ -85,6 +85,18 @@ class CategoryOptionsCellsTest {
     }
 
     @Test
+    fun theRecentRowKeepsItsHalfWidthSizeThoughItIsTheDefaultOfACategory() {
+        val raw = CategoryOptionsStore.encode(
+            mapOf(CategoryOptionsStore.RECENT_KEY to CategoryOptions(size = CategorySize.NORMAL))
+        )
+        val back = CategoryOptionsStore.decode(raw).getValue(CategoryOptionsStore.RECENT_KEY)
+        assertEquals(CategorySize.NORMAL, back.size)
+        assertEquals(CategorySize.NORMAL, RecentLayout.sizeOf(back))
+        // A category at its defaults still leaves no trace.
+        assertEquals("", CategoryOptionsStore.encode(mapOf("A" to CategoryOptions())))
+    }
+
+    @Test
     fun theStripOfNewInstallsKeepsItsEntryWhenAnotherCategoryChanges() {
         val strip = CategoryOptions(size = CategorySize.STRIP, col = 0, row = 0)
         val raw = CategoryOptionsStore.encode(mapOf(CategoryOptionsStore.RECENT_KEY to strip))

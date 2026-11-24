@@ -54,7 +54,9 @@ class CategoriesController(
         actions.edits
     )
     private val icons: CategoryIcons = CategoryIcons(catalog, decorateIcon)
-    private val rows: CategoriesAdapter = CategoriesAdapter(icons, rowActions, editHandlers) { context, hidden ->
+    private val rows: CategoriesAdapter = CategoriesAdapter(
+        icons, rowActions, editHandlers, ::holdRecent
+    ) { context, hidden ->
         CategoryOptionsDialog.showHidden(context, hidden) { id ->
             actions.edits.onOptions(id) { it.copy(hidden = false) }
         }
@@ -142,6 +144,23 @@ class CategoriesController(
         if (rows.editing) return
         drag.arm(item, id, drag.lastDownX, drag.lastDownY)
         openMenu(item, id, drag.lastDownX, drag.lastDownY)
+    }
+
+    // The finger holds the row of the newest installs: a menu of its sizes (it is no tile: no arc, nothing to drag).
+    private fun holdRecent(view: View) {
+        if (rows.editing || state.isOpen) return
+        val context = recycler.context
+        closeMenu()
+        menuOwner = null
+        val sizes = listOf(
+            Triple(CategorySize.STRIP, R.drawable.ic_fork_size_strip, R.string.fork_menu_size_strip),
+            Triple(CategorySize.NORMAL, R.drawable.ic_fork_size_normal, R.string.fork_menu_size_normal),
+            Triple(CategorySize.WIDE, R.drawable.ic_fork_size_wide, R.string.fork_menu_size_wide)
+        ).map { (size, icon, label) -> SizeChoice(size, icon, context.getString(label)) }
+        val current = RecentLayout.sizeOf(options[CategoryOptionsStore.RECENT_KEY])
+        menu.show(view, drag.lastDownX, drag.lastDownY, current, sizes, LayoutRow.NONE, emptyList(), null) { size ->
+            actions.edits.onOptions(CategoryOptionsStore.RECENT_KEY) { it.copy(size = size) }
+        }
     }
 
     private fun openMenuAtCentre(view: View, id: String) {
@@ -385,12 +404,13 @@ class CategoriesController(
         val context = recycler.context
         val slots = data.settings.recentCount.coerceIn(CategoryLayout.RECENT_MIN, CategoryLayout.RECENT_MAX)
         val list = ArrayList<CategoryRow>()
+        val recentSize = RecentLayout.sizeOf(data.settings.options[CategoryOptionsStore.RECENT_KEY])
         val recent = if (showRecent) {
-            CategoryLayout.recentlyInstalled(data.recent, slots) { it.installTime }
+            CategoryLayout.recentlyInstalled(data.recent, RecentLayout.capacity(recentSize, slots)) { it.installTime }
         } else {
             emptyList()
         }
-        if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent, slots))
+        if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent, slots, recentSize))
         data.categories.mapTo(list) { CategoryRow.Tile(it, data.settings.options[it.group.id] ?: CategoryOptions()) }
         if (data.loose.isNotEmpty()) {
             if (data.categories.isNotEmpty()) {

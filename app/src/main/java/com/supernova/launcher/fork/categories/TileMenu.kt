@@ -92,7 +92,7 @@ internal class TileMenu(private val context: Context, private val look: TileLook
                 val text = context.getString(R.string.fork_menu_caption, choice.label, footprint.w, footprint.h)
                 content.addView(caption(text))
             }
-            content.addView(divider())
+            if (layouts.choices.isNotEmpty() || rows.isNotEmpty()) content.addView(divider())
         }
         if (layouts.choices.isNotEmpty()) {
             content.addView(layoutRow(layouts))
