@@ -174,6 +174,8 @@ internal class MosaicDrag(
     }
 
     private fun down(e: MotionEvent) {
+        // A new touch starts clean: nothing of an earlier one may outlast it.
+        swallowing = false
         lastDownX = e.rawX
         lastDownY = e.rawY
         val view = arcView
@@ -255,9 +257,16 @@ internal class MosaicDrag(
                 resizing -> resizeFollow(e.rawX, e.rawY)
                 dragging -> follow(e.rawX, e.rawY)
             }
-            MotionEvent.ACTION_UP -> if (resizing) finishResize(commit = true) else finish(commit = true)
-            MotionEvent.ACTION_CANCEL -> if (resizing) finishResize(commit = false) else finish(commit = false)
+            MotionEvent.ACTION_UP -> endTouch(commit = true)
+            MotionEvent.ACTION_CANCEL -> endTouch(commit = false)
         }
+    }
+
+    // The touch is over, however it was taken: a resize or a drag ends, a swallowed touch is let go. Once the list
+    // has intercepted a touch its events come here, not to onInterceptTouchEvent, so the reset must be here too.
+    private fun endTouch(commit: Boolean) {
+        swallowing = false
+        if (resizing) finishResize(commit) else finish(commit)
     }
 
     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) = Unit
