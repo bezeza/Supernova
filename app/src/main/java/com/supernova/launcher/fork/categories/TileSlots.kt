@@ -25,10 +25,12 @@ internal object TileSlots {
     private const val EIGHTH = 0.125f
     private const val TALL_CORNER_X = 0.25f
 
-    // [large] 3 / 1 / 0 large icons, the rest of the card small icons.
+    // [large] 3 / 2 / 1 / 0 large icons, the rest of the card small icons.
     fun normal(large: Int): List<Slot> = when (large) {
         0 -> grid(THIRD, GRID_THREE, large = false)
         1 -> listOf(Slot(0f, 0f, HALF, true)) + miniCells(skip = { x, y -> x < LARGE_CELLS && y < LARGE_CELLS })
+        2 -> listOf(Slot(0f, 0f, HALF, true), Slot(HALF, 0f, HALF, true)) +
+            miniCells(skip = { _, y -> y < LARGE_CELLS })
         else -> listOf(Slot(0f, 0f, HALF, true), Slot(HALF, 0f, HALF, true), Slot(0f, HALF, HALF, true)) +
             miniCells(skip = { x, y -> !(x >= LARGE_CELLS && y >= LARGE_CELLS) })
     }
@@ -63,6 +65,13 @@ internal object TileSlots {
             for (x in 0 until GRID_TWO) add(Slot(BIG_CORNER + x * EIGHTH, BIG_CORNER + y * EIGHTH, EIGHTH, false))
         }
     }
+
+    // A strip is one row: [count] large icons across its whole width, each as large as the strip is high.
+    fun strip(count: Int): List<Slot> = List(count) { Slot(it.toFloat(), 0f, 1f, true) }
+
+    // A half tile is a normal one's width and half its height: two large icons in a row, each as large as the tile
+    // is high.
+    fun half(): List<Slot> = strip(GRID_TWO)
 
     // How many heights of the card the icons run across: 1 for a square tile, 2 for a double one.
     fun contentWidth(slots: List<Slot>): Float = slots.maxOfOrNull { it.x + it.size } ?: 1f

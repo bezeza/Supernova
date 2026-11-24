@@ -16,7 +16,12 @@ data class TileLook(
     // The category's icon before its name, a setting that is off unless chosen.
     val showIcons: Boolean = false,
     // A tap on a tile's large icon launches the app (iOS), or opens the category.
-    val launchFromIcons: Boolean = true
+    val launchFromIcons: Boolean = true,
+    // The menu of a tile: its surface and text colours (the popup surface of the style) and the accent that
+    // marks the size the tile has.
+    val menuSurface: Int = 0xFF2B2F36.toInt(),
+    val menuText: Int = 0xFFFFFFFF.toInt(),
+    val accent: Int = 0xFF4C8DF6.toInt()
 )
 
 // What the drawer hands over to draw: the categories in the folders' order,
@@ -59,16 +64,9 @@ class CategoryEdits(
     // The "+" on a category's screen: pick the apps of the folder.
     val onAddApps: (DrawerGroup) -> Unit,
     // The tiles dragged to a new order: the ids of the shown folders, in that order.
-    val onOrder: (List<String>) -> Unit
-)
-
-// What arranging the tiles asks of the controller.
-internal class EditHandlers(
-    // A tap on a tile: its settings.
-    val onTap: (View, CategoryEntry) -> Unit,
-    val onDone: () -> Unit,
-    // A tile's corner dragged to another size.
-    val onResize: (String, CategorySize) -> Unit
+    val onOrder: (List<String>) -> Unit,
+    // Tiles put in cells, some given another size too, all in one change (a tile moved moves others).
+    val onTiles: (Map<String, TileChange>) -> Unit = {}
 )
 
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

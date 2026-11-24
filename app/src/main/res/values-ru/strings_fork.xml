@@ -14,6 +14,7 @@
     <string name="fork_search_at_bottom_summary">Строка поиска внизу меню, только в стиле «Категории»</string>
     <string name="fork_pick_large">Выбрать большие иконки</string>
     <string name="fork_pick_large_hint">Выберите большую иконку %1$d из %2$d</string>
+    <string name="fork_pick_large_done">Большие иконки выбраны</string>
     <string name="fork_tap_large_icon">Тап по большой иконке</string>
     <string name="fork_tap_large_icon_summary">Включено: запускает приложение, как в iOS. Выключено: любое касание плитки открывает категорию</string>
     <string name="fork_sort_inside">Сортировка внутри: %1$s</string>
@@ -48,7 +49,26 @@
     <string name="fork_look_grid3">3 × 3</string>
     <string name="fork_look_single">Только первое приложение</string>
     <string name="fork_edit_done">Готово</string>
-    <string name="fork_edit_hint">Перетаскивайте плитку, чтобы переместить, уголок, чтобы изменить размер, шестерню, чтобы открыть настройки</string>
+    <string name="fork_edit_hint">Перетаскивайте плитку, чтобы переместить, коснитесь, чтобы открыть размеры и настройки</string>
     <string name="fork_size_large">Большая (2×2): размером в четыре плитки</string>
     <string name="fork_size_tall">Высокая (1×2): две плитки одна над другой</string>
+    <string name="fork_menu_open">Открыть</string>
+    <string name="fork_menu_options">Параметры…</string>
+    <string name="fork_menu_arrange">Расставить плитки</string>
+    <string name="fork_menu_compact">Уплотнить</string>
+    <string name="fork_menu_size_small">Малая</string>
+    <string name="fork_menu_size_normal">Обычная</string>
+    <string name="fork_menu_size_tall">Высокая</string>
+    <string name="fork_menu_size_wide">Широкая</string>
+    <string name="fork_menu_size_large">Большая</string>
+    <string name="fork_size_strip">Полоса (4×1): один ряд значков</string>
+    <string name="fork_menu_size_strip">Полоса</string>
+    <string name="fork_size_half">Полуплитка (2×1): вдвое ниже обычной</string>
+    <string name="fork_menu_size_half">Полуплитка</string>
+    <string name="fork_menu_large_0">Все маленькие</string>
+    <string name="fork_menu_large_1">1 большой</string>
+    <string name="fork_menu_large_2">2 больших</string>
+    <string name="fork_menu_large_3">3 больших</string>
+    <string name="fork_menu_strip_4">4 значка</string>
+    <string name="fork_menu_strip_5">5 значков</string>
 </resources>

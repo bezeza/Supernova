@@ -5,6 +5,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,13 @@ internal class CategoryPage(
     private var picker: LargePicker<LaunchableApp>? = null
     private var shownApps: List<LaunchableApp> = emptyList()
 
+    private val bar = PickBar(context) { cancelPicking() }.apply { visibility = View.GONE }
+
+    // The apps chosen so far, by their place in the grid, wear their numbers while choosing.
+    private val marks = PickMarks(density).also {
+        it.orderAt = { position -> shownApps.getOrNull(position)?.let { app -> picker?.orderOf(app) } }
+    }
+
     private val header = CategoryHeader(context).also {
         it.onBack = { onBack() }
         it.onPick = { startPicking() }
@@ -50,6 +58,7 @@ internal class CategoryPage(
         }
         layoutManager = manager
         adapter = cells
+        addItemDecoration(marks)
         itemAnimator = null
         clipToPadding = false
         overScrollMode = View.OVER_SCROLL_NEVER
@@ -61,10 +70,22 @@ internal class CategoryPage(
         isClickable = true
         val wide = ViewGroup.LayoutParams.MATCH_PARENT
         addView(header, LinearLayout.LayoutParams(wide, ViewGroup.LayoutParams.WRAP_CONTENT))
+        val gap = (BAR_SIDE_DP * density).toInt()
+        addView(bar, LinearLayout.LayoutParams(wide, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            setMargins(gap, 0, gap, gap / 2)
+        })
         addView(grid, LinearLayout.LayoutParams(wide, 0, 1f))
     }
 
     private val swipe = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        // A tap on empty space of the grid, between and under the icons, leaves the screen as Back does. Not while
+        // the large icons are being chosen: a tap is a choice then.
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
+            val onEmpty = picker == null && grid.findChildViewUnder(e.x, e.y) == null
+            if (onEmpty) onBack()
+            return onEmpty
+        }
+
         override fun onFling(first: MotionEvent?, second: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             first ?: return false
             val goesBack = BackSwipe.isBack(second.x - first.x, second.y - first.y, velocityX, density)
@@ -84,7 +105,7 @@ internal class CategoryPage(
 
     // The page takes a category: its name, and its apps in the grid laid out as [look] says, from the top.
     fun bind(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook) {
-        picker = null
+        stopPicking()
         shownApps = apps
         header.show(group.name, choosable = apps.size > 1)
         (grid.layoutManager as GridLayoutManager).spanCount = look.columns.coerceAtLeast(1)
@@ -102,36 +123,56 @@ internal class CategoryPage(
 
     // The page is let go: a choosing of large icons in it ends.
     fun release() {
-        picker = null
+        stopPicking()
     }
 
     fun rebind() = cells.notifyItemRangeChanged(0, cells.itemCount)
 
-    fun setLook(textColor: Int, showIcon: Boolean) = header.setLook(textColor, showIcon)
+    // The header and the apps' labels take the look's text colour, the surface the page lies on.
+    fun setLook(textColor: Int, showIcon: Boolean, accent: Int) {
+        header.setLook(textColor, showIcon)
+        bar.setLook(accent)
+        marks.accent = accent
+        if (cells.labelTextColor != textColor) {
+            cells.labelTextColor = textColor
+            rebind()
+        }
+    }
 
     // True while choosing, whatever the tap was: it is the choosing's, not a launch.
     fun handleTap(app: LaunchableApp): Boolean {
         val current = picker ?: return false
-        if (current.pick(app)) finishOrHint(current)
+        // A tap on an app already chosen takes it back; any other is the next large icon.
+        if (!current.unpick(app)) current.pick(app)
+        if (current.isComplete) {
+            val chosen = current.picked
+            stopPicking()
+            onPicked(chosen)
+            Toast.makeText(appContext, R.string.fork_pick_large_done, Toast.LENGTH_SHORT).show()
+        } else {
+            showProgress(current)
+        }
         return true
     }
 
-    private fun finishOrHint(current: LargePicker<LaunchableApp>) {
-        if (!current.isComplete) {
-            header.setHint(hintFor(current), choosable = true)
-            return
-        }
-        picker = null
-        header.setHint(null, choosable = shownApps.size > 1)
-        onPicked(current.picked)
+    // The bar says which large icon is next, and the apps chosen so far wear their numbers.
+    private fun showProgress(current: LargePicker<LaunchableApp>) {
+        bar.setMessage(appContext.getString(R.string.fork_pick_large_hint, current.next, current.slots))
+        grid.invalidate()
     }
 
-    // Back while choosing stops the choosing and leaves the screen open.
+    // Back or the bar's button while choosing stops the choosing and leaves the screen open.
     fun cancelPicking(): Boolean {
         if (picker == null) return false
-        picker = null
-        header.setHint(null, choosable = shownApps.size > 1)
+        stopPicking()
         return true
+    }
+
+    private fun stopPicking() {
+        picker = null
+        bar.visibility = View.GONE
+        header.setPicking(false, choosable = shownApps.size > 1)
+        grid.invalidate()
     }
 
     private fun startPicking() {
@@ -139,9 +180,12 @@ internal class CategoryPage(
         if (slots < 1) return
         val current = LargePicker<LaunchableApp>(slots)
         picker = current
-        header.setHint(hintFor(current), choosable = true)
+        bar.visibility = View.VISIBLE
+        header.setPicking(true, choosable = true)
+        showProgress(current)
     }
 
-    private fun hintFor(current: LargePicker<LaunchableApp>): String =
-        appContext.getString(R.string.fork_pick_large_hint, current.next, current.slots)
+    private companion object {
+        const val BAR_SIDE_DP = 12f
+    }
 }

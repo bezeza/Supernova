@@ -12,6 +12,7 @@ internal class CardGeometry(private val slots: () -> List<TileSlots.Slot>, priva
     // A small tile's icons run a little under one height across (its name takes a strip on top), and it is still
     // square: only a layout that runs about half a height across is a tall tile.
     fun height(width: Int): Int = when {
+        content() > STRIP_CONTENT_MIN -> width / content().toInt() - gap()
         content() > 1f -> TileGeometry.doubleHeight(width, gap())
         content() < TALL_CONTENT_MAX -> TileGeometry.tallHeight(width, gap())
         else -> width
@@ -47,5 +48,8 @@ internal class CardGeometry(private val slots: () -> List<TileSlots.Slot>, priva
     private companion object {
         const val PADDING_SHARE = 0.07f
         const val TALL_CONTENT_MAX = 0.6f
+
+        // More icons across than a double tile's two heights: a strip, one row as high as an icon is wide.
+        const val STRIP_CONTENT_MIN = 2.5f
     }
 }

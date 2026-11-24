@@ -15,12 +15,4 @@ internal object CategoryReorder {
         val queue = ArrayDeque(known)
         return all.mapIndexed { index, id -> if (index in slots) queue.removeFirst() else id }
     }
-
-    // [list] with the item at [from] taken out and put at [to].
-    fun <T> moved(list: List<T>, from: Int, to: Int): List<T> {
-        if (from !in list.indices || to !in list.indices || from == to) return list
-        val out = list.toMutableList()
-        out.add(to, out.removeAt(from))
-        return out
-    }
 }

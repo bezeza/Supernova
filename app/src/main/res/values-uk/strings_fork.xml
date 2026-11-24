@@ -14,6 +14,7 @@
     <string name="fork_search_at_bottom_summary">Рядок пошуку внизу меню, лише у стилі «Категорії»</string>
     <string name="fork_pick_large">Вибрати великі іконки</string>
     <string name="fork_pick_large_hint">Оберіть велику іконку %1$d з %2$d</string>
+    <string name="fork_pick_large_done">Великі іконки обрано</string>
     <string name="fork_tap_large_icon">Тап по великій іконці</string>
     <string name="fork_tap_large_icon_summary">Увімкнено: запускає застосунок, як в iOS. Вимкнено: будь-який тап по плитці відкриває категорію</string>
     <string name="fork_sort_inside">Сортування всередині: %1$s</string>
@@ -48,7 +49,26 @@
     <string name="fork_look_grid3">3 × 3</string>
     <string name="fork_look_single">Лише перший застосунок</string>
     <string name="fork_edit_done">Готово</string>
-    <string name="fork_edit_hint">Тягніть плитку, щоб перемістити, кутик, щоб змінити розмір, шестерню, щоб відкрити налаштування</string>
+    <string name="fork_edit_hint">Тягніть плитку, щоб перемістити, торкніться, щоб відкрити розміри й налаштування</string>
     <string name="fork_size_large">Велика (2×2): завбільшки з чотири плитки</string>
     <string name="fork_size_tall">Висока (1×2): дві плитки одна над одною</string>
+    <string name="fork_menu_open">Відкрити</string>
+    <string name="fork_menu_options">Параметри…</string>
+    <string name="fork_menu_arrange">Розкласти плитки</string>
+    <string name="fork_menu_compact">Ущільнити</string>
+    <string name="fork_menu_size_small">Мала</string>
+    <string name="fork_menu_size_normal">Звичайна</string>
+    <string name="fork_menu_size_tall">Висока</string>
+    <string name="fork_menu_size_wide">Широка</string>
+    <string name="fork_menu_size_large">Велика</string>
+    <string name="fork_size_strip">Смуга (4×1): один рядок іконок</string>
+    <string name="fork_menu_size_strip">Смуга</string>
+    <string name="fork_size_half">Півплитка (2×1): удвічі нижча за звичайну</string>
+    <string name="fork_menu_size_half">Півплитка</string>
+    <string name="fork_menu_large_0">Усі малі</string>
+    <string name="fork_menu_large_1">1 велика</string>
+    <string name="fork_menu_large_2">2 великі</string>
+    <string name="fork_menu_large_3">3 великі</string>
+    <string name="fork_menu_strip_4">4 іконки</string>
+    <string name="fork_menu_strip_5">5 іконок</string>
 </resources>

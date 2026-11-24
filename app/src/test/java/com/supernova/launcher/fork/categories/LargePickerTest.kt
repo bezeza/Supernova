@@ -47,6 +47,31 @@ class LargePickerTest {
     }
 
     @Test
+    fun orderOfTellsWhichLargeIconAnAppIsAndNullIfNone() {
+        val picker = LargePicker<String>(3)
+        picker.pick("C")
+        picker.pick("A")
+        assertEquals(1, picker.orderOf("C"))
+        assertEquals(2, picker.orderOf("A"))
+        assertEquals(null, picker.orderOf("B"))
+    }
+
+    @Test
+    fun takingAChoiceBackMovesTheLaterOnesUpAndFreesTheSlot() {
+        val picker = LargePicker<String>(3)
+        picker.pick("A")
+        picker.pick("B")
+        picker.pick("C")
+        assertTrue(picker.isComplete)
+        assertTrue(picker.unpick("A"))
+        assertEquals(listOf("B", "C"), picker.picked)
+        assertEquals(1, picker.orderOf("B"))
+        assertEquals(3, picker.next)
+        assertFalse(picker.isComplete)
+        assertFalse(picker.unpick("A"))
+    }
+
+    @Test
     fun aCategoryOfTwoAppsHasTwoSlots() {
         val picker = LargePicker<String>(2)
         picker.pick("B")

@@ -7,17 +7,12 @@ import kotlin.math.hypot
 // Plain arithmetic, so it is testable without a view.
 internal object TileResize {
 
-    // [width] and [height] are how far the corner is dragged. [small] and [normal] are the sides of a small and a
-    // normal tile (both square), [wide] the width of a double tile and the height of a tall one, the side of a big
-    // one: as long as two normal tiles with the gap between them are. A double tile is [wide] by [normal], a tall
-    // one [normal] by [wide], a big one [wide] by [wide].
-    fun sizeFor(width: Float, height: Float, small: Float, normal: Float, wide: Float): CategorySize =
-        listOf(
-            CategorySize.SMALL to (small to small),
-            CategorySize.NORMAL to (normal to normal),
-            CategorySize.WIDE to (wide to normal),
-            CategorySize.TALL to (normal to wide),
-            CategorySize.LARGE to (wide to wide)
-        ).minByOrNull { (_, footprint) -> hypot(footprint.first - width, footprint.second - height) }?.first
-            ?: CategorySize.NORMAL
+    // The size whose footprint, in cells across and down, is nearest to where a corner dragged to [cols] by [rows]
+    // cells has taken the tile: the one the tile snaps to while its corner is held.
+    fun sizeForCells(cols: Float, rows: Float): CategorySize =
+        CategorySize.entries.minByOrNull { size ->
+            val footprint = CellFlow.footprint(size)
+            hypot(footprint.w - cols, footprint.h - rows)
+        } ?: CategorySize.NORMAL
+
 }

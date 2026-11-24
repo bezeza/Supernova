@@ -36,6 +36,33 @@ class TileSlotsTest {
     }
 
     @Test
+    fun twoLargeTileHasTwoLargeAndEightSmall() {
+        val slots = TileSlots.normal(2)
+        assertEquals(2, TileSlots.largeCount(slots))
+        assertEquals(8, TileSlots.miniCount(slots))
+    }
+
+    @Test
+    fun aStripIsOneRowOfLargeIcons() {
+        listOf(4, 5).forEach { count ->
+            val slots = TileSlots.strip(count)
+            assertEquals(count, TileSlots.largeCount(slots))
+            assertEquals(0, TileSlots.miniCount(slots))
+            assertEquals(count.toFloat(), TileSlots.contentWidth(slots), eps)
+            assertTrue(slots.all { it.y == 0f && it.size == 1f })
+        }
+    }
+
+    @Test
+    fun aHalfTileIsOneRowOfTwoLargeIcons() {
+        val slots = TileSlots.half()
+        assertEquals(2, TileSlots.largeCount(slots))
+        assertEquals(0, TileSlots.miniCount(slots))
+        assertEquals(2f, TileSlots.contentWidth(slots), eps)
+        assertTrue(slots.all { it.y == 0f && it.size == 1f })
+    }
+
+    @Test
     fun noLargeTileIsThreeByThreeSmall() {
         val slots = TileSlots.normal(0)
         assertEquals(0, TileSlots.largeCount(slots))
@@ -51,7 +78,8 @@ class TileSlotsTest {
 
     @Test
     fun everyLayoutStaysInsideTheCard() {
-        listOf(TileSlots.normal(3), TileSlots.normal(1), TileSlots.normal(0), TileSlots.small()).forEach {
+        listOf(TileSlots.normal(3), TileSlots.normal(2), TileSlots.normal(1), TileSlots.normal(0), TileSlots.small())
+            .forEach {
             assertTrue(inside(it))
         }
     }

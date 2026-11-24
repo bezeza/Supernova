@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.AppCatalog
@@ -39,22 +38,16 @@ class CategoriesController(
 
     private var options: Map<String, CategoryOptions> = emptyMap()
 
-    // A tap on a tile while the tiles are arranged opens the category's options (the folder's own menu is a row in
-    // them); a corner dragged to another size changes the category's size.
-    private val editHandlers: EditHandlers = EditHandlers(
-        onTap = { view, entry -> showOptions(view, entry.group, entry.apps) },
-        onDone = { arranger.stop() },
-        onResize = { id, size -> actions.edits.onOptions(id) { it.copy(size = size) } }
-    )
-
-    // A long press on a tile starts arranging the tiles.
+    // A long press on a tile opens its menu, and a move of the finger from there takes the tile off to be dragged.
     private val rowActions: CategoriesActions = CategoriesActions(
         actions.onApp, actions.onAppLongPress, actions.onCategory,
-        { _, _, _ -> if (!state.isOpen) arranger.start() },
+        { view, group, _ -> if (!state.isOpen) holdTile(view, group.id) },
         actions.edits
     )
     private val icons: CategoryIcons = CategoryIcons(catalog, decorateIcon)
-    private val rows: CategoriesAdapter = CategoriesAdapter(icons, rowActions, editHandlers) { context, hidden ->
+    private val rows: CategoriesAdapter = CategoriesAdapter(
+        icons, rowActions, ::openMenuAtCentre, ::holdRecent
+    ) { context, hidden ->
         CategoryOptionsDialog.showHidden(context, hidden) { id ->
             actions.edits.onOptions(id) { it.copy(hidden = false) }
         }
@@ -65,11 +58,7 @@ class CategoriesController(
 
     private val recycler: RecyclerView = RecyclerView(container.context).apply {
         visibility = View.GONE
-        layoutManager = GridLayoutManager(context, MIN_TILES * 2).apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int = rows.spanAt(position, spanCount)
-            }
-        }
+        layoutManager = MosaicLayoutManager(rows).apply { spanCount = MIN_TILES * 2 }
         adapter = rows
         itemAnimator = null
         clipToPadding = false
@@ -79,7 +68,8 @@ class CategoriesController(
         addOnLayoutChangeListener { view, left, _, right, _, _, _, _, _ ->
             val tiles = ((right - left) / (TILE_MAX_DP * view.resources.displayMetrics.density))
                 .toInt().coerceAtLeast(MIN_TILES)
-            (layoutManager as GridLayoutManager).spanCount = tiles * 2
+            (layoutManager as MosaicLayoutManager).spanCount = tiles * 2
+            rows.setColumns(tiles * 2)
             keepClear()
         }
     }
@@ -90,9 +80,177 @@ class CategoriesController(
         addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepClear() }
     }
 
-    private val arranger: TileArranger = TileArranger(
-        recycler, rows, { actions.edits.onOrder(it) }
-    ) { editing ->
+    // What the dragging of a tile asks of this list and changes in it.
+    private val dragHost = object : MosaicDrag.Host {
+        override fun placed(): List<Placed> = rows.placed()
+
+        override fun preview(cells: List<Placed>?) = rows.showCells(cells)
+
+        override fun commit(cells: List<Placed>) = commitCells(cells, null)
+
+        override fun idOf(view: View): String? =
+            recycler.getChildViewHolder(view)?.bindingAdapterPosition?.let { rows.tileIdAt(it) }
+
+        override fun dragStarted() = menu.dismiss()
+
+        override fun arranging(): Boolean = rows.editing
+
+        override fun menuShowing(): Boolean = menu.isShowing
+
+        override fun dismissMenu() = menu.dismiss()
+
+        override fun resize(id: String, size: CategorySize) = resizeTile(id, size)
+
+        override fun groupOf(id: String): List<String> =
+            CellGrid.block(rows.placed(), id).map { it.id }.ifEmpty { listOf(id) }
+
+        override fun viewsOf(ids: Set<String>): Map<String, View> =
+            (0 until recycler.childCount).map { recycler.getChildAt(it) }
+                .mapNotNull { child -> idOf(child)?.takeIf { it in ids }?.let { it to child } }.toMap()
+    }
+
+    private val drag = MosaicDrag(recycler, dragHost).also { recycler.addOnItemTouchListener(it) }
+
+    init {
+        // A menu does not outlast the list moving under it, or the list going off the screen.
+        recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(view: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && !drag.isDragging && !drag.isResizing) closeMenu()
+            }
+        })
+        recycler.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) = Unit
+
+            override fun onViewDetachedFromWindow(view: View) {
+                closeMenu()
+            }
+        })
+    }
+
+    // The menu of a tile, made again for the colours of the moment.
+    private var look = TileLook(textColor = 0)
+    private var menuOwner: TileMenu? = null
+    private val menu: TileMenu
+        get() = menuOwner ?: TileMenu(recycler.context, look).also {
+            it.onDismiss = { if (!drag.isResizing) drag.hideHandle() }
+            menuOwner = it
+        }
+
+    // The finger holds a tile outside the arranging: its menu opens, and a move of the finger takes the tile off.
+    private fun holdTile(view: View, id: String) {
+        val item = recycler.findContainingItemView(view) ?: return
+        if (rows.editing) return
+        drag.arm(item, id, drag.lastDownX, drag.lastDownY)
+        openMenu(item, id, drag.lastDownX, drag.lastDownY)
+    }
+
+    // The finger holds the row of the newest installs: a menu of its sizes (it is no tile: no arc, nothing to drag).
+    private fun holdRecent(view: View) {
+        if (rows.editing || state.isOpen) return
+        val context = recycler.context
+        closeMenu()
+        menuOwner = null
+        val sizes = listOf(
+            Triple(CategorySize.STRIP, R.drawable.ic_fork_size_strip, R.string.fork_menu_size_strip),
+            Triple(CategorySize.NORMAL, R.drawable.ic_fork_size_normal, R.string.fork_menu_size_normal),
+            Triple(CategorySize.WIDE, R.drawable.ic_fork_size_wide, R.string.fork_menu_size_wide)
+        ).map { (size, icon, label) -> SizeChoice(size, icon, context.getString(label)) }
+        val current = RecentLayout.sizeOf(options[CategoryOptionsStore.RECENT_KEY])
+        menu.show(view, drag.lastDownX, drag.lastDownY, current, sizes, LayoutRow.NONE, emptyList(), null) { size ->
+            actions.edits.onOptions(CategoryOptionsStore.RECENT_KEY) { it.copy(size = size) }
+        }
+    }
+
+    private fun openMenuAtCentre(view: View, id: String) {
+        val at = IntArray(2)
+        view.getLocationOnScreen(at)
+        openMenu(view, id, at[0] + view.width / 2f, at[1] + view.height / 2f)
+    }
+
+    private fun openMenu(view: View, id: String, x: Float, y: Float) {
+        val tile = rows.tile(id) ?: return
+        val context = recycler.context
+        closeMenu()
+        menuOwner = null
+        val rowsOfMenu = buildList {
+            add(MenuRow(context.getString(R.string.fork_menu_open), R.drawable.ic_menu_open) {
+                actions.onCategory(view, tile.entry.group, tile.entry.apps)
+            })
+            add(MenuRow(context.getString(R.string.fork_menu_options), R.drawable.ic_menu_edit) {
+                showOptions(view, tile.entry.group, tile.entry.apps)
+            })
+            add(MenuRow(context.getString(R.string.fork_folder_menu), R.drawable.ic_menu_move_to_folder) {
+                actions.onCategoryLongPress(view, tile.entry.group, tile.entry.apps)
+            })
+            add(MenuRow(context.getString(R.string.fork_menu_compact), R.drawable.ic_menu_sort) {
+                commitCells(CellGrid.compact(rows.placed()), null)
+            })
+            if (!rows.editing) {
+                add(MenuRow(context.getString(R.string.fork_menu_arrange), R.drawable.ic_menu_widgets) {
+                    arranger.start()
+                })
+            }
+        }
+        val layouts = layoutRow(context, id, tile.options)
+        drag.outlineColor = look.accent
+        // The arc first, so the menu can keep clear of it.
+        val item = recycler.findContainingItemView(view) ?: view
+        drag.showHandle(item, id, look.textColor)
+        val sizes = sizeChoices(context)
+        menu.show(view, x, y, tile.options.size, sizes, layouts, rowsOfMenu, drag.handleOnScreen()) { size ->
+            resizeTile(id, size)
+        }
+    }
+
+    private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
+        Triple(CategorySize.SMALL, R.drawable.ic_fork_size_small, R.string.fork_menu_size_small),
+        Triple(CategorySize.HALF, R.drawable.ic_fork_size_half, R.string.fork_menu_size_half),
+        Triple(CategorySize.NORMAL, R.drawable.ic_fork_size_normal, R.string.fork_menu_size_normal),
+        Triple(CategorySize.TALL, R.drawable.ic_fork_size_tall, R.string.fork_menu_size_tall),
+        Triple(CategorySize.WIDE, R.drawable.ic_fork_size_wide, R.string.fork_menu_size_wide),
+        Triple(CategorySize.STRIP, R.drawable.ic_fork_size_strip, R.string.fork_menu_size_strip),
+        Triple(CategorySize.LARGE, R.drawable.ic_fork_size_large, R.string.fork_menu_size_large)
+    ).map { (size, icon, label) -> SizeChoice(size, icon, context.getString(label)) }
+
+    // How a tile lays out its icons: how many of them are large. Only a normal tile (3, 2, 1 or none) and a strip (4 or
+    // 5 icons) have a choice; the other sizes have one layout.
+    private fun layoutRow(context: Context, id: String, options: CategoryOptions): LayoutRow {
+        val choices = when (options.size) {
+            CategorySize.NORMAL -> CategoryOptions.LARGE_CHOICES.reversed().map { count ->
+                LayoutChoice(count, LARGE_ICONS.getValue(count), context.getString(LARGE_LABELS.getValue(count)))
+            }
+            CategorySize.STRIP -> CategoryOptions.STRIP_CHOICES.map { count ->
+                LayoutChoice(count, LARGE_ICONS.getValue(count), context.getString(LARGE_LABELS.getValue(count)))
+            }
+            else -> emptyList()
+        }
+        val current = if (options.size == CategorySize.STRIP) {
+            CategoryOptions.stripCount(options.large)
+        } else {
+            minOf(options.large, CategoryLayout.LARGE_SLOTS)
+        }
+        return if (choices.isEmpty()) LayoutRow.NONE else LayoutRow(choices, current) { count ->
+            actions.edits.onOptions(id) { it.copy(large = count) }
+        }
+    }
+
+    // A tile given another size: the tiles it now covers go down, and everything is kept in one change.
+    private fun resizeTile(id: String, size: CategorySize) {
+        val cells = CellGrid.resize(rows.placed(), id, CellFlow.footprint(size))
+        commitCells(cells, id to size)
+    }
+
+    // The tiles in these cells kept, the order of the folders with them (the other drawer styles read it).
+    private fun commitCells(cells: List<Placed>, sized: Pair<String, CategorySize>?) {
+        val changes = cells.associate { cell ->
+            cell.id to TileChange(sized?.takeIf { it.first == cell.id }?.second, cell.col, cell.row)
+        }
+        rows.showCells(cells)
+        actions.edits.onTiles(changes)
+        actions.edits.onOrder(CellGrid.order(cells))
+    }
+
+    private val arranger: TileArranger = TileArranger(recycler, rows) { editing ->
         doneBar.visibility = if (editing) View.VISIBLE else View.GONE
         keepClear()
     }
@@ -200,7 +358,14 @@ class CategoriesController(
 
     // Back: choosing large icons stops first, then the screen closes. True
     // when it did either, so the Back is spent.
-    fun back(): Boolean = arranger.stop() || screen.cancelPicking() || closeScreen()
+    fun back(): Boolean = closeMenu() || arranger.stop() || screen.cancelPicking() || closeScreen()
+
+    // A tile's menu is up: Back closes it first.
+    private fun closeMenu(): Boolean {
+        val showing = menuOwner?.isShowing == true
+        if (showing) menuOwner?.dismiss()
+        return showing
+    }
 
     // A tap on an app of the screen: a choice while choosing, else [launch].
     fun onScreenAppClick(launch: () -> Unit, app: LaunchableApp) {
@@ -209,6 +374,7 @@ class CategoriesController(
 
     // True when a screen was open and is closed now: the Back that did it is spent.
     fun closeScreen(animate: Boolean = true): Boolean {
+        closeMenu()
         arranger.stop()
         val wasOpen = state.close()
         standalone = false
@@ -221,9 +387,11 @@ class CategoriesController(
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setLook(data.look)
+        look = data.look
+        if (menuOwner?.isShowing != true) menuOwner = null
         doneBar.setLook(data.look.textColor, CategoryTint.cardColor(data.look.textColor, data.look.backdrop))
         options = data.settings.options
-        screen.setLook(data.look.textColor, data.look.showIcons)
+        screen.setLook(data.look.textColor, data.look.showIcons, data.look.accent)
         if (state.isOpen) {
             val open = data.categories.firstOrNull { it.group.id == state.openId }
             if (open != null && state.sync(data.categories.map { it.group.id })) screen.update(open.apps)
@@ -232,12 +400,13 @@ class CategoriesController(
         val context = recycler.context
         val slots = data.settings.recentCount.coerceIn(CategoryLayout.RECENT_MIN, CategoryLayout.RECENT_MAX)
         val list = ArrayList<CategoryRow>()
+        val recentSize = RecentLayout.sizeOf(data.settings.options[CategoryOptionsStore.RECENT_KEY])
         val recent = if (showRecent) {
-            CategoryLayout.recentlyInstalled(data.recent, slots) { it.installTime }
+            CategoryLayout.recentlyInstalled(data.recent, RecentLayout.capacity(recentSize, slots)) { it.installTime }
         } else {
             emptyList()
         }
-        if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent, slots))
+        if (recent.isNotEmpty()) list.add(CategoryRow.Recent(recent, slots, recentSize))
         data.categories.mapTo(list) { CategoryRow.Tile(it, data.settings.options[it.group.id] ?: CategoryOptions()) }
         if (data.loose.isNotEmpty()) {
             if (data.categories.isNotEmpty()) {
@@ -267,6 +436,15 @@ class CategoriesController(
     }
 
     private companion object {
+        // The icon and the name of each layout, by how many icons are large (a strip's 4 and 5 are its icons).
+        val LARGE_ICONS = mapOf(
+            0 to R.drawable.ic_fork_large_0, 1 to R.drawable.ic_fork_large_1, 2 to R.drawable.ic_fork_large_2,
+            3 to R.drawable.ic_fork_large_3, 4 to R.drawable.ic_fork_strip_4, 5 to R.drawable.ic_fork_strip_5
+        )
+        val LARGE_LABELS = mapOf(
+            0 to R.string.fork_menu_large_0, 1 to R.string.fork_menu_large_1, 2 to R.string.fork_menu_large_2,
+            3 to R.string.fork_menu_large_3, 4 to R.string.fork_menu_strip_4, 5 to R.string.fork_menu_strip_5
+        )
         const val MIN_TILES = 2
         const val TILE_MAX_DP = 200f
         const val SIDE_DP = 6f

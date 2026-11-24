@@ -44,6 +44,7 @@ import com.supernova.launcher.fork.categories.CategoryEntry
 import com.supernova.launcher.fork.categories.ScreenLook
 import com.supernova.launcher.fork.categories.TileLook
 import com.supernova.launcher.ui.theme.Styles
+import com.supernova.launcher.ui.theme.ThemeEngine
 import com.supernova.launcher.ui.theme.SurfaceId
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -104,7 +105,10 @@ class DrawerController(
         binding.drawerListContainer, viewModel.appCatalog(), decorateIcon,
         CategoriesActions(
             onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress,
-            CategoryEdits(::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder)
+            CategoryEdits(
+                ::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder,
+                ::changeCategoryTiles
+            )
         ),
         categoryAdapter
     ).also { it.onScreenChanged = { applyListVisibility() } }
@@ -2021,7 +2025,10 @@ class DrawerController(
                 backdrop = com.supernova.launcher.ui.theme.StyleConfig.decode(prefs.styleConfig)
                     .styleFor(surface).alpha ?: prefs.drawerBgOpacity,
                 showIcons = prefs.categoriesShowIcons,
-                launchFromIcons = prefs.categoriesLaunchLarge
+                launchFromIcons = prefs.categoriesLaunchLarge,
+                menuSurface = Styles.resolve(binding.root.context, prefs).of(SurfaceId.POPUP).surface,
+                menuText = Styles.resolve(binding.root.context, prefs).of(SurfaceId.POPUP).text,
+                accent = ThemeEngine.accentColor(binding.root.context, prefs.accentColor)
             )
         )
     }
@@ -2045,7 +2052,10 @@ class DrawerController(
                 onAppClick, onAppLongPress,
                 { _, group, apps -> showCategoryScreen(group, apps, standalone = false, controller, cells) },
                 { view, group, apps -> if (group.id != OTHER_APPS_ID) onFolderLongPress(view, group, apps) },
-                CategoryEdits(::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder)
+                CategoryEdits(
+                    ::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder,
+                    ::changeCategoryTiles
+                )
             ),
             cells
         )
@@ -2111,6 +2121,16 @@ class DrawerController(
     private fun changeCategoryOrder(shown: List<String>) {
         val all = viewModel.drawerFolderGroups().map { it.id }
         viewModel.setGroupOrder(com.supernova.launcher.data.DrawerGroupType.FOLDER, CategoryReorder.merged(all, shown))
+    }
+
+    // Fork: tiles put in cells (and some given another size) in one write, as moving a tile moves others.
+    private fun changeCategoryTiles(changes: Map<String, com.supernova.launcher.fork.categories.TileChange>) {
+        val raw = viewModel.state.value.prefs.categoriesOptions
+        val existing = viewModel.drawerGroups().map { it.id }
+        viewModel.set(
+            com.supernova.launcher.data.Pref.categoriesOptions,
+            CategoryOptionsStore.updateTiles(raw, changes, existing)
+        )
     }
 
     private fun changeCategoryOptions(id: String, change: (CategoryOptions) -> CategoryOptions) {

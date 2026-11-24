@@ -67,7 +67,6 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         slots = layout
         val named = TileSlots.nameShare(layout) > 0f
         name.visibility = if (named) VISIBLE else GONE
-        edit.small = named
         requestLayout()
     }
 
@@ -79,7 +78,6 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         shape.setColor(card)
         empty.setTextColor(text)
         name.setTextColor(text)
-        edit.setColor(text)
     }
 
 
