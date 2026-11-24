@@ -100,6 +100,13 @@ class CategoriesController(
         override fun dismissMenu() = menu.dismiss()
 
         override fun resize(id: String, size: CategorySize) = resizeTile(id, size)
+
+        override fun groupOf(id: String): List<String> =
+            CellGrid.block(rows.placed(), id).map { it.id }.ifEmpty { listOf(id) }
+
+        override fun viewsOf(ids: Set<String>): Map<String, View> =
+            (0 until recycler.childCount).map { recycler.getChildAt(it) }
+                .mapNotNull { child -> idOf(child)?.takeIf { it in ids }?.let { it to child } }.toMap()
     }
 
     private val drag = MosaicDrag(recycler, dragHost).also { recycler.addOnItemTouchListener(it) }

@@ -20,6 +20,9 @@ internal object CellGrid {
 
     const val COLUMNS = 4
 
+    // The small tiles of a block: a square of two by two.
+    private const val BLOCK = 4
+
     fun overlaps(a: Placed, b: Placed): Boolean =
         a.col < b.right && b.col < a.right && a.row < b.bottom && b.row < a.bottom
 
@@ -42,6 +45,30 @@ internal object CellGrid {
         val tile = items.firstOrNull { it.id == id } ?: return items
         val moved = tile.copy(col = col.coerceIn(0, columns - tile.w), row = row.coerceAtLeast(0))
         return settle(listOf(moved), items.filter { it.id != id })
+    }
+
+    // The four small tiles that stand as a square of 2 by 2 cells with tile [id] among them, in reading order; empty
+    // when [id] is no small tile or is in no full square. Such a block is what a drag takes as one.
+    fun block(items: List<Placed>, id: String): List<Placed> {
+        val tile = items.firstOrNull { it.id == id && it.w == 1 && it.h == 1 } ?: return emptyList()
+        val small = items.filter { it.w == 1 && it.h == 1 }
+        val squares = (tile.row - 1..tile.row).flatMap { top ->
+            (tile.col - 1..tile.col).filter { it >= 0 && top >= 0 }.map { left ->
+                small.filter { it.col in left..left + 1 && it.row in top..top + 1 }
+            }
+        }
+        return squares.firstOrNull { it.size == BLOCK }?.sortedWith(compareBy({ it.row }, { it.col })).orEmpty()
+    }
+
+    // The tiles [ids] moved together by ([dCol], [dRow]) cells, the group kept inside the grid and the others
+    // pushed down out of its way.
+    fun dropGroup(items: List<Placed>, ids: Set<String>, dCol: Int, dRow: Int, columns: Int = COLUMNS): List<Placed> {
+        val group = items.filter { it.id in ids }
+        if (group.isEmpty()) return items
+        val shiftCol = dCol.coerceIn(-group.minOf { it.col }, columns - group.maxOf { it.right })
+        val shiftRow = dRow.coerceAtLeast(-group.minOf { it.row })
+        val moved = group.map { it.copy(col = it.col + shiftCol, row = it.row + shiftRow) }
+        return settle(moved, items.filter { it.id !in ids })
     }
 
     // Tile [id] given another size, in its own cell where it still fits, else pulled left so it does.

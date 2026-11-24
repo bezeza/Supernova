@@ -47,6 +47,12 @@ internal class MosaicDrag(
 
         // The tile was given another size by its corner.
         fun resize(id: String, size: CategorySize)
+
+        // The tiles a drag of tile [id] takes along: the four small ones of its block, else just it.
+        fun groupOf(id: String): List<String>
+
+        // The views of the tiles [ids] that are on the screen, by folder id.
+        fun viewsOf(ids: Set<String>): Map<String, View>
     }
 
     private val slop = ViewConfiguration.get(recycler.context).scaledTouchSlop
@@ -55,6 +61,9 @@ internal class MosaicDrag(
 
     private var armed: View? = null
     private var armedId: String? = null
+    private var group: Set<String> = emptySet()
+    private var followers: List<Triple<View, Float, Float>> = emptyList()
+    private var startCell: Pair<Int, Int>? = null
     private var downX = 0f
     private var downY = 0f
     private var dragging = false
@@ -282,10 +291,15 @@ internal class MosaicDrag(
         recycler.getLocationOnScreen(at)
         grabX = e.rawX - at[0] - view.left
         grabY = e.rawY - at[1] - view.top
-        view.translationZ = LIFT_DP * recycler.resources.displayMetrics.density
-        view.alpha = LIFTED_ALPHA
-        view.scaleX = LIFTED_SCALE
-        view.scaleY = LIFTED_SCALE
+        val id = armedId
+        group = id?.let { host.groupOf(it).toSet() }.orEmpty()
+        val first = start.firstOrNull { it.id == id }
+        startCell = first?.let { it.col to it.row }
+        // The others of a block ride with the one under the finger, each where it stood beside it.
+        followers = host.viewsOf(group - setOfNotNull(id)).values.map {
+            Triple(it, (it.left - view.left).toFloat(), (it.top - view.top).toFloat())
+        }
+        (listOf(view) + followers.map { it.first }).forEach { lift(it) }
         recycler.parent?.requestDisallowInterceptTouchEvent(true)
         follow(e.rawX, e.rawY)
     }
@@ -302,6 +316,10 @@ internal class MosaicDrag(
         fingerY = y
         view.translationX = x - grabX - view.left
         view.translationY = y - grabY - view.top
+        followers.forEach { (other, dx, dy) ->
+            other.translationX = x - grabX + dx - other.left
+            other.translationY = y - grabY + dy - other.top
+        }
         previewAt(x - grabX, y - grabY)
         recycler.removeCallbacks(scroller)
         if (y < edgeZone || y > recycler.height - edgeZone) recycler.postOnAnimation(scroller)
@@ -317,7 +335,12 @@ internal class MosaicDrag(
             val cell = lm.cellAt(left + inside, top + inside)
             if (cell != lastCell) {
                 lastCell = cell
-                val cells = CellGrid.drop(start, id, cell.first, cell.second, lm.spanCount)
+                val from = startCell
+                val cells = if (group.size > 1 && from != null) {
+                    CellGrid.dropGroup(start, group, cell.first - from.first, cell.second - from.second, lm.spanCount)
+                } else {
+                    CellGrid.drop(start, id, cell.first, cell.second, lm.spanCount)
+                }
                 shown = cells
                 host.preview(cells)
             }
@@ -330,18 +353,30 @@ internal class MosaicDrag(
             return
         }
         recycler.removeCallbacks(scroller)
-        val view = armed
-        view?.animate()?.translationX(0f)?.translationY(0f)?.translationZ(0f)?.alpha(1f)?.scaleX(1f)?.scaleY(1f)
-            ?.setDuration(SETTLE_MS)?.start()
+        (listOfNotNull(armed) + followers.map { it.first }).forEach { view ->
+            view.animate().translationX(0f).translationY(0f).translationZ(0f).alpha(1f).scaleX(1f).scaleY(1f)
+                .setDuration(SETTLE_MS).start()
+        }
+        followers = emptyList()
         val cells = shown
         dragging = false
         if (commit && cells != null) host.commit(cells) else host.preview(null)
         disarm()
     }
 
+    // A tile lifted off the list under the finger.
+    private fun lift(view: View) {
+        view.translationZ = LIFT_DP * recycler.resources.displayMetrics.density
+        view.alpha = LIFTED_ALPHA
+        view.scaleX = LIFTED_SCALE
+        view.scaleY = LIFTED_SCALE
+    }
+
     private fun disarm() {
         armed = null
         armedId = null
+        group = emptySet()
+        startCell = null
         lastCell = null
         shown = null
     }

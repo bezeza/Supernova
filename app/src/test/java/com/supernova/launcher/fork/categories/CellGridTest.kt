@@ -23,6 +23,55 @@ class CellGridTest {
         assertTrue(CellGrid.overlaps(p("a", 0, 0, 2, 2), p("b", 1, 1, 2, 2)))
     }
 
+    private fun square(prefix: String, col: Int, row: Int) = listOf(
+        p("${prefix}1", col, row), p("${prefix}2", col + 1, row),
+        p("${prefix}3", col, row + 1), p("${prefix}4", col + 1, row + 1)
+    )
+
+    @Test
+    fun fourSmallTilesInASquareAreABlockWhicheverOfThemYouAsk() {
+        val items = square("s", 2, 0) + p("n", 0, 0, 2, 2)
+        listOf("s1", "s2", "s3", "s4").forEach { id ->
+            assertEquals(listOf("s1", "s2", "s3", "s4"), CellGrid.block(items, id).map { it.id })
+        }
+    }
+
+    @Test
+    fun aSmallTileWithoutAFullSquareIsNoBlockAndNeitherIsABigOne() {
+        val items = listOf(p("a", 0, 0), p("b", 1, 0), p("c", 0, 1), p("n", 2, 0, 2, 2))
+        assertTrue(CellGrid.block(items, "a").isEmpty())
+        assertTrue(CellGrid.block(items, "n").isEmpty())
+        assertTrue(CellGrid.block(items, "missing").isEmpty())
+    }
+
+    @Test
+    fun aBlockDoesNotNeedToStandOnEvenCells() {
+        val items = square("s", 1, 1)
+        assertEquals(4, CellGrid.block(items, "s4").size)
+    }
+
+    @Test
+    fun aBlockDroppedMovesAsOneAndPushesWhatIsInItsWay() {
+        val items = square("s", 0, 0) + p("n", 2, 0, 2, 2) + p("m", 0, 2, 2, 2)
+        val out = CellGrid.dropGroup(items, setOf("s1", "s2", "s3", "s4"), 0, 2)
+        noOverlaps(out)
+        assertEquals(p("s1", 0, 2), out.first { it.id == "s1" })
+        assertEquals(p("s4", 1, 3), out.first { it.id == "s4" })
+        assertEquals(p("m", 0, 4, 2, 2), out.first { it.id == "m" })
+        assertEquals(p("n", 2, 0, 2, 2), out.first { it.id == "n" })
+    }
+
+    @Test
+    fun aBlockIsKeptInsideTheGridWhenDroppedBeyondItsEdges() {
+        val items = square("s", 0, 0)
+        val right = CellGrid.dropGroup(items, setOf("s1", "s2", "s3", "s4"), 9, 0)
+        assertEquals(2, right.minOf { it.col })
+        assertEquals(3, right.maxOf { it.col })
+        val left = CellGrid.dropGroup(square("s", 2, 0), setOf("s1", "s2", "s3", "s4"), -9, -9)
+        assertEquals(0, left.minOf { it.col })
+        assertEquals(0, left.minOf { it.row })
+    }
+
     @Test
     fun aTileDroppedOnFreeCellsMovesAndNothingElseDoes() {
         val items = listOf(p("a", 0, 0, 2, 2), p("b", 2, 0, 2, 2))
