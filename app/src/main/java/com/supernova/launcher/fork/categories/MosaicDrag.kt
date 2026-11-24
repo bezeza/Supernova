@@ -149,6 +149,8 @@ internal class MosaicDrag(
         armedId = id
         downX = rawX
         downY = rawY
+        // A pager the list sits in (the home screen's) must not take the move that takes the tile off.
+        recycler.parent?.requestDisallowInterceptTouchEvent(true)
     }
 
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
