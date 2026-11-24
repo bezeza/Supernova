@@ -118,6 +118,18 @@ class AppDrawerAdapter(
     private var showLabels = true
     private var labelPrefs: com.supernova.launcher.data.LauncherPrefs? = null
 
+    // Fork: the labels' text colour where the host's surface is not the drawer's, as a category's page on the home
+    // screen, which lies on the wallpaper: the colour a label has by default (dark by day) is then lost on it. That
+    // page's adapter is given no label prefs, so its labels are not styled at all. A colour the owner chose for the
+    // labels wins.
+    var labelTextColor: Int? = null
+
+    private fun styleLabel(label: android.widget.TextView) {
+        val prefs = labelPrefs
+        if (prefs != null) LabelStyler.apply(label, prefs, onWallpaper = false, context = LabelContext.DRAWER)
+        labelTextColor?.takeIf { prefs?.labelColor.isNullOrEmpty() }?.let(label::setTextColor)
+    }
+
     var displayMode: DisplayMode = DisplayMode.TILE
     // Exact tile width for the paged style; 0 = natural width.
     var cellWidthPx: Int = 0
@@ -593,7 +605,7 @@ class AppDrawerAdapter(
         fun bind(app: LaunchableApp) {
             applyTileWidth(binding.root)
             binding.appLabel.text = app.label
-            labelPrefs?.let { LabelStyler.apply(binding.appLabel, it, onWallpaper = false, context = LabelContext.DRAWER) }
+            styleLabel(binding.appLabel)
             binding.appLabel.visibility = if (showLabels && !app.hideLabel) View.VISIBLE else View.GONE
             binding.root.contentDescription = app.label
             binding.appIcon.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -612,7 +624,7 @@ class AppDrawerAdapter(
 
         fun bind(app: LaunchableApp) {
             binding.appLabel.text = app.label
-            labelPrefs?.let { LabelStyler.apply(binding.appLabel, it, onWallpaper = false, context = LabelContext.DRAWER) }
+            styleLabel(binding.appLabel)
             binding.appIcon.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
             sizeIcon(binding.root, binding.appIcon, baseIconPx, keepInsideTile = false)
             bindIcon(binding.appIcon, app)
@@ -630,7 +642,7 @@ class AppDrawerAdapter(
         fun bind(folder: FolderEntry) {
             applyTileWidth(binding.root)
             binding.appLabel.text = folder.group.name
-            labelPrefs?.let { LabelStyler.apply(binding.appLabel, it, onWallpaper = false, context = LabelContext.DRAWER) }
+            styleLabel(binding.appLabel)
             binding.appLabel.visibility = if (showLabels) View.VISIBLE else View.GONE
             // Announce like workspace folders ("Folder: name"), not as a bare app label.
             binding.root.contentDescription =
@@ -651,7 +663,7 @@ class AppDrawerAdapter(
 
         fun bind(folder: FolderEntry) {
             binding.appLabel.text = folder.group.name
-            labelPrefs?.let { LabelStyler.apply(binding.appLabel, it, onWallpaper = false, context = LabelContext.DRAWER) }
+            styleLabel(binding.appLabel)
             binding.appIcon.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
             sizeIcon(binding.root, binding.appIcon, baseIconPx, keepInsideTile = false)
             binding.appIcon.setImageDrawable(decorateFolderIcon(folder.icon, folder))

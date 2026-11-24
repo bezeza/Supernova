@@ -115,7 +115,14 @@ internal class CategoryPage(
 
     fun rebind() = cells.notifyItemRangeChanged(0, cells.itemCount)
 
-    fun setLook(textColor: Int, showIcon: Boolean) = header.setLook(textColor, showIcon)
+    // The header and the apps' labels take the look's text colour, the surface the page lies on.
+    fun setLook(textColor: Int, showIcon: Boolean) {
+        header.setLook(textColor, showIcon)
+        if (cells.labelTextColor != textColor) {
+            cells.labelTextColor = textColor
+            rebind()
+        }
+    }
 
     // True while choosing, whatever the tap was: it is the choosing's, not a launch.
     fun handleTap(app: LaunchableApp): Boolean {
