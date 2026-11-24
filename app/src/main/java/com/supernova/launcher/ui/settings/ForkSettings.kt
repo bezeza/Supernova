@@ -4,6 +4,7 @@ import android.content.Context
 import com.supernova.launcher.R
 import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.data.Pref
+import com.supernova.launcher.fork.categories.CategoryColumns
 import com.supernova.launcher.ui.DrawerStyle
 import com.supernova.launcher.ui.LauncherViewModel
 
@@ -23,7 +24,8 @@ object ForkSettings {
                 SettingsSection(section.title, afterInfiniteScroll(section.items, listOf(homePageRow(viewModel))))
             } else if (section.title == R.string.settings_section_drawer) {
                 val extra = autoSortRows(context, viewModel, actions)
-                val extraRows = categoriesRows(viewModel) + folderScreenRow(viewModel)
+                val extraRows = categoriesRows(viewModel) + columnsRow(context, viewModel, actions) +
+                    folderScreenRow(viewModel)
                 val withStyleRows = afterDrawerStyle(section.items, extraRows)
                 SettingsSection(section.title, afterSmartFolders(withStyleRows, extra))
             } else {
@@ -83,6 +85,33 @@ object ForkSettings {
             { it.categoriesSearchBottom }
         ) { viewModel.set(Pref.categoriesSearchBottom, it) }
     )
+
+    // How many columns an open category has. Shown wherever a category can open: the Categories style, the home
+    // screen's page of categories, or folders opened on a screen of their own.
+    private fun columnsRow(
+        context: Context,
+        viewModel: LauncherViewModel,
+        actions: SettingsCatalogue.Actions
+    ): SettingItem {
+        val options = CategoryColumns.entries
+        val labels = listOf(
+            R.string.fork_columns_auto, R.string.fork_columns_menu, R.string.fork_columns_3,
+            R.string.fork_columns_4, R.string.fork_columns_5
+        ).map { context.getString(it) }
+        return SettingItem.Row(
+            R.string.fork_columns,
+            subtitle = { labels[options.indexOf(it.categoriesColumns)] },
+            onClick = {
+                actions.pickChoice(
+                    Choice(
+                        R.string.fork_columns, labels, options.indexOf(viewModel.state.value.prefs.categoriesColumns),
+                        { viewModel.set(Pref.categoriesColumns, options[it]) }
+                    )
+                )
+            },
+            visibleIf = { it.drawerStyle == DrawerStyle.CATEGORIES || it.categoriesHomePage || it.folderScreen }
+        )
+    }
 
     // Another drawer style: a folder of the drawer opens on a screen like a category's, with its "+".
     private fun folderScreenRow(viewModel: LauncherViewModel): SettingItem = SettingItem.Toggle(

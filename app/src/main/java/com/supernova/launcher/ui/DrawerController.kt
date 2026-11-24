@@ -36,6 +36,8 @@ import com.supernova.launcher.fork.categories.CategoryOptions
 import com.supernova.launcher.fork.categories.CategorySettings
 import com.supernova.launcher.fork.categories.CategoryOptionsStore
 import com.supernova.launcher.fork.categories.CategoryOrder
+import com.supernova.launcher.fork.categories.CategoryColumns
+import com.supernova.launcher.fork.categories.CategoryColumnsLayout
 import com.supernova.launcher.fork.categories.CategoryReorder
 import com.supernova.launcher.fork.categories.CategorySort
 import com.supernova.launcher.fork.categories.HiddenCategory
@@ -2178,18 +2180,46 @@ class DrawerController(
         val prefs = viewModel.state.value.prefs
         val recycler = binding.drawerRecycler
         cells.displayMode = adapter.displayMode
-        cells.tileWidthPx = adapter.tileWidthPx
-        cells.tileHeightPx = adapter.tileHeightPx
+        val look = categoryLook(prefs, apps.size, cells, recycler)
+        controller.openScreen(group, apps, look, standalone)
+    }
+
+    // Fork: how an open category's apps stand. "Like the menu" copies the drawer's grid as it always did; the others
+    // take the columns the setting gives (CategoryColumnsLayout), so the icons fill them, and a category with fewer
+    // apps than columns keeps the column's width and has its block centred.
+    private fun categoryLook(
+        prefs: LauncherPrefs,
+        appCount: Int,
+        cells: AppDrawerAdapter,
+        recycler: RecyclerView
+    ): ScreenLook {
+        val menuColumns = columnCount(prefs)
+        val display = lastDisplay
+        if (prefs.categoriesColumns == CategoryColumns.MENU || display == null) {
+            cells.tileWidthPx = adapter.tileWidthPx
+            cells.tileHeightPx = adapter.tileHeightPx
+            cells.tileContentPx = adapter.tileContentPx
+            cells.tileCompactPx = adapter.tileCompactPx
+            display?.let { cells.setDisplay(it.first, it.second, it.third) }
+            return ScreenLook(
+                menuColumns, recycler.paddingLeft, recycler.paddingTop, recycler.paddingRight, recycler.paddingBottom
+            )
+        }
+        val width = (recycler.width.takeIf { it > 0 } ?: context.resources.displayMetrics.widthPixels) -
+            recycler.paddingLeft - recycler.paddingRight
+        val density = context.resources.displayMetrics.density
+        val layout = CategoryColumnsLayout.compute(
+            prefs.categoriesColumns, appCount, menuColumns, display.first, width, density
+        )
+        // The rows are the tiles' own height here, not the drawer's share of its height.
+        cells.tileWidthPx = layout.columnPx
+        cells.tileHeightPx = 0
         cells.tileContentPx = adapter.tileContentPx
         cells.tileCompactPx = adapter.tileCompactPx
-        lastDisplay?.let { cells.setDisplay(it.first, it.second, it.third) }
-        controller.openScreen(
-            group, apps,
-            ScreenLook(
-                columnCount(prefs), recycler.paddingLeft, recycler.paddingTop,
-                recycler.paddingRight, recycler.paddingBottom
-            ),
-            standalone
+        cells.setDisplay(layout.iconScale, display.second, display.third)
+        return ScreenLook(
+            layout.shown, recycler.paddingLeft + layout.sidePx, recycler.paddingTop,
+            recycler.paddingRight + layout.sidePx, recycler.paddingBottom
         )
     }
 

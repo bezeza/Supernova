@@ -3,6 +3,12 @@
      locale generator never touch them. -->
 <resources>
     <string name="fork_drawer_style_categories">Категорії</string>
+    <string name="fork_columns">Колонки в категорії</string>
+    <string name="fork_columns_auto">Авто</string>
+    <string name="fork_columns_menu">Як у меню</string>
+    <string name="fork_columns_3">3</string>
+    <string name="fork_columns_4">4</string>
+    <string name="fork_columns_5">5</string>
     <string name="fork_show_recent_installs">Показувати нові застосунки</string>
     <string name="fork_show_recent_installs_summary">Рядок нових застосунків угорі меню</string>
     <string name="fork_recent_installs_title">Нещодавно встановлені</string>
