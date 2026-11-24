@@ -69,15 +69,4 @@ class CategoryEdits(
     val onTiles: (Map<String, TileChange>) -> Unit = {}
 )
 
-// What arranging the tiles asks of the controller.
-internal class EditHandlers(
-    // A tap on a tile: its settings.
-    val onTap: (View, CategoryEntry) -> Unit,
-    val onDone: () -> Unit,
-    // A tile's corner dragged to another size.
-    val onResize: (String, CategorySize) -> Unit,
-    // A tile tapped while arranging: its menu, for the tile with this folder id.
-    val onMenu: (View, String) -> Unit = { _, _ -> }
-)
-
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

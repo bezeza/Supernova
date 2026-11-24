@@ -38,15 +38,6 @@ class CategoriesController(
 
     private var options: Map<String, CategoryOptions> = emptyMap()
 
-    // A tap on a tile while the tiles are arranged opens the category's options (the folder's own menu is a row in
-    // them); a corner dragged to another size changes the category's size.
-    private val editHandlers: EditHandlers = EditHandlers(
-        onTap = { view, entry -> showOptions(view, entry.group, entry.apps) },
-        onDone = { arranger.stop() },
-        onResize = { id, size -> actions.edits.onOptions(id) { it.copy(size = size) } },
-        onMenu = { view, id -> openMenuAtCentre(view, id) }
-    )
-
     // A long press on a tile opens its menu, and a move of the finger from there takes the tile off to be dragged.
     private val rowActions: CategoriesActions = CategoriesActions(
         actions.onApp, actions.onAppLongPress, actions.onCategory,
@@ -55,7 +46,7 @@ class CategoriesController(
     )
     private val icons: CategoryIcons = CategoryIcons(catalog, decorateIcon)
     private val rows: CategoriesAdapter = CategoriesAdapter(
-        icons, rowActions, editHandlers, ::holdRecent
+        icons, rowActions, ::openMenuAtCentre, ::holdRecent
     ) { context, hidden ->
         CategoryOptionsDialog.showHidden(context, hidden) { id ->
             actions.edits.onOptions(id) { it.copy(hidden = false) }
@@ -252,9 +243,7 @@ class CategoriesController(
         actions.edits.onOrder(CellGrid.order(cells))
     }
 
-    private val arranger: TileArranger = TileArranger(
-        recycler, rows, { actions.edits.onOrder(it) }
-    ) { editing ->
+    private val arranger: TileArranger = TileArranger(recycler, rows) { editing ->
         doneBar.visibility = if (editing) View.VISIBLE else View.GONE
         keepClear()
     }

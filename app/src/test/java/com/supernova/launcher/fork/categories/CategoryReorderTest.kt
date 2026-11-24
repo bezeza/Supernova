@@ -43,18 +43,4 @@ class CategoryReorderTest {
     fun noTilesLeavesEverythingAsItWas() {
         assertEquals(listOf("a", "b"), CategoryReorder.merged(listOf("a", "b"), emptyList()))
     }
-
-    @Test
-    fun movedPutsAnItemWhereItWasDropped() {
-        assertEquals(listOf("b", "c", "a"), CategoryReorder.moved(listOf("a", "b", "c"), 0, 2))
-        assertEquals(listOf("c", "a", "b"), CategoryReorder.moved(listOf("a", "b", "c"), 2, 0))
-    }
-
-    @Test
-    fun movedOutOfRangeOrToTheSamePlaceChangesNothing() {
-        val list = listOf("a", "b")
-        assertEquals(list, CategoryReorder.moved(list, 1, 1))
-        assertEquals(list, CategoryReorder.moved(list, 5, 0))
-        assertEquals(list, CategoryReorder.moved(list, 0, -1))
-    }
 }
