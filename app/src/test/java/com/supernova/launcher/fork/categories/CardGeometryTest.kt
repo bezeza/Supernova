@@ -55,6 +55,17 @@ class CardGeometryTest {
     }
 
     @Test
+    fun aStripIsOneRowAsHighAsAnIconIsWideAndItsIconsFit() {
+        listOf(4, 5).forEach { count ->
+            val slots = TileSlots.strip(count)
+            val wide = 4 * normal / 2 + 2 * gap
+            val geometry = CardGeometry({ slots }, { gap })
+            assertEquals(wide / count - gap, geometry.height(wide))
+            check(slots, wide)
+        }
+    }
+
+    @Test
     fun aBigTileIsSquare() {
         val width = 2 * normal + 2 * gap
         assertEquals(width, CardGeometry({ TileSlots.big() }, { gap }).height(width))

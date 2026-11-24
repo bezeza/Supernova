@@ -28,8 +28,9 @@ internal sealed class CategoryRow(val key: String, val content: String) {
     ) {
         val slots = when (options.size) {
             CategorySize.SMALL -> TileSlots.small()
-            CategorySize.NORMAL -> TileSlots.normal(options.large)
-            CategorySize.WIDE, CategorySize.STRIP -> TileSlots.double()
+            CategorySize.NORMAL -> TileSlots.normal(minOf(options.large, CategoryLayout.LARGE_SLOTS))
+            CategorySize.WIDE -> TileSlots.double()
+            CategorySize.STRIP -> TileSlots.strip(CategoryOptions.stripCount(options.large))
             CategorySize.LARGE -> TileSlots.big()
             CategorySize.TALL -> TileSlots.tall()
         }

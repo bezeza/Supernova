@@ -24,7 +24,9 @@ internal object CategoryOptionsDialog {
 
     fun show(context: Context, name: String, options: CategoryOptions, handlers: OptionsHandlers) {
         // The number of large icons is a normal tile's: a wide one is a row, a small one all small icons.
-        val rows = Row.entries.filter { it != Row.LARGE || options.size == CategorySize.NORMAL }
+        val rows = Row.entries.filter {
+            it != Row.LARGE || options.size == CategorySize.NORMAL || options.size == CategorySize.STRIP
+        }
         val labels = rows.map { label(context, it, options) }.toTypedArray()
         MaterialAlertDialogBuilder(context)
             .setTitle(name)
@@ -35,11 +37,14 @@ internal object CategoryOptionsDialog {
                         pick(context, name, choice, handlers.onSort)
                     }
                     Row.SIZE -> {
-                        val choice = Choice(CategorySize.entries - CategorySize.STRIP, options.size, ::sizeLabel)
+                        val choice = Choice(CategorySize.entries, options.size, ::sizeLabel)
                         pick(context, name, choice, handlers.onSize)
                     }
                     Row.LARGE -> {
-                        val choice = Choice(CategoryOptions.LARGE_CHOICES, options.large, ::largeLabel)
+                        val strip = options.size == CategorySize.STRIP
+                        val values = if (strip) CategoryOptions.STRIP_CHOICES else CategoryOptions.LARGE_CHOICES
+                        val now = if (strip) CategoryOptions.stripCount(options.large) else options.large
+                        val choice = Choice(values, now, ::largeLabel)
                         pick(context, name, choice, handlers.onLarge)
                     }
                     Row.HIDE -> handlers.onHide()
@@ -83,7 +88,8 @@ internal object CategoryOptionsDialog {
     private fun sizeLabel(context: Context, size: CategorySize): String = context.getString(
         when (size) {
             CategorySize.NORMAL -> R.string.fork_size_normal
-            CategorySize.WIDE, CategorySize.STRIP -> R.string.fork_size_wide
+            CategorySize.WIDE -> R.string.fork_size_wide
+            CategorySize.STRIP -> R.string.fork_size_strip
             CategorySize.SMALL -> R.string.fork_size_small
             CategorySize.LARGE -> R.string.fork_size_large
             CategorySize.TALL -> R.string.fork_size_tall

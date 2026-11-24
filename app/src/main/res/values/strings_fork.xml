@@ -60,4 +60,12 @@
     <string name="fork_menu_size_tall">Tall</string>
     <string name="fork_menu_size_wide">Wide</string>
     <string name="fork_menu_size_large">Big</string>
+    <string name="fork_size_strip">Strip (4×1): one row of icons</string>
+    <string name="fork_menu_size_strip">Strip</string>
+    <string name="fork_menu_large_0">All small</string>
+    <string name="fork_menu_large_1">1 large</string>
+    <string name="fork_menu_large_2">2 large</string>
+    <string name="fork_menu_large_3">3 large</string>
+    <string name="fork_menu_strip_4">4 icons</string>
+    <string name="fork_menu_strip_5">5 icons</string>
 </resources>

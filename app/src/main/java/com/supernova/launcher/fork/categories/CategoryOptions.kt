@@ -56,10 +56,18 @@ data class CategoryOptions(
 
     companion object {
         const val LARGE_DEFAULT = 3
-        val LARGE_CHOICES = listOf(3, 1, 0)
 
-        // Anything but 3, 1 or 0 is the default.
-        fun largeOrDefault(value: Int): Int = if (value in LARGE_CHOICES) value else LARGE_DEFAULT
+        // What a normal tile has: 3, 2, 1 or no large icons. A strip has 4 or 5 (STRIP_CHOICES), kept in the same
+        // field: a normal tile reads 4 and 5 as 3, a strip reads anything under 5 as 4.
+        val LARGE_CHOICES = listOf(3, 2, 1, 0)
+        val STRIP_CHOICES = listOf(4, 5)
+        private const val MOST = 5
+
+        // Anything but 0 to 5 is the default.
+        fun largeOrDefault(value: Int): Int = if (value in 0..MOST) value else LARGE_DEFAULT
+
+        // The large icons a strip has: five if five were chosen, else four.
+        fun stripCount(value: Int): Int = if (value >= MOST) MOST else STRIP_CHOICES.first()
     }
 }
 

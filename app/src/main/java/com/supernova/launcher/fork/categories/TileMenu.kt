@@ -18,6 +18,16 @@ import androidx.core.content.withStyledAttributes
 // One of the sizes a tile can have, as an icon in the row on top of its menu.
 internal class SizeChoice(val size: CategorySize, @DrawableRes val icon: Int, val label: String)
 
+// One of the ways a tile can lay out its icons (how many are large), as an icon in the second row of the menu.
+internal class LayoutChoice(val count: Int, @DrawableRes val icon: Int, val label: String)
+
+// The layouts a tile offers, the one it has and what picking one does. Empty for a size that has one layout.
+internal class LayoutRow(val choices: List<LayoutChoice>, val current: Int, val onPick: (Int) -> Unit) {
+    companion object {
+        val NONE = LayoutRow(emptyList(), 0) {}
+    }
+}
+
 // A row of the menu under the sizes.
 internal class MenuRow(val label: String, @DrawableRes val icon: Int, val onClick: () -> Unit)
 
@@ -40,6 +50,7 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         touchY: Float,
         current: CategorySize,
         sizes: List<SizeChoice>,
+        layouts: LayoutRow,
         rows: List<MenuRow>,
         onSize: (CategorySize) -> Unit
     ) {
@@ -58,6 +69,10 @@ internal class TileMenu(private val context: Context, private val look: TileLook
                 dismiss()
                 onSize(size)
             })
+            content.addView(divider())
+        }
+        if (layouts.choices.isNotEmpty()) {
+            content.addView(layoutRow(layouts))
             content.addView(divider())
         }
         rows.forEach { row -> content.addView(rowView(row)) }
@@ -97,16 +112,33 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         return row
     }
 
+    private fun layoutRow(layouts: LayoutRow): View {
+        val row = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        layouts.choices.forEach { choice ->
+            row.addView(iconButton(choice.icon, choice.label, choice.count == layouts.current) {
+                dismiss()
+                layouts.onPick(choice.count)
+            })
+        }
+        return row
+    }
+
     private fun sizeButton(choice: SizeChoice, active: Boolean, onSize: (CategorySize) -> Unit): View =
+        iconButton(choice.icon, choice.label, active) { onSize(choice.size) }
+
+    private fun iconButton(@DrawableRes icon: Int, label: String, active: Boolean, onClick: () -> Unit): View =
         ImageView(context).apply {
-            setImageResource(choice.icon)
+            setImageResource(icon)
             imageTintList = ColorStateList.valueOf(if (active) look.accent else look.menuText)
             val pad = dp(SIZE_ICON_PAD_DP)
             setPadding(pad, pad, pad, pad)
             if (active) background = activeBackground()
-            contentDescription = choice.label
-            TooltipCompat.setTooltipText(this, choice.label)
-            setOnClickListener { onSize(choice.size) }
+            contentDescription = label
+            TooltipCompat.setTooltipText(this, label)
+            setOnClickListener { onClick() }
             layoutParams = LinearLayout.LayoutParams(dp(SIZE_ICON_DP), dp(SIZE_ICON_DP))
         }
 

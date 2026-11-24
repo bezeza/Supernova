@@ -60,4 +60,12 @@
     <string name="fork_menu_size_tall">Висока</string>
     <string name="fork_menu_size_wide">Широка</string>
     <string name="fork_menu_size_large">Велика</string>
+    <string name="fork_size_strip">Смуга (4×1): один рядок іконок</string>
+    <string name="fork_menu_size_strip">Смуга</string>
+    <string name="fork_menu_large_0">Усі малі</string>
+    <string name="fork_menu_large_1">1 велика</string>
+    <string name="fork_menu_large_2">2 великі</string>
+    <string name="fork_menu_large_3">3 великі</string>
+    <string name="fork_menu_strip_4">4 іконки</string>
+    <string name="fork_menu_strip_5">5 іконок</string>
 </resources>

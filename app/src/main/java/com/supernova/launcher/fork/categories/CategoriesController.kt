@@ -148,7 +148,10 @@ class CategoriesController(
                 })
             }
         }
-        menu.show(view, x, y, tile.options.size, sizeChoices(context), rowsOfMenu) { size -> resizeTile(id, size) }
+        val layouts = layoutRow(context, id, tile.options)
+        menu.show(view, x, y, tile.options.size, sizeChoices(context), layouts, rowsOfMenu) { size ->
+            resizeTile(id, size)
+        }
     }
 
     private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
@@ -156,8 +159,31 @@ class CategoriesController(
         Triple(CategorySize.NORMAL, R.drawable.ic_fork_size_normal, R.string.fork_menu_size_normal),
         Triple(CategorySize.TALL, R.drawable.ic_fork_size_tall, R.string.fork_menu_size_tall),
         Triple(CategorySize.WIDE, R.drawable.ic_fork_size_wide, R.string.fork_menu_size_wide),
+        Triple(CategorySize.STRIP, R.drawable.ic_fork_size_strip, R.string.fork_menu_size_strip),
         Triple(CategorySize.LARGE, R.drawable.ic_fork_size_large, R.string.fork_menu_size_large)
     ).map { (size, icon, label) -> SizeChoice(size, icon, context.getString(label)) }
+
+    // How a tile lays out its icons: how many of them are large. Only a normal tile (3, 2, 1 or none) and a strip (4 or
+    // 5 icons) have a choice; the other sizes have one layout.
+    private fun layoutRow(context: Context, id: String, options: CategoryOptions): LayoutRow {
+        val choices = when (options.size) {
+            CategorySize.NORMAL -> CategoryOptions.LARGE_CHOICES.reversed().map { count ->
+                LayoutChoice(count, LARGE_ICONS.getValue(count), context.getString(LARGE_LABELS.getValue(count)))
+            }
+            CategorySize.STRIP -> CategoryOptions.STRIP_CHOICES.map { count ->
+                LayoutChoice(count, LARGE_ICONS.getValue(count), context.getString(LARGE_LABELS.getValue(count)))
+            }
+            else -> emptyList()
+        }
+        val current = if (options.size == CategorySize.STRIP) {
+            CategoryOptions.stripCount(options.large)
+        } else {
+            minOf(options.large, CategoryLayout.LARGE_SLOTS)
+        }
+        return if (choices.isEmpty()) LayoutRow.NONE else LayoutRow(choices, current) { count ->
+            actions.edits.onOptions(id) { it.copy(large = count) }
+        }
+    }
 
     // A tile given another size: the tiles it now covers go down, and everything is kept in one change.
     private fun resizeTile(id: String, size: CategorySize) {
@@ -354,6 +380,15 @@ class CategoriesController(
     }
 
     private companion object {
+        // The icon and the name of each layout, by how many icons are large (a strip's 4 and 5 are its icons).
+        val LARGE_ICONS = mapOf(
+            0 to R.drawable.ic_fork_large_0, 1 to R.drawable.ic_fork_large_1, 2 to R.drawable.ic_fork_large_2,
+            3 to R.drawable.ic_fork_large_3, 4 to R.drawable.ic_fork_strip_4, 5 to R.drawable.ic_fork_strip_5
+        )
+        val LARGE_LABELS = mapOf(
+            0 to R.string.fork_menu_large_0, 1 to R.string.fork_menu_large_1, 2 to R.string.fork_menu_large_2,
+            3 to R.string.fork_menu_large_3, 4 to R.string.fork_menu_strip_4, 5 to R.string.fork_menu_strip_5
+        )
         const val MIN_TILES = 2
         const val TILE_MAX_DP = 200f
         const val SIDE_DP = 6f
