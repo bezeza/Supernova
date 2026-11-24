@@ -14,6 +14,7 @@
     <string name="fork_search_at_bottom_summary">Search row at the bottom of the drawer, in the Categories style only</string>
     <string name="fork_pick_large">Choose large icons</string>
     <string name="fork_pick_large_hint">Choose large icon %1$d of %2$d</string>
+    <string name="fork_pick_large_done">Large icons chosen</string>
     <string name="fork_tap_large_icon">Tap on a large icon</string>
     <string name="fork_tap_large_icon_summary">On: launches the app, as in iOS. Off: any tap on the tile opens the category</string>
     <string name="fork_sort_inside">Sort inside: %1$s</string>

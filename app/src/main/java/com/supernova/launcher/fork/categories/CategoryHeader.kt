@@ -15,7 +15,7 @@ import com.supernova.launcher.R
 
 // The top of a category's screen: a back arrow, the category's name (with its
 // icon when that is switched on) and a button that starts choosing the large
-// icons. While choosing, the name line shows what to do instead.
+// icons. While choosing, the two buttons are away and a bar under the header says what to do ([PickBar]).
 internal class CategoryHeader(context: Context) : LinearLayout(context) {
 
     var onBack: () -> Unit = {}
@@ -26,7 +26,6 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
     private var name = ""
     private var textColor = 0
     private var showIcon = false
-    private var hint: String? = null
 
     private val backButton = button(R.drawable.ic_back, context.getString(R.string.back)) { onBack() }
     private val pickButton =
@@ -59,21 +58,18 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
     // [choosable]: there is something to choose between.
     fun show(name: String, choosable: Boolean) {
         this.name = name
-        hint = null
         pickButton.visibility = if (choosable) VISIBLE else GONE
         render()
     }
 
     fun setChoosable(choosable: Boolean) {
-        if (hint == null) pickButton.visibility = if (choosable) VISIBLE else GONE
+        if (pickButton.visibility != INVISIBLE) pickButton.visibility = if (choosable) VISIBLE else GONE
     }
 
-    // While choosing: [text] in place of the name, and the button away.
-    fun setHint(text: String?, choosable: Boolean) {
-        hint = text
-        pickButton.visibility = if (text != null) INVISIBLE else if (choosable) VISIBLE else GONE
-        addButton.visibility = if (text != null) INVISIBLE else VISIBLE
-        render()
+    // While choosing the name stays and the two buttons are away: what to do is said by the bar under the header.
+    fun setPicking(picking: Boolean, choosable: Boolean) {
+        pickButton.visibility = if (picking) INVISIBLE else if (choosable) VISIBLE else GONE
+        addButton.visibility = if (picking) INVISIBLE else VISIBLE
     }
 
     fun setLook(color: Int, showIcon: Boolean) {
@@ -88,8 +84,8 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
     }
 
     private fun render() {
-        title.text = hint ?: name
-        val glyph = if (showIcon && hint == null) CategoryGlyphs.forName(context, name) else null
+        title.text = name
+        val glyph = if (showIcon) CategoryGlyphs.forName(context, name) else null
         if (glyph == null) {
             title.setCompoundDrawablesRelative(null, null, null, null)
             return

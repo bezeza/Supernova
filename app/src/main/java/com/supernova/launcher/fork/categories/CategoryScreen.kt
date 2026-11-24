@@ -77,7 +77,7 @@ internal class CategoryScreen(
 
     fun rebind() = page.rebind()
 
-    fun setLook(textColor: Int, showIcon: Boolean) = page.setLook(textColor, showIcon)
+    fun setLook(textColor: Int, showIcon: Boolean, accent: Int) = page.setLook(textColor, showIcon, accent)
 
     // True while choosing, whatever the tap was: it is the choosing's, not a launch.
     fun handleTap(app: LaunchableApp): Boolean = page.handleTap(app)

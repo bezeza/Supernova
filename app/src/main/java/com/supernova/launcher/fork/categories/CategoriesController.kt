@@ -391,7 +391,7 @@ class CategoriesController(
         if (menuOwner?.isShowing != true) menuOwner = null
         doneBar.setLook(data.look.textColor, CategoryTint.cardColor(data.look.textColor, data.look.backdrop))
         options = data.settings.options
-        screen.setLook(data.look.textColor, data.look.showIcons)
+        screen.setLook(data.look.textColor, data.look.showIcons, data.look.accent)
         if (state.isOpen) {
             val open = data.categories.firstOrNull { it.group.id == state.openId }
             if (open != null && state.sync(data.categories.map { it.group.id })) screen.update(open.apps)

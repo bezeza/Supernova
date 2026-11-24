@@ -14,6 +14,12 @@ internal class LargePicker<T>(val slots: Int) {
 
     val isComplete: Boolean get() = chosen.size >= slots
 
+    // Which large icon [item] is, from 1, null while it is not chosen.
+    fun orderOf(item: T): Int? = chosen.indexOf(item).takeIf { it >= 0 }?.plus(1)
+
+    // A tap on an app already chosen takes it back: the ones chosen after it move up a place. False for any other.
+    fun unpick(item: T): Boolean = chosen.remove(item)
+
     // False for an app already chosen: one app cannot fill two slots.
     fun pick(item: T): Boolean {
         if (isComplete || item in chosen) return false

@@ -14,6 +14,7 @@
     <string name="fork_search_at_bottom_summary">Строка поиска внизу меню, только в стиле «Категории»</string>
     <string name="fork_pick_large">Выбрать большие иконки</string>
     <string name="fork_pick_large_hint">Выберите большую иконку %1$d из %2$d</string>
+    <string name="fork_pick_large_done">Большие иконки выбраны</string>
     <string name="fork_tap_large_icon">Тап по большой иконке</string>
     <string name="fork_tap_large_icon_summary">Включено: запускает приложение, как в iOS. Выключено: любое касание плитки открывает категорию</string>
     <string name="fork_sort_inside">Сортировка внутри: %1$s</string>
