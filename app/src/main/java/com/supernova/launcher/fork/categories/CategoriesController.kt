@@ -111,6 +111,22 @@ class CategoriesController(
 
     private val drag = MosaicDrag(recycler, dragHost).also { recycler.addOnItemTouchListener(it) }
 
+    init {
+        // A menu does not outlast the list moving under it, or the list going off the screen.
+        recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(view: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && !drag.isDragging && !drag.isResizing) closeMenu()
+            }
+        })
+        recycler.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) = Unit
+
+            override fun onViewDetachedFromWindow(view: View) {
+                closeMenu()
+            }
+        })
+    }
+
     // The menu of a tile, made again for the colours of the moment.
     private var look = TileLook(textColor = 0)
     private var menuOwner: TileMenu? = null
@@ -160,11 +176,13 @@ class CategoriesController(
         }
         val layouts = layoutRow(context, id, tile.options)
         drag.outlineColor = look.accent
-        menu.show(view, x, y, tile.options.size, sizeChoices(context), layouts, rowsOfMenu) { size ->
+        // The arc first, so the menu can keep clear of it.
+        val item = recycler.findContainingItemView(view) ?: view
+        drag.showHandle(item, id, look.textColor)
+        val sizes = sizeChoices(context)
+        menu.show(view, x, y, tile.options.size, sizes, layouts, rowsOfMenu, drag.handleOnScreen()) { size ->
             resizeTile(id, size)
         }
-        val item = recycler.findContainingItemView(view) ?: view
-        drag.showHandle(item, id, look.menuText)
     }
 
     private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
@@ -340,6 +358,7 @@ class CategoriesController(
 
     // True when a screen was open and is closed now: the Back that did it is spent.
     fun closeScreen(animate: Boolean = true): Boolean {
+        closeMenu()
         arranger.stop()
         val wasOpen = state.close()
         standalone = false

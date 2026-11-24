@@ -2,6 +2,7 @@ package com.supernova.launcher.fork.categories
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.Gravity
@@ -55,6 +56,7 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         sizes: List<SizeChoice>,
         layouts: LayoutRow,
         rows: List<MenuRow>,
+        keepClear: Rect?,
         onSize: (CategorySize) -> Unit
     ) {
         dismiss()
@@ -100,7 +102,11 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         } else {
             below
         }
-        window.showAtLocation(anchor, Gravity.NO_GRAVITY, x, y)
+        val room = MenuSpot.Room(screen.widthPixels, screen.heightPixels, margin, dp(ARC_CLEARANCE_DP))
+        val avoid = keepClear?.let { MenuSpot.Box(it.left, it.top, it.right, it.bottom) }
+        val want = MenuSpot.Box(x, y, x + content.measuredWidth, y + content.measuredHeight)
+        val spot = MenuSpot.place(want, avoid, room)
+        window.showAtLocation(anchor, Gravity.NO_GRAVITY, spot.first, spot.second)
     }
 
     fun dismiss() {
@@ -196,6 +202,7 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         const val MIN_WIDTH_DP = 236f
         const val ELEVATION_DP = 8f
         const val SCREEN_MARGIN_DP = 8f
+        const val ARC_CLEARANCE_DP = 12f
         const val FINGER_GAP_DP = 28f
         const val SIZE_ICON_DP = 44f
         const val SIZE_ICON_PAD_DP = 10f

@@ -128,6 +128,14 @@ internal class MosaicDrag(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) recycler.systemGestureExclusionRects = rects
     }
 
+    // Where the arc's touch zone is on the screen, for a menu to keep clear of it (null while there is no arc).
+    fun handleOnScreen(): Rect? {
+        if (arc == null) return null
+        val at = IntArray(2)
+        recycler.getLocationOnScreen(at)
+        return Rect(arcHit).apply { offset(at[0], at[1]) }
+    }
+
     fun hideHandle() {
         keepGestureOff(emptyList())
         arc?.let { recycler.overlay.remove(it) }
