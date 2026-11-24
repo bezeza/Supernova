@@ -456,7 +456,6 @@
     <string name="folder_show_name">Показывать название папки</string>
     <string name="folder_show_count">Показывать число приложений</string>
     <string name="folder_window_radius">Радиус углов окна</string>
-    <string name="placement_hidden">Скрыто</string>
     <string name="drawer_bar_filled">Закрашенный фон</string>
     <string name="drawer_search_bar">Строка поиска меню приложений</string>
     <string name="drawer_scrubber_color">Цвет быстрой прокрутки</string>
@@ -673,6 +672,8 @@
     <string name="reshape_legacy">Менять форму старых значков</string>
     <string name="reshape_legacy_auto">Только масштабировать</string>
     <string name="reshape_legacy_on">Масштабировать и добавлять фон</string>
+    <string name="normalize_icon_size">Нормализовать размер значков</string>
+    <string name="normalize_icon_size_summary">Уменьшать крупные значки по рекомендациям Material</string>
     <string name="drawer_pull_to_search">Потянуть для поиска</string>
     <string name="folder_prioritize_first">Выделять первый значок</string>
     <string name="folder_prioritize_first_summary">Первое приложение крупное на значке папки, остальные мелкие</string>
@@ -706,6 +707,8 @@
     <string name="auto_add_apps">Добавлять новые приложения на главный экран</string>
     <string name="label_font">Шрифт подписи</string>
     <string name="label_single_line">Подписи в одну строку</string>
+    <string name="label_even_rows">Равные промежутки между рядами</string>
+    <string name="label_even_rows_summary">В меню приложений и папках ряды оставляют место для подписей в две строки</string>
     <string name="icon_size">Размер значков</string>
     <string name="icon_size_fitted">Значки самые большие, какие вмещает эта сетка. Чтобы они были крупнее, уменьшите число строк или столбцов либо отключите подписи.</string>
     <string name="label_group">Подпись</string>
@@ -829,6 +832,7 @@
     <string name="search_bar_shadow">Тень</string>
     <string name="search_bar_hint_text">Показывать текст «Поиск»</string>
     <string name="drawer_bar_hint_text">Показывать текст «Поиск»</string>
+    <string name="search_window_hint_text">Показывать текст «Поиск»</string>
     <string name="search_bar_chips">Кнопки</string>
     <string name="search_bar_chip_voice">Голосовой поиск</string>
     <string name="search_bar_chip_assistant">Ассистент</string>

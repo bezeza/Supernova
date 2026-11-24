@@ -388,7 +388,6 @@ popup_style_android12|Android 12
 folder_show_name|Показывать название папки
 folder_show_count|Показывать число приложений
 folder_window_radius|Радиус углов окна
-placement_hidden|Скрыто
 drawer_bar_filled|Закрашенный фон
 drawer_search_bar|Строка поиска меню приложений
 drawer_scrubber_color|Цвет быстрой прокрутки
@@ -1049,3 +1048,8 @@ onboarding_import_action|<u>Импортируйте настройки</u>
 onboarding_privacy_line|Supernova не собирает данных. Ничего не покидает ваш телефон.
 onboarding_privacy_link|<u>Политика конфиденциальности</u>
 restart_supernova_subtitle|Закрыть и снова открыть лаунчер
+normalize_icon_size|Нормализовать размер значков
+normalize_icon_size_summary|Уменьшать крупные значки по рекомендациям Material
+label_even_rows|Равные промежутки между рядами
+label_even_rows_summary|В меню приложений и папках ряды оставляют место для подписей в две строки
+search_window_hint_text|Показывать текст «Поиск»
