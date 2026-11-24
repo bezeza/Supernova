@@ -57,6 +57,12 @@ internal class EditGestures(private val card: ViewGroup) {
     // A tap on the gear.
     var onGear: () -> Unit = {}
 
+    // A tap on the card while arranging, where it is no gear's: the tile's menu.
+    var onTap: () -> Unit = {}
+
+    // Whether the card wears its gear and its grip. The mosaic's tiles do not: their size is chosen in their menu.
+    var marksShown = true
+
     // Told when a finger takes the grip and when it lets it go: the list must not take the hold for a tile drag.
     var onGripHeld: (Boolean) -> Unit = {}
 
@@ -123,8 +129,8 @@ internal class EditGestures(private val card: ViewGroup) {
         startHeight = card.height
         moved = false
         tracking = true
-        gearHit = marks.onGear(event.x, event.y)
-        onGrip = !gearHit && marks.onGrip(event.x, event.y)
+        gearHit = marksShown && marks.onGear(event.x, event.y)
+        onGrip = marksShown && !gearHit && marks.onGrip(event.x, event.y)
         // A drag of the grip is the card's: the list must not take it for a tile drag.
         if (onGrip) {
             card.parent?.requestDisallowInterceptTouchEvent(true)
@@ -140,6 +146,7 @@ internal class EditGestures(private val card: ViewGroup) {
                 relayoutList()
             }
             !moved && gearHit -> onGear()
+            !moved && !onGrip -> onTap()
         }
         onGrip = false
         gearHit = false
@@ -157,7 +164,7 @@ internal class EditGestures(private val card: ViewGroup) {
     }
 
     fun draw(canvas: Canvas) {
-        if (editing) marks.draw(canvas)
+        if (editing && marksShown) marks.draw(canvas)
     }
 
     // A tile that changed its size in place leaves the tiles below it where they were until the list lays out

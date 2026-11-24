@@ -51,4 +51,13 @@
     <string name="fork_edit_hint">Перетаскивайте плитку, чтобы переместить, уголок, чтобы изменить размер, шестерню, чтобы открыть настройки</string>
     <string name="fork_size_large">Большая (2×2): размером в четыре плитки</string>
     <string name="fork_size_tall">Высокая (1×2): две плитки одна над другой</string>
+    <string name="fork_menu_open">Открыть</string>
+    <string name="fork_menu_options">Параметры…</string>
+    <string name="fork_menu_arrange">Расставить плитки</string>
+    <string name="fork_menu_compact">Уплотнить</string>
+    <string name="fork_menu_size_small">Малая</string>
+    <string name="fork_menu_size_normal">Обычная</string>
+    <string name="fork_menu_size_tall">Высокая</string>
+    <string name="fork_menu_size_wide">Широкая</string>
+    <string name="fork_menu_size_large">Большая</string>
 </resources>

@@ -63,6 +63,9 @@ data class CategoryOptions(
     }
 }
 
+// A tile put in a cell, and given another size if [size] is not null.
+class TileChange(val size: CategorySize?, val col: Int, val row: Int)
+
 @Serializable
 internal class StoredOptions(
     val sort: String = "",
@@ -109,6 +112,17 @@ object CategoryOptionsStore {
                 StoredOptions(v.sort.name, v.hidden, v.size.name, v.large, v.col ?: NO_CELL, v.row ?: NO_CELL)
             }
         return if (stored.isEmpty()) "" else json.encodeToString(stored)
+    }
+
+    // [raw] with every tile in [changes] given its new cell (and size, where one is given) in one go, and the
+    // categories that are gone (not in [existing]) dropped.
+    fun updateTiles(raw: String, changes: Map<String, TileChange>, existing: Collection<String>): String {
+        val all = decode(raw).toMutableMap()
+        changes.forEach { (id, change) ->
+            val now = all[id] ?: CategoryOptions()
+            all[id] = now.copy(size = change.size ?: now.size, col = change.col, row = change.row)
+        }
+        return encode(all.filterKeys { it in changes || it in existing || it in KEPT_KEYS })
     }
 
     // [raw] with category [id] changed by [change], and the categories that are

@@ -13,11 +13,33 @@ package com.supernova.launcher.fork.categories
 internal object MosaicRects {
 
     // [rects] holds left, top, right and bottom of each position, four ints after four.
-    class Result(val rects: IntArray, val height: Int) {
+    class Result(
+        val rects: IntArray,
+        val height: Int,
+        // The lines the mosaic's rows start at (from the top of the list), the left edges of the columns (from the
+        // left edge of the list) and how far a row is below the last line: for finding the cell under a point.
+        val lines: IntArray = IntArray(0),
+        val edge: IntArray = IntArray(0),
+        val pitch: Int = 1
+    ) {
         fun left(position: Int) = rects[position * PARTS + LEFT]
         fun top(position: Int) = rects[position * PARTS + TOP]
         fun right(position: Int) = rects[position * PARTS + RIGHT]
         fun bottom(position: Int) = rects[position * PARTS + BOTTOM]
+
+        // The cell (column, row) under a point [x] across and [y] down the whole list, both counted from the top left
+        // corner of its content; kept inside the grid across, and any row down (the mosaic grows as tiles are put
+        // below it).
+        fun cellAt(x: Int, y: Int): Pair<Int, Int> {
+            val col = ((edge.indices.lastOrNull { edge[it] <= x } ?: 0)).coerceIn(0, (edge.size - 2).coerceAtLeast(0))
+            val last = lines.size - 1
+            val row = when {
+                lines.isEmpty() || y < lines[0] -> 0
+                y >= lines[last] -> last + (y - lines[last]) / pitch.coerceAtLeast(1)
+                else -> lines.indices.last { lines[it] <= y }
+            }
+            return col to row
+        }
     }
 
     // What the geometry needs from the list and the screen.
@@ -94,7 +116,7 @@ internal object MosaicRects {
         }
         y = line[mosaicRows]
         y = flow(input, rects, (lastTile + 1) until input.count, y)
-        return Result(rects, y + input.bottom)
+        return Result(rects, y + input.bottom, line, edge, input.pitch)
     }
 
     private fun edge(input: Input, column: Int): Int = borders(input.width, input.columns)[column]

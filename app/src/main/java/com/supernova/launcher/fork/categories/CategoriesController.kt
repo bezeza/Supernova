@@ -43,13 +43,14 @@ class CategoriesController(
     private val editHandlers: EditHandlers = EditHandlers(
         onTap = { view, entry -> showOptions(view, entry.group, entry.apps) },
         onDone = { arranger.stop() },
-        onResize = { id, size -> actions.edits.onOptions(id) { it.copy(size = size) } }
+        onResize = { id, size -> actions.edits.onOptions(id) { it.copy(size = size) } },
+        onMenu = { view, id -> openMenuAtCentre(view, id) }
     )
 
-    // A long press on a tile starts arranging the tiles.
+    // A long press on a tile opens its menu, and a move of the finger from there takes the tile off to be dragged.
     private val rowActions: CategoriesActions = CategoriesActions(
         actions.onApp, actions.onAppLongPress, actions.onCategory,
-        { _, _, _ -> if (!state.isOpen) arranger.start() },
+        { view, group, _ -> if (!state.isOpen) holdTile(view, group.id) },
         actions.edits
     )
     private val icons: CategoryIcons = CategoryIcons(catalog, decorateIcon)
@@ -84,6 +85,94 @@ class CategoriesController(
     private val doneBar: PinnedDoneBar = PinnedDoneBar(container.context) { arranger.stop() }.apply {
         visibility = View.GONE
         addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepClear() }
+    }
+
+    // What the dragging of a tile asks of this list and changes in it.
+    private val dragHost = object : MosaicDrag.Host {
+        override fun placed(): List<Placed> = rows.placed()
+
+        override fun preview(cells: List<Placed>?) = rows.showCells(cells)
+
+        override fun commit(cells: List<Placed>) = commitCells(cells, null)
+
+        override fun idOf(view: View): String? =
+            recycler.getChildViewHolder(view)?.bindingAdapterPosition?.let { rows.tileIdAt(it) }
+
+        override fun dragStarted() = menu.dismiss()
+
+        override fun arranging(): Boolean = rows.editing
+    }
+
+    private val drag = MosaicDrag(recycler, dragHost).also { recycler.addOnItemTouchListener(it) }
+
+    // The menu of a tile, made again for the colours of the moment.
+    private var look = TileLook(textColor = 0)
+    private var menuOwner: TileMenu? = null
+    private val menu: TileMenu
+        get() = menuOwner ?: TileMenu(recycler.context, look).also { menuOwner = it }
+
+    // The finger holds a tile outside the arranging: its menu opens, and a move of the finger takes the tile off.
+    private fun holdTile(view: View, id: String) {
+        val item = recycler.findContainingItemView(view) ?: return
+        if (rows.editing) return
+        drag.arm(item, id, drag.lastDownX, drag.lastDownY)
+        openMenu(item, id, drag.lastDownX, drag.lastDownY)
+    }
+
+    private fun openMenuAtCentre(view: View, id: String) {
+        val at = IntArray(2)
+        view.getLocationOnScreen(at)
+        openMenu(view, id, at[0] + view.width / 2f, at[1] + view.height / 2f)
+    }
+
+    private fun openMenu(view: View, id: String, x: Float, y: Float) {
+        val tile = rows.tile(id) ?: return
+        val context = recycler.context
+        menuOwner = null
+        val rowsOfMenu = buildList {
+            add(MenuRow(context.getString(R.string.fork_menu_open), R.drawable.ic_menu_open) {
+                actions.onCategory(view, tile.entry.group, tile.entry.apps)
+            })
+            add(MenuRow(context.getString(R.string.fork_menu_options), R.drawable.ic_menu_edit) {
+                showOptions(view, tile.entry.group, tile.entry.apps)
+            })
+            add(MenuRow(context.getString(R.string.fork_folder_menu), R.drawable.ic_menu_move_to_folder) {
+                actions.onCategoryLongPress(view, tile.entry.group, tile.entry.apps)
+            })
+            add(MenuRow(context.getString(R.string.fork_menu_compact), R.drawable.ic_menu_sort) {
+                commitCells(CellGrid.compact(rows.placed()), null)
+            })
+            if (!rows.editing) {
+                add(MenuRow(context.getString(R.string.fork_menu_arrange), R.drawable.ic_menu_widgets) {
+                    arranger.start()
+                })
+            }
+        }
+        menu.show(view, x, y, tile.options.size, sizeChoices(context), rowsOfMenu) { size -> resizeTile(id, size) }
+    }
+
+    private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
+        Triple(CategorySize.SMALL, R.drawable.ic_fork_size_small, R.string.fork_menu_size_small),
+        Triple(CategorySize.NORMAL, R.drawable.ic_fork_size_normal, R.string.fork_menu_size_normal),
+        Triple(CategorySize.TALL, R.drawable.ic_fork_size_tall, R.string.fork_menu_size_tall),
+        Triple(CategorySize.WIDE, R.drawable.ic_fork_size_wide, R.string.fork_menu_size_wide),
+        Triple(CategorySize.LARGE, R.drawable.ic_fork_size_large, R.string.fork_menu_size_large)
+    ).map { (size, icon, label) -> SizeChoice(size, icon, context.getString(label)) }
+
+    // A tile given another size: the tiles it now covers go down, and everything is kept in one change.
+    private fun resizeTile(id: String, size: CategorySize) {
+        val cells = CellGrid.resize(rows.placed(), id, CellFlow.footprint(size))
+        commitCells(cells, id to size)
+    }
+
+    // The tiles in these cells kept, the order of the folders with them (the other drawer styles read it).
+    private fun commitCells(cells: List<Placed>, sized: Pair<String, CategorySize>?) {
+        val changes = cells.associate { cell ->
+            cell.id to TileChange(sized?.takeIf { it.first == cell.id }?.second, cell.col, cell.row)
+        }
+        rows.showCells(cells)
+        actions.edits.onTiles(changes)
+        actions.edits.onOrder(CellGrid.order(cells))
     }
 
     private val arranger: TileArranger = TileArranger(
@@ -217,6 +306,8 @@ class CategoriesController(
     // [showRecent] is the settings switch for the row over the tiles.
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setLook(data.look)
+        look = data.look
+        menuOwner = null
         doneBar.setLook(data.look.textColor, CategoryTint.cardColor(data.look.textColor, data.look.backdrop))
         options = data.settings.options
         screen.setLook(data.look.textColor, data.look.showIcons)

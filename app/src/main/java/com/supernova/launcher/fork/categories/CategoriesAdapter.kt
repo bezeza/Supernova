@@ -114,6 +114,25 @@ internal class CategoriesAdapter(
     // Where each tile stands in the mosaic, by folder id.
     private var cells: Map<String, Placed> = emptyMap()
 
+    // The tiles as they stand, each in its cell, and the cells shown instead while a tile is dragged (null: as
+    // they stand).
+    fun placed(): List<Placed> = cells.values.toList()
+
+    fun showCells(shown: List<Placed>?) {
+        if (shown == null) {
+            show(onScreen(base))
+        } else {
+            cells = shown.associateBy { it.id }
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_RELAYOUT)
+        }
+    }
+
+    // The tile with this folder id, as the controller gave it.
+    fun tile(id: String): CategoryRow.Tile? =
+        base.firstOrNull { it is CategoryRow.Tile && it.entry.group.id == id } as? CategoryRow.Tile
+
+    fun tileIdAt(position: Int): String? = (items.getOrNull(position) as? CategoryRow.Tile)?.entry?.group?.id
+
     // The tiles in the cells they were left in, a new one in the first free cell, and in their reading order in
     // the list, so what the list holds in order is what the eye reads. The other rows stay where they are.
     private fun mosaic(list: List<CategoryRow>): List<CategoryRow> {
@@ -444,6 +463,8 @@ internal class CategoriesAdapter(
             card.edit.onPreview = { w, h -> resize(entry.group.id, w, h, targets(view), save = false) }
             card.edit.onResize = { w, h -> resize(entry.group.id, w, h, targets(view), save = true) }
             card.edit.onGear = { editHandlers.onTap(card, entry) }
+            card.edit.marksShown = !MOSAIC
+            card.edit.onTap = { editHandlers.onMenu(view, entry.group.id) }
             card.edit.onGripHeld = { gripHeld = it }
             card.launchFromIcons = look.launchFromIcons
             card.setSlots(row.slots)

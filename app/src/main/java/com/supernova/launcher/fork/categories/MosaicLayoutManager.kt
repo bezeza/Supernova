@@ -186,6 +186,13 @@ internal class MosaicLayoutManager(private val source: MosaicSource) : RecyclerV
         requestLayout()
     }
 
+    // The cell under a point of the list as it is on the screen ([x] and [y] from its top left corner).
+    fun cellAt(x: Float, y: Float): Pair<Int, Int> =
+        geometry.cellAt(x.toInt() - paddingLeft, y.toInt() + scrolled)
+
+    // How wide a column and how high a row line to line are, for the size of a tile in cells.
+    fun columnWidth(): Int = ((width - paddingLeft - paddingRight) / spanCount).coerceAtLeast(1)
+
     // The first row on the screen, going by where rows stand from the top: the one nearest the top edge.
     fun findFirstVisibleItemPosition(): Int {
         var best = RecyclerView.NO_POSITION
