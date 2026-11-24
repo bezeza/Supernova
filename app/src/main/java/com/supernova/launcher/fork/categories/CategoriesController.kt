@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.supernova.launcher.R
 import com.supernova.launcher.data.AppCatalog
@@ -65,11 +64,7 @@ class CategoriesController(
 
     private val recycler: RecyclerView = RecyclerView(container.context).apply {
         visibility = View.GONE
-        layoutManager = GridLayoutManager(context, MIN_TILES * 2).apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int = rows.spanAt(position, spanCount)
-            }
-        }
+        layoutManager = MosaicLayoutManager(rows).apply { spanCount = MIN_TILES * 2 }
         adapter = rows
         itemAnimator = null
         clipToPadding = false
@@ -79,7 +74,8 @@ class CategoriesController(
         addOnLayoutChangeListener { view, left, _, right, _, _, _, _, _ ->
             val tiles = ((right - left) / (TILE_MAX_DP * view.resources.displayMetrics.density))
                 .toInt().coerceAtLeast(MIN_TILES)
-            (layoutManager as GridLayoutManager).spanCount = tiles * 2
+            (layoutManager as MosaicLayoutManager).spanCount = tiles * 2
+            rows.setColumns(tiles * 2)
             keepClear()
         }
     }

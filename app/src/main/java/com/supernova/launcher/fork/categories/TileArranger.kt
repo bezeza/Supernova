@@ -2,7 +2,6 @@ package com.supernova.launcher.fork.categories
 
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 // Arranging the tiles: while it is on the tiles shake, a hold drags one to
@@ -19,7 +18,12 @@ internal class TileArranger(
 
     private val touchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
-            if (rows.isDraggable(viewHolder.bindingAdapterPosition)) makeMovementFlags(DRAG_FLAGS, 0) else 0
+            // In the mosaic a tile is moved by the mosaic's own drag (the next commit), not by the list.
+            if (!rows.mosaic && rows.isDraggable(viewHolder.bindingAdapterPosition)) {
+                makeMovementFlags(DRAG_FLAGS, 0)
+            } else {
+                0
+            }
 
         override fun onMove(
             recyclerView: RecyclerView,
@@ -61,7 +65,7 @@ internal class TileArranger(
 
     // The list's first visible row stays where it is on screen while [change] regroups the tiles under it.
     private fun keepingScroll(change: () -> Unit) {
-        val layout = recycler.layoutManager as? LinearLayoutManager
+        val layout = recycler.layoutManager as? MosaicLayoutManager
         val first = layout?.findFirstVisibleItemPosition() ?: RecyclerView.NO_POSITION
         val anchor = if (first == RecyclerView.NO_POSITION) null else rows.anchorAt(first)
         val top = layout?.findViewByPosition(first)?.top ?: 0

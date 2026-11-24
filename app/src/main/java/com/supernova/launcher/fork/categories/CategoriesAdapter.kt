@@ -23,7 +23,8 @@ internal sealed class CategoryRow(val key: String, val content: String) {
 
     class Tile(val entry: CategoryEntry, val options: CategoryOptions = CategoryOptions()) : CategoryRow(
         "tile/${entry.group.id}",
-        entry.group.name + "|" + options.size + options.large + "|" + entry.apps.joinToString(",") { appKey(it) }
+        entry.group.name + "|" + options.size + options.large + "@" + options.col + "," + options.row + "|" +
+            entry.apps.joinToString(",") { appKey(it) }
     ) {
         val slots = when (options.size) {
             CategorySize.SMALL -> TileSlots.small()
@@ -64,7 +65,7 @@ internal class CategoriesAdapter(
     private val actions: CategoriesActions,
     private val editHandlers: EditHandlers,
     private val onShowHidden: (Context, List<HiddenCategory>) -> Unit
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), MosaicSource {
 
     private var look = TileLook(textColor = 0)
     private val textColor: Int get() = look.textColor
@@ -84,6 +85,11 @@ internal class CategoriesAdapter(
     // True while a tile that is not small is dragged: the small ones stand in blocks of four, see [TilePairs.blocks].
     private var gathered = false
 
+    private var columns = CellGrid.COLUMNS
+
+    // True while the tiles stand in the mosaic, where a drag is not the list's but the mosaic's own.
+    val mosaic: Boolean get() = MOSAIC
+
     init {
         setHasStableIds(true)
     }
@@ -98,10 +104,46 @@ internal class CategoriesAdapter(
         show(onScreen(list))
     }
 
+    // How many columns the mosaic has: four, more on a wide screen. The tiles are placed anew when it changes.
+    fun setColumns(count: Int) {
+        if (columns == count || count < 1) return
+        columns = count
+        show(onScreen(base))
+    }
+
+    // Where each tile stands in the mosaic, by folder id.
+    private var cells: Map<String, Placed> = emptyMap()
+
+    // The tiles in the cells they were left in, a new one in the first free cell, and in their reading order in
+    // the list, so what the list holds in order is what the eye reads. The other rows stay where they are.
+    private fun mosaic(list: List<CategoryRow>): List<CategoryRow> {
+        val tiles = list.filterIsInstance<CategoryRow.Tile>()
+        val placed = CellGrid.arrange(
+            tiles.map { Entry(it.entry.group.id, it.options.size, it.options.col, it.options.row) }, columns
+        )
+        cells = placed.associateBy { it.id }
+        val rank = CellGrid.order(placed).withIndex().associate { it.value to it.index }
+        val ordered = tiles.sortedBy { rank[it.entry.group.id] ?: Int.MAX_VALUE }
+        var next = 0
+        return list.map { if (it is CategoryRow.Tile) ordered[next++] else it }
+    }
+
+    override fun cellAt(position: Int): Placed? =
+        (items.getOrNull(position) as? CategoryRow.Tile)?.let { cells[it.entry.group.id] }
+
+    override fun kindAt(position: Int): Int = getItemViewType(position)
+
+    // A row of the mosaic is half of a normal tile's height: its square card (two columns across) and its name under
+    // it, which may take two lines.
+    override fun unitHeight(context: Context, columnWidth: Int): Int {
+        val line = TextView(context).apply { setTextSize(TypedValue.COMPLEX_UNIT_SP, TILE_LABEL_SP) }.lineHeight
+        return columnWidth + (dp(context, TITLE_GAP_DP) + TITLE_LINES * line) / 2
+    }
+
     // What is on screen for the rows: while arranging every tile is its own item, so one small tile can be dragged;
     // otherwise two small ones in a row are a pair, and the bar on top is only there while arranging.
     private fun onScreen(list: List<CategoryRow>): List<CategoryRow> =
-        if (!editing) grouped(list) else if (gathered) blocked(list) else list
+        if (MOSAIC) mosaic(list) else if (!editing) grouped(list) else if (gathered) blocked(list) else list
 
     // The rows with the small tiles in blocks of four, the last block of a run holding what is left.
     private fun blocked(list: List<CategoryRow>): List<CategoryRow> =
@@ -260,7 +302,7 @@ internal class CategoriesAdapter(
 
     // A tile is two spans wide (a small one, one; a double one, four, or the row if that is narrower), a loose
     // app one, anything else the whole row.
-    fun spanAt(position: Int, spanCount: Int): Int = when (val row = getItem(position)) {
+    override fun spanAt(position: Int, spanCount: Int): Int = when (val row = getItem(position)) {
         is CategoryRow.Tile -> when (row.options.size) {
             CategorySize.NORMAL, CategorySize.TALL -> SPAN_TILE
             CategorySize.SMALL -> 1
@@ -632,6 +674,9 @@ internal class CategoriesAdapter(
     }
 
     private companion object {
+        // The tiles stand in a mosaic. The pairs, blocks and gaps below are what stood before it, kept until it is
+        // checked, and gone with the next commit.
+        const val MOSAIC = true
         const val TYPE_RECENT = 0
         const val TYPE_TILE = 1
         const val TYPE_HEADER = 2
