@@ -27,6 +27,15 @@ class CategoryColumnsTest {
     }
 
     @Test
+    fun anAppAddedToANineAppCategoryTakesItToFourColumns() {
+        val before = CategoryColumnsLayout.compute(CategoryColumns.AUTO, 9, 7, 1f, 1080, 2.75f)
+        val after = CategoryColumnsLayout.compute(CategoryColumns.AUTO, 10, 7, 1f, 1080, 2.75f)
+        assertEquals(3, before.shown)
+        assertEquals(4, after.shown)
+        assertTrue(after.columnPx < before.columnPx)
+    }
+
+    @Test
     fun aChosenNumberOfColumnsHoldsWhateverTheCount() {
         assertEquals(3, cols(CategoryColumns.THREE, 40))
         assertEquals(4, cols(CategoryColumns.FOUR, 1))

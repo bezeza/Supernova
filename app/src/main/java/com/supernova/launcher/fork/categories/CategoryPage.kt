@@ -35,6 +35,7 @@ internal class CategoryPage(
     private val density = context.resources.displayMetrics.density
     private val appContext = context
     private var picker: LargePicker<LaunchableApp>? = null
+    private var look: ScreenLook? = null
     private var shownApps: List<LaunchableApp> = emptyList()
 
     private val bar = PickBar(context) { cancelPicking() }.apply { visibility = View.GONE }
@@ -62,6 +63,13 @@ internal class CategoryPage(
         itemAnimator = null
         clipToPadding = false
         overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
+    // The grid takes a look: its columns and its padding.
+    private val applyLook: (ScreenLook) -> Unit = { look ->
+        this.look = look
+        (grid.layoutManager as GridLayoutManager).spanCount = look.columns.coerceAtLeast(1)
+        grid.setPadding(look.left, look.top, look.right, look.bottom)
     }
 
     val view = LinearLayout(context).apply {
@@ -108,8 +116,7 @@ internal class CategoryPage(
         stopPicking()
         shownApps = apps
         header.show(group.name, choosable = apps.size > 1)
-        (grid.layoutManager as GridLayoutManager).spanCount = look.columns.coerceAtLeast(1)
-        grid.setPadding(look.left, look.top, look.right, look.bottom)
+        applyLook(look)
         cells.submit(apps, emptyList(), true, AppDrawerAdapter.Order.UNSORTED, replace = true)
         grid.scrollToPosition(0)
     }
@@ -118,6 +125,8 @@ internal class CategoryPage(
     fun update(apps: List<LaunchableApp>) {
         shownApps = apps
         header.setChoosable(apps.size > 1)
+        // The columns follow the count of apps: one added through "+" may take the category to four.
+        look?.relook?.invoke(apps.size)?.let(applyLook)
         cells.submit(apps, emptyList(), true, AppDrawerAdapter.Order.UNSORTED, replace = false)
     }
 

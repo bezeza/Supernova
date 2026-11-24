@@ -2203,7 +2203,7 @@ class DrawerController(
             display?.let { cells.setDisplay(it.first, it.second, it.third) }
             return ScreenLook(
                 menuColumns, recycler.paddingLeft, recycler.paddingTop, recycler.paddingRight, recycler.paddingBottom
-            )
+            ) { count -> categoryLook(viewModel.state.value.prefs, count, cells, recycler) }
         }
         val width = (recycler.width.takeIf { it > 0 } ?: context.resources.displayMetrics.widthPixels) -
             recycler.paddingLeft - recycler.paddingRight
@@ -2220,7 +2220,7 @@ class DrawerController(
         return ScreenLook(
             layout.shown, recycler.paddingLeft + layout.sidePx, recycler.paddingTop,
             recycler.paddingRight + layout.sidePx, recycler.paddingBottom
-        )
+        ) { count -> categoryLook(viewModel.state.value.prefs, count, cells, recycler) }
     }
 
     // Fork: the Categories list covers the grid on the All tab, unsearched.
