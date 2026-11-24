@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.withStyledAttributes
+import com.supernova.launcher.R
 
 // One of the sizes a tile can have, as an icon in the row on top of its menu.
 internal class SizeChoice(val size: CategorySize, @DrawableRes val icon: Int, val label: String)
@@ -31,6 +32,18 @@ internal class LayoutRow(val choices: List<LayoutChoice>, val current: Int, val 
 
 // A row of the menu under the sizes.
 internal class MenuRow(val label: String, @DrawableRes val icon: Int, val onClick: () -> Unit)
+
+// The side in pixels of a button of the menu's rows of icons: [SIZE_ICON_DP], or less where [count] of them
+// would not fit the screen's width.
+private const val SIZE_ICON_DP = 48f
+private const val SCREEN_MARGIN_DP = 8f
+private const val MENU_PAD_DP = 8f
+
+private fun buttonSide(context: Context, count: Int): Int {
+    val density = context.resources.displayMetrics.density
+    val room = context.resources.displayMetrics.widthPixels - 2 * ((SCREEN_MARGIN_DP + MENU_PAD_DP) * density).toInt()
+    return minOf((SIZE_ICON_DP * density).toInt(), room / maxOf(count, 1))
+}
 
 // The menu of a tile: the sizes it can have as a row of icons, the one it has marked in the accent colour, and under
 // them the things to do with it. It is a window over the list that does not take the finger: the touch that opened it
@@ -74,10 +87,16 @@ internal class TileMenu(private val context: Context, private val look: TileLook
                 dismiss()
                 onSize(size)
             })
+            sizes.firstOrNull { it.size == current }?.let { choice ->
+                val footprint = CellFlow.footprint(choice.size)
+                val text = context.getString(R.string.fork_menu_caption, choice.label, footprint.w, footprint.h)
+                content.addView(caption(text))
+            }
             content.addView(divider())
         }
         if (layouts.choices.isNotEmpty()) {
             content.addView(layoutRow(layouts))
+            layouts.choices.firstOrNull { it.count == layouts.current }?.let { content.addView(caption(it.label)) }
             content.addView(divider())
         }
         rows.forEach { row -> content.addView(rowView(row)) }
@@ -119,7 +138,10 @@ internal class TileMenu(private val context: Context, private val look: TileLook
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
         }
-        sizes.forEach { choice -> row.addView(sizeButton(choice, choice.size == current, onSize)) }
+        val button = buttonSide(context, sizes.size)
+        sizes.forEach { choice ->
+            row.addView(iconButton(choice.icon, choice.label, choice.size == current, button) { onSize(choice.size) })
+        }
         return row
     }
 
@@ -128,8 +150,9 @@ internal class TileMenu(private val context: Context, private val look: TileLook
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
         }
+        val button = buttonSide(context, layouts.choices.size)
         layouts.choices.forEach { choice ->
-            row.addView(iconButton(choice.icon, choice.label, choice.count == layouts.current) {
+            row.addView(iconButton(choice.icon, choice.label, choice.count == layouts.current, button) {
                 dismiss()
                 layouts.onPick(choice.count)
             })
@@ -137,20 +160,32 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         return row
     }
 
-    private fun sizeButton(choice: SizeChoice, active: Boolean, onSize: (CategorySize) -> Unit): View =
-        iconButton(choice.icon, choice.label, active) { onSize(choice.size) }
+    // The name of what is marked, one line under the icons, as the icons alone are small to tell apart.
+    private fun caption(text: String): View = TextView(context).apply {
+        this.text = text
+        gravity = Gravity.CENTER
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, CAPTION_SP)
+        setTextColor(look.menuText)
+        setPadding(0, dp(CAPTION_TOP_DP), 0, 0)
+    }
 
-    private fun iconButton(@DrawableRes icon: Int, label: String, active: Boolean, onClick: () -> Unit): View =
+    private fun iconButton(
+        @DrawableRes icon: Int,
+        label: String,
+        active: Boolean,
+        button: Int,
+        onClick: () -> Unit
+    ): View =
         ImageView(context).apply {
             setImageResource(icon)
             imageTintList = ColorStateList.valueOf(if (active) look.accent else look.menuText)
-            val pad = dp(SIZE_ICON_PAD_DP)
+            val pad = button / PAD_DIVISOR
             setPadding(pad, pad, pad, pad)
             if (active) background = activeBackground()
             contentDescription = label
             TooltipCompat.setTooltipText(this, label)
             setOnClickListener { onClick() }
-            layoutParams = LinearLayout.LayoutParams(dp(SIZE_ICON_DP), dp(SIZE_ICON_DP))
+            layoutParams = LinearLayout.LayoutParams(button, button)
         }
 
     // The round wash of the accent behind the size the tile has.
@@ -201,11 +236,12 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         const val PAD_DP = 8f
         const val MIN_WIDTH_DP = 236f
         const val ELEVATION_DP = 8f
-        const val SCREEN_MARGIN_DP = 8f
         const val ARC_CLEARANCE_DP = 12f
         const val FINGER_GAP_DP = 28f
-        const val SIZE_ICON_DP = 44f
-        const val SIZE_ICON_PAD_DP = 10f
+        // A button is a sixth padding on each side, so its icon is two thirds of it: 32 dp in 48.
+        const val PAD_DIVISOR = 6
+        const val CAPTION_SP = 13f
+        const val CAPTION_TOP_DP = 2f
         const val ROW_HEIGHT_DP = 48f
         const val ROW_SIDE_DP = 12f
         const val ROW_ICON_DP = 22f

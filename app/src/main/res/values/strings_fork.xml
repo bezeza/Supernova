@@ -63,6 +63,7 @@
     <string name="fork_size_strip">Strip (4×1): one row of icons</string>
     <string name="fork_menu_size_strip">Strip</string>
     <string name="fork_size_half">Half (2×1): half a normal tile high</string>
+    <string name="fork_menu_caption" translatable="false">%1$s · %2$d×%3$d</string>
     <string name="fork_menu_size_half">Half</string>
     <string name="fork_menu_large_0">All small</string>
     <string name="fork_menu_large_1">1 large</string>
