@@ -8,7 +8,7 @@
 
 *Mosaic · block drag · tile menu · open category · large icons*
 
-**No ads. No tracking. Open source.** AGPL-3.0 · Telegram **[@Bezeza](https://t.me/Bezeza)**
+**No ads. No tracking. Open source.** AGPL-3.0 · Telegram **[@Bezeza](https://t.me/Bezeza)** · 💛 **[Monobank jar](https://send.monobank.ua/jar/8Hqt4ZL4oD)**
 
 </div>
 
@@ -29,6 +29,9 @@
 
 ### 📲 Встановлення
 Готових релізів у цьому репозиторії ще немає. Хочеш збірку, пиши в Telegram **[@Bezeza](https://t.me/Bezeza)**, або збери сам: `./gradlew assembleRelease` (потрібен JDK 17 і Android SDK).
+
+### 💛 Підтримати
+Форк безкоштовний і без реклами. Якщо він тобі став у пригоді, можна кинути на каву й розвиток у [банку Monobank](https://send.monobank.ua/jar/8Hqt4ZL4oD). Дякую, це справді мотивує!
 
 ### 🤝 Подяка й ліцензія
 Усе найкраще в основі, це робота [@tanujnotes](https://github.com/tanujnotes) і спільноти Supernova. Форк тримається поруч з оригіналом (синхронізація з upstream, окремий код у пакеті `fork`). Ліцензія **AGPL-3.0**, див. [LICENSE](LICENSE). Як усе влаштовано: [FORK.md](FORK.md).
@@ -51,6 +54,9 @@
 ### 📲 Установка
 Готовых релизов в этом репозитории пока нет. Нужна сборка: пишите в Telegram **[@Bezeza](https://t.me/Bezeza)**, или соберите сами: `./gradlew assembleRelease` (нужны JDK 17 и Android SDK).
 
+### 💛 Поддержать
+Форк бесплатный и без рекламы. Если он вам пригодился, можно бросить на кофе и развитие в [банку Monobank](https://send.monobank.ua/jar/8Hqt4ZL4oD). Спасибо, это правда мотивирует!
+
 ### 🤝 Благодарность и лицензия
 Всё лучшее в основе, это работа [@tanujnotes](https://github.com/tanujnotes) и сообщества Supernova. Форк держится рядом с оригиналом (синхронизация с upstream, отдельный код в пакете `fork`). Лицензия **AGPL-3.0**, см. [LICENSE](LICENSE). Как всё устроено: [FORK.md](FORK.md).
 
@@ -71,6 +77,9 @@ A fork of the wonderful [Supernova](https://github.com/tanujnotes/Supernova) lau
 
 ### 📲 Install
 There are no ready releases in this repository yet. Want a build? Message **[@Bezeza](https://t.me/Bezeza)** on Telegram, or build it yourself: `./gradlew assembleRelease` (needs JDK 17 and the Android SDK).
+
+### 💛 Support
+The fork is free and ad-free. If it helped you, you can toss in for coffee and further work via a [Monobank jar](https://send.monobank.ua/jar/8Hqt4ZL4oD). Thank you, it really keeps me going!
 
 ### 🤝 Credits & license
 The best of it is the base, the work of [@tanujnotes](https://github.com/tanujnotes) and the Supernova community. This fork stays close to the original (synced with upstream, its own code in the `fork` package). License **AGPL-3.0**, see [LICENSE](LICENSE). How it is built: [FORK.md](FORK.md).
