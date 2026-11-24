@@ -41,6 +41,9 @@ internal class TileMenu(private val context: Context, private val look: TileLook
 
     val isShowing: Boolean get() = popup?.isShowing == true
 
+    // Told when the menu goes, however it goes.
+    var onDismiss: () -> Unit = {}
+
     private fun dp(value: Float): Int = (value * density).toInt()
 
     @Suppress("LongParameterList") // What one menu is made of, each part used once.
@@ -77,8 +80,10 @@ internal class TileMenu(private val context: Context, private val look: TileLook
         }
         rows.forEach { row -> content.addView(rowView(row)) }
         val window = PopupWindow(content, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        window.isFocusable = true
-        window.isOutsideTouchable = true
+        // Not focusable: the touches outside it reach the list, where the corner arc of the tile is.
+        window.isFocusable = false
+        window.isOutsideTouchable = false
+        window.setOnDismissListener { onDismiss() }
         window.elevation = dp(ELEVATION_DP).toFloat()
         popup = window
         content.measure(

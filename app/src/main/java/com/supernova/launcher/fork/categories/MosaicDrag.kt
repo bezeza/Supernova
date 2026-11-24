@@ -1,8 +1,12 @@
 package com.supernova.launcher.fork.categories
 
+import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.hypot
 
@@ -35,6 +39,14 @@ internal class MosaicDrag(
 
         // True while the tiles are being arranged: a tile is taken by a touch and a move, with no hold.
         fun arranging(): Boolean
+
+        // Whether a tile's menu is up, and closing it.
+        fun menuShowing(): Boolean
+
+        fun dismissMenu()
+
+        // The tile was given another size by its corner.
+        fun resize(id: String, size: CategorySize)
     }
 
     private val slop = ViewConfiguration.get(recycler.context).scaledTouchSlop
@@ -73,6 +85,58 @@ internal class MosaicDrag(
 
     val isDragging: Boolean get() = dragging
 
+    val isResizing: Boolean get() = resizing
+
+    // The arc at a tile's corner while its menu is up, where a finger starts a resize; the outline shows the size the
+    // corner has taken the tile to while the finger moves.
+    private var arc: CornerArc? = null
+    private var arcView: View? = null
+    private var arcId: String? = null
+    private val arcHit = Rect()
+    private var resizing = false
+    private var resizeStart: Pair<Float, Float> = 0f to 0f
+    private var resizeFrom: Placed? = null
+    private var resizeSize: CategorySize? = null
+    private var swallowing = false
+    private val outline = GradientDrawable().apply {
+        cornerRadius = OUTLINE_CORNER_DP * recycler.resources.displayMetrics.density
+    }
+
+    // The tile's menu is up: its arc shows at the card's corner.
+    fun showHandle(view: View, id: String, color: Int) {
+        hideHandle()
+        val card = (view as? ViewGroup)?.getChildAt(0) ?: return
+        val density = recycler.resources.displayMetrics.density
+        val radius = (ARC_RADIUS_DP * density).toInt()
+        val gap = (ARC_GAP_DP * density).toInt()
+        val right = view.left + card.right + gap
+        val bottom = view.top + card.bottom + gap
+        val shape = CornerArc(density, color)
+        shape.setBounds(right - radius, bottom - radius, right, bottom)
+        recycler.overlay.add(shape)
+        recycler.invalidate()
+        val reach = (ARC_REACH_DP * density).toInt()
+        arcHit.set(right - reach, bottom - reach, right + reach, bottom + reach)
+        keepGestureOff(listOf(Rect(arcHit)))
+        arc = shape
+        arcView = view
+        arcId = id
+    }
+
+    // The system's Back gesture at the screen's edge does not take a touch on the arc (a wide tile's reaches the edge).
+    private fun keepGestureOff(rects: List<Rect>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) recycler.systemGestureExclusionRects = rects
+    }
+
+    fun hideHandle() {
+        keepGestureOff(emptyList())
+        arc?.let { recycler.overlay.remove(it) }
+        recycler.invalidate()
+        arc = null
+        arcView = null
+        arcId = null
+    }
+
     // Where the finger last went down on the list, on the screen: a tile's menu opens there.
     var lastDownX = 0f
         private set
@@ -89,16 +153,83 @@ internal class MosaicDrag(
 
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         when (e.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                lastDownX = e.rawX
-                lastDownY = e.rawY
-                if (host.arranging()) armUnder(e)
-            }
+            MotionEvent.ACTION_DOWN -> down(e)
             MotionEvent.ACTION_MOVE -> if (armed != null && !dragging && moved(e)) begin(e)
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (!dragging) disarm()
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (!dragging && !resizing) disarm()
+                swallowing = false
+            }
         }
-        return dragging
+        return dragging || resizing || swallowing
     }
+
+    private fun down(e: MotionEvent) {
+        lastDownX = e.rawX
+        lastDownY = e.rawY
+        val view = arcView
+        when {
+            view != null && arcHit.contains(e.x.toInt(), e.y.toInt()) -> startResize(view, e)
+            // A touch elsewhere while a menu is up closes the menu and nothing else.
+            host.menuShowing() -> {
+                host.dismissMenu()
+                swallowing = true
+            }
+            host.arranging() -> armUnder(e)
+        }
+    }
+
+    private fun startResize(view: View, e: MotionEvent) {
+        val id = arcId ?: return
+        resizeFrom = host.placed().firstOrNull { it.id == id }
+        resizeStart = e.rawX to e.rawY
+        resizeSize = null
+        resizing = true
+        recycler.parent?.requestDisallowInterceptTouchEvent(true)
+        host.dragStarted()
+        arcView = view
+    }
+
+    // The corner follows the finger: the size nearest to where it has taken the tile is the one shown, as an outline.
+    private fun resizeFollow(rawX: Float, rawY: Float) {
+        val from = resizeFrom
+        val view = arcView
+        val lm = recycler.layoutManager as? MosaicLayoutManager
+        if (from != null && view != null && lm != null) {
+            val unit = lm.columnWidth().toFloat()
+            val cols = from.w + (rawX - resizeStart.first) / unit
+            val rows = from.h + (rawY - resizeStart.second) / unit
+            val size = TileResize.sizeForCells(cols, rows)
+            if (size != resizeSize) {
+                resizeSize = size
+                val footprint = CellFlow.footprint(size)
+                val color = outlineColor
+                outline.setColor((color and COLOR_MASK) or (OUTLINE_FILL_ALPHA shl ALPHA_SHIFT))
+                outline.setStroke(
+                    (OUTLINE_STROKE_DP * recycler.resources.displayMetrics.density).toInt(),
+                    (color and COLOR_MASK) or (OUTLINE_STROKE_ALPHA shl ALPHA_SHIFT)
+                )
+                val left = view.left
+                val top = view.top
+                outline.setBounds(left, top, left + (footprint.w * unit).toInt(), top + (footprint.h * unit).toInt())
+                if (outline.callback == null) recycler.overlay.add(outline)
+                recycler.invalidate()
+            }
+        }
+    }
+
+    private fun finishResize(commit: Boolean) {
+        recycler.overlay.remove(outline)
+        recycler.invalidate()
+        val id = arcId
+        val size = resizeSize
+        resizing = false
+        resizeSize = null
+        hideHandle()
+        if (commit && id != null && size != null) host.resize(id, size)
+    }
+
+    // The colour of the outline: the accent of the arc.
+    var outlineColor = 0xFF4C8DF6.toInt()
 
     private fun armUnder(e: MotionEvent) {
         val view = recycler.findChildViewUnder(e.x, e.y) ?: return
@@ -110,9 +241,12 @@ internal class MosaicDrag(
 
     override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
         when (e.actionMasked) {
-            MotionEvent.ACTION_MOVE -> if (dragging) follow(e.rawX, e.rawY)
-            MotionEvent.ACTION_UP -> finish(commit = true)
-            MotionEvent.ACTION_CANCEL -> finish(commit = false)
+            MotionEvent.ACTION_MOVE -> when {
+                resizing -> resizeFollow(e.rawX, e.rawY)
+                dragging -> follow(e.rawX, e.rawY)
+            }
+            MotionEvent.ACTION_UP -> if (resizing) finishResize(commit = true) else finish(commit = true)
+            MotionEvent.ACTION_CANCEL -> if (resizing) finishResize(commit = false) else finish(commit = false)
         }
     }
 
@@ -194,6 +328,15 @@ internal class MosaicDrag(
     }
 
     private companion object {
+        const val ARC_RADIUS_DP = 26f
+        const val ARC_GAP_DP = 3f
+        const val ARC_REACH_DP = 32f
+        const val OUTLINE_CORNER_DP = 24f
+        const val OUTLINE_STROKE_DP = 2f
+        const val OUTLINE_FILL_ALPHA = 0x30
+        const val OUTLINE_STROKE_ALPHA = 0xB0
+        const val COLOR_MASK = 0xFFFFFF
+        const val ALPHA_SHIFT = 24
         const val EDGE_ZONE_DP = 72f
         const val EDGE_STEP_DP = 14f
         const val LIFT_DP = 12f

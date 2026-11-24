@@ -101,6 +101,12 @@ class CategoriesController(
         override fun dragStarted() = menu.dismiss()
 
         override fun arranging(): Boolean = rows.editing
+
+        override fun menuShowing(): Boolean = menu.isShowing
+
+        override fun dismissMenu() = menu.dismiss()
+
+        override fun resize(id: String, size: CategorySize) = resizeTile(id, size)
     }
 
     private val drag = MosaicDrag(recycler, dragHost).also { recycler.addOnItemTouchListener(it) }
@@ -109,7 +115,10 @@ class CategoriesController(
     private var look = TileLook(textColor = 0)
     private var menuOwner: TileMenu? = null
     private val menu: TileMenu
-        get() = menuOwner ?: TileMenu(recycler.context, look).also { menuOwner = it }
+        get() = menuOwner ?: TileMenu(recycler.context, look).also {
+            it.onDismiss = { if (!drag.isResizing) drag.hideHandle() }
+            menuOwner = it
+        }
 
     // The finger holds a tile outside the arranging: its menu opens, and a move of the finger takes the tile off.
     private fun holdTile(view: View, id: String) {
@@ -128,6 +137,7 @@ class CategoriesController(
     private fun openMenu(view: View, id: String, x: Float, y: Float) {
         val tile = rows.tile(id) ?: return
         val context = recycler.context
+        closeMenu()
         menuOwner = null
         val rowsOfMenu = buildList {
             add(MenuRow(context.getString(R.string.fork_menu_open), R.drawable.ic_menu_open) {
@@ -149,9 +159,12 @@ class CategoriesController(
             }
         }
         val layouts = layoutRow(context, id, tile.options)
+        drag.outlineColor = look.accent
         menu.show(view, x, y, tile.options.size, sizeChoices(context), layouts, rowsOfMenu) { size ->
             resizeTile(id, size)
         }
+        val item = recycler.findContainingItemView(view) ?: view
+        drag.showHandle(item, id, look.menuText)
     }
 
     private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
@@ -311,7 +324,14 @@ class CategoriesController(
 
     // Back: choosing large icons stops first, then the screen closes. True
     // when it did either, so the Back is spent.
-    fun back(): Boolean = arranger.stop() || screen.cancelPicking() || closeScreen()
+    fun back(): Boolean = closeMenu() || arranger.stop() || screen.cancelPicking() || closeScreen()
+
+    // A tile's menu is up: Back closes it first.
+    private fun closeMenu(): Boolean {
+        val showing = menuOwner?.isShowing == true
+        if (showing) menuOwner?.dismiss()
+        return showing
+    }
 
     // A tap on an app of the screen: a choice while choosing, else [launch].
     fun onScreenAppClick(launch: () -> Unit, app: LaunchableApp) {
@@ -333,7 +353,7 @@ class CategoriesController(
     fun submit(data: CategoriesData, showRecent: Boolean) {
         rows.setLook(data.look)
         look = data.look
-        menuOwner = null
+        if (menuOwner?.isShowing != true) menuOwner = null
         doneBar.setLook(data.look.textColor, CategoryTint.cardColor(data.look.textColor, data.look.backdrop))
         options = data.settings.options
         screen.setLook(data.look.textColor, data.look.showIcons)
