@@ -65,6 +65,14 @@ internal class CategoryPage(
     }
 
     private val swipe = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        // A tap on empty space of the grid, between and under the icons, leaves the screen as Back does. Not while
+        // the large icons are being chosen: a tap is a choice then.
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
+            val onEmpty = picker == null && grid.findChildViewUnder(e.x, e.y) == null
+            if (onEmpty) onBack()
+            return onEmpty
+        }
+
         override fun onFling(first: MotionEvent?, second: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             first ?: return false
             val goesBack = BackSwipe.isBack(second.x - first.x, second.y - first.y, velocityX, density)
