@@ -274,6 +274,9 @@ data class LauncherPrefs(
     // options as JSON by folder id (fork/categories/CategoryOptions).
     val categoriesRecentCount: Int = 4,
     val categoriesOptions: String = "",
+    // How many columns an open category has: by its apps (the default), as the menu, or a number.
+    val categoriesColumns: com.supernova.launcher.fork.categories.CategoryColumns =
+        com.supernova.launcher.fork.categories.CategoryColumns.AUTO,
     // Fork: a drawer folder opens on a screen like a category's, in the other drawer styles.
     val folderScreen: Boolean = false,
     // Fork: the last page of the home screen shows the category tiles.
