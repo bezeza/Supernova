@@ -62,6 +62,8 @@
     <string name="fork_menu_size_large">Большая</string>
     <string name="fork_size_strip">Полоса (4×1): один ряд значков</string>
     <string name="fork_menu_size_strip">Полоса</string>
+    <string name="fork_size_half">Полуплитка (2×1): вдвое ниже обычной</string>
+    <string name="fork_menu_size_half">Полуплитка</string>
     <string name="fork_menu_large_0">Все маленькие</string>
     <string name="fork_menu_large_1">1 большой</string>
     <string name="fork_menu_large_2">2 больших</string>

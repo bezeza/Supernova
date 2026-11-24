@@ -66,6 +66,14 @@ class CardGeometryTest {
     }
 
     @Test
+    fun aHalfTileIsAsWideAsANormalOneAndHalfAsHighAndItsIconsFit() {
+        val slots = TileSlots.half()
+        val geometry = CardGeometry({ slots }, { gap })
+        assertEquals(normal / 2 - gap, geometry.height(normal))
+        check(slots, normal)
+    }
+
+    @Test
     fun aBigTileIsSquare() {
         val width = 2 * normal + 2 * gap
         assertEquals(width, CardGeometry({ TileSlots.big() }, { gap }).height(width))

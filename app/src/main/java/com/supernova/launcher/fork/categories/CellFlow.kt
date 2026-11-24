@@ -15,6 +15,7 @@ internal object CellFlow {
         CategorySize.TALL -> Footprint(HALF, FULL)
         CategorySize.LARGE -> Footprint(FULL, FULL)
         CategorySize.STRIP -> Footprint(FULL, 1)
+        CategorySize.HALF -> Footprint(HALF, 1)
     }
 
     // A unit is what stands in a row as one: a tile, or two small tiles one over the other.

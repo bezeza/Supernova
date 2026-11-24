@@ -75,6 +75,16 @@ class CategoryOptionsCellsTest {
     }
 
     @Test
+    fun aHalfTileSurvivesTheBackupAndAnOlderBuildReadsItAsNormal() {
+        val raw = CategoryOptionsStore.encode(mapOf("A" to CategoryOptions(size = CategorySize.HALF, col = 2, row = 1)))
+        val back = CategoryOptionsStore.decode(raw).getValue("A")
+        assertEquals(CategorySize.HALF, back.size)
+        assertEquals(2 to 1, back.col to back.row)
+        // The older build knows no HALF and falls back to NORMAL on the name it finds.
+        assertEquals("HALF", legacyJson.decodeFromString<Map<String, LegacyStored>>(raw).getValue("A").size)
+    }
+
+    @Test
     fun theStripOfNewInstallsKeepsItsEntryWhenAnotherCategoryChanges() {
         val strip = CategoryOptions(size = CategorySize.STRIP, col = 0, row = 0)
         val raw = CategoryOptionsStore.encode(mapOf(CategoryOptionsStore.RECENT_KEY to strip))

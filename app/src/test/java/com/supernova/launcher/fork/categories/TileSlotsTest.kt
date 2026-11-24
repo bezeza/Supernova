@@ -54,6 +54,15 @@ class TileSlotsTest {
     }
 
     @Test
+    fun aHalfTileIsOneRowOfTwoLargeIcons() {
+        val slots = TileSlots.half()
+        assertEquals(2, TileSlots.largeCount(slots))
+        assertEquals(0, TileSlots.miniCount(slots))
+        assertEquals(2f, TileSlots.contentWidth(slots), eps)
+        assertTrue(slots.all { it.y == 0f && it.size == 1f })
+    }
+
+    @Test
     fun noLargeTileIsThreeByThreeSmall() {
         val slots = TileSlots.normal(0)
         assertEquals(0, TileSlots.largeCount(slots))

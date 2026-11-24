@@ -33,6 +33,7 @@ internal sealed class CategoryRow(val key: String, val content: String) {
             CategorySize.STRIP -> TileSlots.strip(CategoryOptions.stripCount(options.large))
             CategorySize.LARGE -> TileSlots.big()
             CategorySize.TALL -> TileSlots.tall()
+            CategorySize.HALF -> TileSlots.half()
         }
         val layout = CategoryLayout.tile(entry.apps, slots)
     }
@@ -342,7 +343,7 @@ internal class CategoriesAdapter(
     // app one, anything else the whole row.
     override fun spanAt(position: Int, spanCount: Int): Int = when (val row = getItem(position)) {
         is CategoryRow.Tile -> when (row.options.size) {
-            CategorySize.NORMAL, CategorySize.TALL -> SPAN_TILE
+            CategorySize.NORMAL, CategorySize.TALL, CategorySize.HALF -> SPAN_TILE
             CategorySize.SMALL -> 1
             CategorySize.WIDE, CategorySize.LARGE, CategorySize.STRIP -> minOf(SPAN_DOUBLE, spanCount)
         }

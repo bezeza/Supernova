@@ -93,6 +93,7 @@ internal object CategoryOptionsDialog {
             CategorySize.SMALL -> R.string.fork_size_small
             CategorySize.LARGE -> R.string.fork_size_large
             CategorySize.TALL -> R.string.fork_size_tall
+            CategorySize.HALF -> R.string.fork_size_half
         }
     )
 

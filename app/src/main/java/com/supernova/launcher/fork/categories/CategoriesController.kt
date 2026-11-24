@@ -187,6 +187,7 @@ class CategoriesController(
 
     private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
         Triple(CategorySize.SMALL, R.drawable.ic_fork_size_small, R.string.fork_menu_size_small),
+        Triple(CategorySize.HALF, R.drawable.ic_fork_size_half, R.string.fork_menu_size_half),
         Triple(CategorySize.NORMAL, R.drawable.ic_fork_size_normal, R.string.fork_menu_size_normal),
         Triple(CategorySize.TALL, R.drawable.ic_fork_size_tall, R.string.fork_menu_size_tall),
         Triple(CategorySize.WIDE, R.drawable.ic_fork_size_wide, R.string.fork_menu_size_wide),

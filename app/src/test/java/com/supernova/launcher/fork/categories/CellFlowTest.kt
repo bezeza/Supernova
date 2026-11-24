@@ -67,6 +67,14 @@ class CellFlowTest {
     }
 
     @Test
+    fun twoHalfTilesStandSideBySideAndAThirdStartsTheNextRowOfOneCell() {
+        val entries = listOf(e("a", CategorySize.HALF), e("b", CategorySize.HALF), e("c", CategorySize.HALF))
+        val out = CellFlow.legacy(entries, 4)
+        assertEquals(2 to 0, at(out, "b"))
+        assertEquals(0 to 1, at(out, "c"))
+    }
+
+    @Test
     fun onSixColumnsThreeNormalTilesStandInOneRow() {
         val out = CellFlow.legacy(three(), 6)
         assertEquals(4 to 0, at(out, "c"))

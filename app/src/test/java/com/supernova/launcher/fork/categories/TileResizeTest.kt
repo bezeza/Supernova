@@ -69,6 +69,14 @@ class TileResizeTest {
     }
 
     @Test
+    fun aCornerDraggedToTwoByOneSnapsToAHalfTile() {
+        assertEquals(CategorySize.HALF, TileResize.sizeForCells(2f, 1f))
+        assertEquals(CategorySize.HALF, TileResize.sizeForCells(2.4f, 1.3f))
+        assertEquals(CategorySize.SMALL, TileResize.sizeForCells(1.2f, 1f))
+        assertEquals(CategorySize.NORMAL, TileResize.sizeForCells(2f, 1.8f))
+    }
+
+    @Test
     fun aCornerDraggedDownSnapsToATallTile() {
         assertEquals(CategorySize.TALL, TileResize.sizeForCells(2f, 4f))
         assertEquals(CategorySize.TALL, TileResize.sizeForCells(2.3f, 3.4f))
