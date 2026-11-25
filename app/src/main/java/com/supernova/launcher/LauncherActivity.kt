@@ -914,7 +914,8 @@ class LauncherActivity :
                 if (predates || viewModel.homePromptShown()) {
                     viewModel.markOnboardingDone()
                 } else {
-                    startActivity(
+                    com.supernova.launcher.fork.ForkHooks.startOnboarding( // Fork
+                        this@LauncherActivity,
                         Intent(this@LauncherActivity, com.supernova.launcher.onboarding.OnboardingActivity::class.java)
                     )
                     return@launch

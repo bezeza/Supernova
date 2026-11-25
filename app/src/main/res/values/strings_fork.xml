@@ -90,4 +90,6 @@
     <string name="fork_hint_tile_menu">Hold a tile: its sizes and menu</string>
     <string name="fork_hint_columns">Number of columns: Settings → App drawer → Columns in a category</string>
     <string name="fork_hint_ok">Got it</string>
+    <string name="fork_language_title">Choose a language</string>
+    <string name="fork_language_next">Next</string>
 </resources>

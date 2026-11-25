@@ -89,4 +89,6 @@
     <string name="fork_hint_tile_menu">Удерживайте плитку: размеры и меню</string>
     <string name="fork_hint_columns">Количество колонок: Настройки → Меню приложений → Колонки в категории</string>
     <string name="fork_hint_ok">Понятно</string>
+    <string name="fork_language_title">Выберите язык</string>
+    <string name="fork_language_next">Далее</string>
 </resources>

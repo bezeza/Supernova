@@ -146,6 +146,13 @@
             android:exported="false"
             android:launchMode="singleTop" />
 
+        <!-- Fork: the language, asked over the first run before it begins. -->
+        <activity
+            android:name=".fork.welcome.ForkLanguageActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTop" />
+
         <!-- Backs the "Share backup" chooser; exposes only cacheDir/share. -->
         <provider
             android:name="androidx.core.content.FileProvider"
