@@ -77,4 +77,13 @@
     <string name="fork_menu_large_3">3 больших</string>
     <string name="fork_menu_strip_4">4 значка</string>
     <string name="fork_menu_strip_5">5 значков</string>
+    <string name="fork_about">О форке</string>
+    <string name="fork_about_summary">Форк: bezeza · оригинал: tanujnotes</string>
+    <string name="fork_about_author">Автор форка: bezeza</string>
+    <string name="fork_about_github">bezeza на GitHub</string>
+    <string name="fork_about_telegram">Telegram @Bezeza</string>
+    <string name="fork_about_original">Оригинал: tanujnotes/Supernova</string>
+    <string name="fork_whats_new">Что нового в форке</string>
+    <string name="fork_whats_new_summary">Отличия от оригинала</string>
+    <string name="fork_changes">• Стиль меню «Категории» с мозаикой плиток: 7 размеров, меню долгим нажатием, перетаскивание, «Уплотнить»\n• Страница категорий на рабочем столе\n• Недавно установленные: 4×1, 2×2 и 4×2\n• Колонки в категории: Авто, Как в меню, 3–5\n• Выбор больших иконок, значки категорий\n• Свои колонки, прозрачность, название и иконка для каждой папки\n• Русский и украинский языки</string>
 </resources>

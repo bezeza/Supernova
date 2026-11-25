@@ -78,4 +78,13 @@
     <string name="fork_menu_large_3">3 large</string>
     <string name="fork_menu_strip_4">4 icons</string>
     <string name="fork_menu_strip_5">5 icons</string>
+    <string name="fork_about">About the fork</string>
+    <string name="fork_about_summary">Fork by bezeza · original by tanujnotes</string>
+    <string name="fork_about_author">Fork by: bezeza</string>
+    <string name="fork_about_github">bezeza on GitHub</string>
+    <string name="fork_about_telegram">Telegram @Bezeza</string>
+    <string name="fork_about_original">Original: tanujnotes/Supernova</string>
+    <string name="fork_whats_new">What\'s new in the fork</string>
+    <string name="fork_whats_new_summary">Changes against the original</string>
+    <string name="fork_changes">• Categories style of the app menu, with a tile mosaic: 7 sizes, long-press menu, dragging, Compact\n• A categories page on the home screen\n• Recently installed: 4×1, 2×2 and 4×2\n• Columns in a category: Auto, As in the menu, 3–5\n• Choosing large icons, category icons\n• Per-folder columns, tint, name and icon\n• Ukrainian and Russian languages</string>
 </resources>
