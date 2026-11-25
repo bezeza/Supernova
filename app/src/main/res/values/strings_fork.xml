@@ -123,4 +123,6 @@
     <string name="fork_backup_in_folder">In the folder: %1$s</string>
     <string name="fork_backup_done">Backup made</string>
     <string name="fork_backup_failed">The backup to the folder failed</string>
+    <string name="fork_updates">Check for updates</string>
+    <string name="fork_updates_summary">Opens the releases page in the browser</string>
 </resources>

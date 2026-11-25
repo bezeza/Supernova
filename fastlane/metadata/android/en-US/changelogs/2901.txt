@@ -1,0 +1,8 @@
+Fork of Supernova v0.2.9.
+- Category tile mosaic: 7 sizes, long-press menu, dragging, Compact
+- Categories page on the home screen
+- Smart folders know Ukrainian apps
+- Weekly backup, with a copy in your folder
+- Language screen, tour and hints
+- Ukrainian and Russian
+Coming from the original: export a backup first.
