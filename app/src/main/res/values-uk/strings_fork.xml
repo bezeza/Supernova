@@ -89,4 +89,6 @@
     <string name="fork_hint_tile_menu">Утримуйте плитку: розміри й меню</string>
     <string name="fork_hint_columns">Кількість колонок: Налаштування → Шухляда застосунків → Колонки в категорії</string>
     <string name="fork_hint_ok">Зрозуміло</string>
+    <string name="fork_language_title">Оберіть мову</string>
+    <string name="fork_language_next">Далі</string>
 </resources>

@@ -5,6 +5,7 @@ Read [FORK.md](FORK.md) and [docs/architecture/LauncherActivity-map.md](docs/arc
 ## Hard rules
 
 - Fork features go in the new package `com.supernova.launcher.fork`. The only planned edit inside `LauncherActivity` is one line at the end of `onCreate`: `ForkHooks.attach(this)`. The hook is already in the tree (PR #4); do not add a second call.
+- One more delegate call, approved by the owner: `ForkHooks.startOnboarding(...)` where `LauncherActivity` starts the first-run wizard (marked `Fork`), so the language screen goes before it. Keep it on a sync.
 - Optional hooks, only when a feature cannot work otherwise: a single delegate call as the first line of `dispatchTouchEvent`, and a single delegate call as the first line of `onNewIntent` after `super`.
 - Add fork UI in code. Do not edit `app/src/main/res/layout/activity_launcher.xml` for fork UI.
 - Do not change `namespace` (`com.supernova.launcher`) or the icon-pack intent action and extra strings listed in FORK.md.

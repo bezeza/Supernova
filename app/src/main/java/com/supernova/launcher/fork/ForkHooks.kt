@@ -1,5 +1,7 @@
 package com.supernova.launcher.fork
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.widget.FrameLayout
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -10,6 +12,8 @@ import com.supernova.launcher.data.LaunchableApp
 import com.supernova.launcher.ui.AppDrawerAdapter
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
+import com.supernova.launcher.fork.welcome.ForkLanguageActivity
+import com.supernova.launcher.fork.welcome.WelcomeFlags
 
 /**
  * The fork's only entry point inside [LauncherActivity].
@@ -28,6 +32,19 @@ object ForkHooks {
 
     fun attach(activity: LauncherActivity) {
         activity.lifecycle.addObserver(observer)
+    }
+
+    /**
+     * Starts the original's first run, [wizard]; until a language has been asked for once, the fork's language
+     * screen instead, which goes on to the wizard. Called where [LauncherActivity] would start the wizard itself.
+     */
+    fun startOnboarding(activity: Activity, wizard: Intent) {
+        val first = if (WelcomeFlags(activity).languageAsked) {
+            wizard
+        } else {
+            Intent(activity, ForkLanguageActivity::class.java)
+        }
+        activity.startActivity(first)
     }
 
     /**

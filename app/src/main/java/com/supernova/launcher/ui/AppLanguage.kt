@@ -14,7 +14,7 @@ import com.supernova.launcher.R
  */
 object AppLanguage {
     // BCP-47 tag to the name shown in the list; an empty tag follows the system.
-    private val choices = listOf(
+    internal val choices = listOf(
         "en" to "English",
         "uk" to "Українська",
         "ru" to "Русский"
