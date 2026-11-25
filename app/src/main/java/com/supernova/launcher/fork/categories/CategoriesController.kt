@@ -80,6 +80,11 @@ class CategoriesController(
         addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepClear() }
     }
 
+    // Told to hold a tile, the first time the tiles are seen.
+    private val hint: TilesHint = TilesHint(container.context) { keepClear() }.also {
+        it.view.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> keepClear() }
+    }
+
     // What the dragging of a tile asks of this list and changes in it.
     private val dragHost = object : MosaicDrag.Host {
         override fun placed(): List<Placed> = rows.placed()
@@ -118,7 +123,8 @@ class CategoriesController(
             }
         })
         recycler.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(view: View) = Unit
+            // The hint may have been seen meanwhile on another copy of the tiles (the drawer's, the home page's).
+            override fun onViewAttachedToWindow(view: View) = updateHint()
 
             override fun onViewDetachedFromWindow(view: View) {
                 closeMenu()
@@ -168,6 +174,7 @@ class CategoriesController(
 
     private fun openMenu(view: View, id: String, x: Float, y: Float) {
         val tile = rows.tile(id) ?: return
+        hint.seen()
         val context = recycler.context
         closeMenu()
         menuOwner = null
@@ -251,6 +258,7 @@ class CategoriesController(
 
     private val arranger: TileArranger = TileArranger(recycler, rows) { editing ->
         doneBar.visibility = if (editing) View.VISIBLE else View.GONE
+        updateHint()
         keepClear()
     }
 
@@ -271,14 +279,16 @@ class CategoriesController(
             minOf(1, container.childCount),
             FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         )
-        // Over the tiles, under a category's screen.
-        container.addView(
-            doneBar,
-            container.indexOfChild(recycler) + 1,
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
+        // Over the tiles, under a category's screen: the bar of the arranging and the hint.
+        listOf(doneBar, hint.view).forEach { plate ->
+            container.addView(
+                plate,
+                container.indexOfChild(recycler) + 1,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
+                )
             )
-        )
+        }
     }
 
     // The list keeps clear of what is over its bottom, and, while arranging, of the bar over it; the bar keeps clear
@@ -286,12 +296,16 @@ class CategoriesController(
     private fun keepClear() {
         val clearance = bottomClearance() + systemBarsOverCopy()
         val gap = (BAR_GAP_DP * recycler.resources.displayMetrics.density).toInt()
-        val bar = doneBar.layoutParams as FrameLayout.LayoutParams
-        if (bar.bottomMargin != clearance + gap || bar.marginStart != sidePx || bar.marginEnd != sidePx) {
-            bar.setMargins(sidePx, 0, sidePx, clearance + gap)
-            doneBar.layoutParams = bar
+        listOf(doneBar, hint.view).forEach { plate ->
+            val params = plate.layoutParams as FrameLayout.LayoutParams
+            if (params.bottomMargin != clearance + gap || params.marginStart != sidePx || params.marginEnd != sidePx) {
+                params.setMargins(sidePx, 0, sidePx, clearance + gap)
+                plate.layoutParams = params
+            }
         }
-        val barSpace = if (arranger.isOn) doneBar.height + gap else 0
+        // One of the two at most: the hint is not told while the tiles are arranged.
+        val plate = if (arranger.isOn) doneBar.height else hint.height
+        val barSpace = if (plate > 0) plate + gap else 0
         val bottom = baseBottomPx + clearance + barSpace
         if (recycler.paddingBottom != bottom) recycler.setPadding(sidePx, 0, sidePx, bottom)
     }
@@ -343,7 +357,11 @@ class CategoriesController(
             wanted -> View.INVISIBLE
             else -> View.GONE
         }
+        updateHint()
     }
+
+    private fun updateHint() =
+        hint.update(state.tilesShown(wanted), rows.placed().isNotEmpty(), arranger.isOn)
 
     // A tile opened: the category's apps on a screen of their own.
     fun openScreen(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook, standalone: Boolean = false) {
@@ -419,6 +437,8 @@ class CategoriesController(
         }
         if (data.settings.hidden.isNotEmpty()) list.add(CategoryRow.Hidden(data.settings.hidden))
         rows.submitList(list)
+        hint.setLook(data.look.accent)
+        updateHint()
     }
 
     private fun showOptions(view: View, group: DrawerGroup, apps: List<LaunchableApp>) {

@@ -33,4 +33,9 @@ class BottomClearanceTest {
         assertEquals(0, BottomClearance.underNavigation(bottomInWindow = 2000, windowHeight = 2400, barHeight = 48))
         assertEquals(0, BottomClearance.underNavigation(bottomInWindow = 2400, windowHeight = 2400, barHeight = 0))
     }
+
+    @Test
+    fun aListStillBelowTheScreenIsCoveredByTheBarAtMost() {
+        assertEquals(60, BottomClearance.underNavigation(bottomInWindow = 4700, windowHeight = 2400, barHeight = 60))
+    }
 }
