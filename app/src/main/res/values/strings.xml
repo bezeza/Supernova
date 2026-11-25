@@ -554,7 +554,8 @@
     <string name="about_device_details">Supernova %1$s, Android %2$s (API %3$d), %4$s</string>
     <string name="about_no_browser">No app here opens links</string>
     <string name="about_source">Source code</string>
-    <string name="about_source_url" translatable="false">https://github.com/tanujnotes/Supernova</string>
+    <!-- Fork: the source of this build, and where its issues go. -->
+    <string name="about_source_url" translatable="false">https://github.com/bezeza/Supernova</string>
     <string name="about_privacy">Privacy policy</string>
     <string name="about_privacy_summary">No data collected; nothing leaves this phone</string>
     <string name="about_privacy_url" translatable="false">https://github.com/tanujnotes/Supernova/blob/main/PRIVACY.md</string>
