@@ -856,7 +856,11 @@ class LauncherRepository(private val context: Context) {
     }.isSuccess
 
     fun autoBackups(): List<File> =
-        autoBackupDir.listFiles()?.sortedByDescending { it.name }.orEmpty()
+        // Fork: the weekly copies are listed and restored with these.
+        listOf(autoBackupDir, File(context.filesDir, com.supernova.launcher.fork.backup.WeeklyBackup.LOCAL_DIR))
+            .flatMap { it.listFiles()?.asList().orEmpty() }
+            .filter { it.name.endsWith(".json") }
+            .sortedByDescending { it.name }
 
     suspend fun exportBackup(prefs: LauncherPrefs): String {
         val model = modelFlow.first()

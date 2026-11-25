@@ -5,6 +5,7 @@ import com.supernova.launcher.R
 import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.data.Pref
 import com.supernova.launcher.fork.about.ForkAbout
+import com.supernova.launcher.fork.backup.ForkBackupRows
 import com.supernova.launcher.fork.categories.CategoryColumns
 import com.supernova.launcher.ui.DrawerStyle
 import com.supernova.launcher.ui.LauncherViewModel
@@ -29,6 +30,8 @@ object ForkSettings {
                     folderScreenRow(viewModel)
                 val withStyleRows = afterDrawerStyle(section.items, extraRows)
                 SettingsSection(section.title, afterSmartFolders(withStyleRows, extra))
+            } else if (section.title == R.string.settings_section_backup) {
+                SettingsSection(section.title, ForkBackupRows.addTo(context, viewModel, section.items))
             } else if (section.title == R.string.about) {
                 SettingsSection(section.title, ForkAbout.addTo(context, section.items))
             } else {

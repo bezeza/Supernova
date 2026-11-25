@@ -160,6 +160,13 @@
             android:exported="false"
             android:launchMode="singleTop" />
 
+        <!-- Fork: asks the system for the weekly backup's folder, with nothing of its own on screen. -->
+        <activity
+            android:name=".fork.backup.BackupFolderActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.Fork.Invisible" />
+
         <!-- Backs the "Share backup" chooser; exposes only cacheDir/share. -->
         <provider
             android:name="androidx.core.content.FileProvider"
