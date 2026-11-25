@@ -92,4 +92,20 @@
     <string name="fork_hint_ok">Got it</string>
     <string name="fork_language_title">Choose a language</string>
     <string name="fork_language_next">Next</string>
+    <string name="fork_tour_mosaic">Tile mosaic</string>
+    <string name="fork_tour_mosaic_text">Categories as tiles of different sizes. Hold a tile to change it.</string>
+    <string name="fork_tour_arrange">Arranging</string>
+    <string name="fork_tour_arrange_text">Drag the tiles where you want them; four small ones move as a block.</string>
+    <string name="fork_tour_feed">Feed</string>
+    <string name="fork_tour_feed_text">A page before the home screen: search, music, calendar, contacts and your widgets.</string>
+    <string name="fork_tour_feed_search">Search</string>
+    <string name="fork_tour_feed_music">Music</string>
+    <string name="fork_tour_skip">Skip</string>
+    <string name="fork_tour_next">Next</string>
+    <string name="fork_tour_done">Done</string>
+    <string name="fork_news_show_tour">Show the tour</string>
+    <string name="fork_news_close">Close</string>
+    <string name="fork_tour_again">Show the tour again</string>
+    <string name="fork_tour_again_summary">Three pages on tiles, arranging and the Feed</string>
+    <string name="fork_tour_dots" translatable="false">● ○ ○</string>
 </resources>
