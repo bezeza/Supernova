@@ -13,7 +13,10 @@ enum class SmartCategory {
     NEWS,
     MAPS,
     PRODUCTIVITY,
-    FINANCE
+    FINANCE,
+    // Fork: appended, for the apps of fork/categories/ForkSmartApps.
+    SHOPPING,
+    GOVERNMENT
 }
 
 // Resolves an app to a Smart Folder category: the curated package-prefix map
@@ -112,7 +115,9 @@ object AppCategories {
     // systemCategory is ApplicationInfo.category (CATEGORY_UNDEFINED when the
     // manifest doesn't declare one). Returns null when the app fits nowhere.
     fun categoryOf(packageName: String, systemCategory: Int): SmartCategory? {
-        prefixMap.firstOrNull { packageName.startsWith(it.first) }?.let { return it.second }
+        val listed = com.supernova.launcher.fork.categories.ForkSmartApps.categoryOf(packageName) // Fork
+            ?: prefixMap.firstOrNull { packageName.startsWith(it.first) }?.second
+        listed?.let { return it }
         return when (systemCategory) {
             ApplicationInfo.CATEGORY_GAME -> SmartCategory.GAMES
             ApplicationInfo.CATEGORY_AUDIO -> SmartCategory.ENTERTAINMENT
