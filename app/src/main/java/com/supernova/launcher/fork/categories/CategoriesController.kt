@@ -356,9 +356,13 @@ class CategoriesController(
         onScreenChanged?.invoke()
     }
 
-    // Back: choosing large icons stops first, then the screen closes. True
-    // when it did either, so the Back is spent.
-    fun back(): Boolean = closeMenu() || arranger.stop() || screen.cancelPicking() || closeScreen()
+    // Back closes one of what is open here, in the order of [BackChain]. True when it did, so the Back is spent.
+    fun back(): Boolean = BackChain.run(
+        menu = { closeMenu() },
+        arranging = { arranger.stop() },
+        picking = { screen.cancelPicking() },
+        screen = { closeScreen() }
+    )
 
     // A tile's menu is up: Back closes it first.
     private fun closeMenu(): Boolean {
