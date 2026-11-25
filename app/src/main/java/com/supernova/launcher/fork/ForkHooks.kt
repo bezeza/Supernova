@@ -13,6 +13,7 @@ import com.supernova.launcher.ui.AppDrawerAdapter
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
 import com.supernova.launcher.fork.welcome.ForkLanguageActivity
+import com.supernova.launcher.fork.welcome.Welcome
 import com.supernova.launcher.fork.welcome.WelcomeFlags
 
 /**
@@ -39,7 +40,10 @@ object ForkHooks {
      * screen instead, which goes on to the wizard. Called where [LauncherActivity] would start the wizard itself.
      */
     fun startOnboarding(activity: Activity, wizard: Intent) {
-        val first = if (WelcomeFlags(activity).languageAsked) {
+        val flags = WelcomeFlags(activity)
+        // A first run that begins with the fork in it ends with the fork's tour.
+        flags.firstRun = true
+        val first = if (flags.languageAsked) {
             wizard
         } else {
             Intent(activity, ForkLanguageActivity::class.java)
@@ -64,7 +68,10 @@ object ForkHooks {
         override fun onStart(owner: LifecycleOwner) = plugIn(owner, Phase.START)
 
         /** Fork work that should run each time the launcher is in front plugs in here. */
-        override fun onResume(owner: LifecycleOwner) = plugIn(owner, Phase.RESUME)
+        override fun onResume(owner: LifecycleOwner) {
+            if (owner is LauncherActivity) Welcome.onLauncherResumed(owner)
+            plugIn(owner, Phase.RESUME)
+        }
 
         /** Fork work that should run when this launcher instance is going away plugs in here. */
         override fun onDestroy(owner: LifecycleOwner) = plugIn(owner, Phase.DESTROY)

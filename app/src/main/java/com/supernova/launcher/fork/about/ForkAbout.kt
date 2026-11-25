@@ -3,6 +3,7 @@ package com.supernova.launcher.fork.about
 import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.supernova.launcher.R
+import com.supernova.launcher.fork.welcome.Welcome
 import com.supernova.launcher.ui.settings.AboutLinks
 import com.supernova.launcher.ui.settings.SettingItem
 
@@ -31,7 +32,12 @@ object ForkAbout {
             R.string.fork_whats_new,
             subtitle = { context.getString(R.string.fork_whats_new_summary) },
             onClick = { showChanges(context) }
-        ).describedBy(R.string.fork_whats_new_summary)
+        ).describedBy(R.string.fork_whats_new_summary),
+        SettingItem.Row(
+            R.string.fork_tour_again,
+            subtitle = { context.getString(R.string.fork_tour_again_summary) },
+            onClick = { Welcome.openTour(context) }
+        ).describedBy(R.string.fork_tour_again_summary)
     )
 
     private fun showAuthor(context: Context) {

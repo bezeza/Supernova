@@ -153,6 +153,13 @@
             android:exported="false"
             android:launchMode="singleTop" />
 
+        <!-- Fork: the tour, after the first run or from About. -->
+        <activity
+            android:name=".fork.welcome.ForkTourActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTop" />
+
         <!-- Backs the "Share backup" chooser; exposes only cacheDir/share. -->
         <provider
             android:name="androidx.core.content.FileProvider"

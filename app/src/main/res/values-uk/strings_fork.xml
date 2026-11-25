@@ -91,4 +91,19 @@
     <string name="fork_hint_ok">Зрозуміло</string>
     <string name="fork_language_title">Оберіть мову</string>
     <string name="fork_language_next">Далі</string>
+    <string name="fork_tour_mosaic">Мозаїка плиток</string>
+    <string name="fork_tour_mosaic_text">Категорії плитками різних розмірів. Утримуйте плитку, щоб змінити її.</string>
+    <string name="fork_tour_arrange">Розкладання</string>
+    <string name="fork_tour_arrange_text">Тягніть плитки куди зручно; чотири малі рухаються блоком.</string>
+    <string name="fork_tour_feed">Стрічка</string>
+    <string name="fork_tour_feed_text">Сторінка перед головним екраном: пошук, музика, календар, контакти й ваші віджети.</string>
+    <string name="fork_tour_feed_search">Пошук</string>
+    <string name="fork_tour_feed_music">Музика</string>
+    <string name="fork_tour_skip">Пропустити</string>
+    <string name="fork_tour_next">Далі</string>
+    <string name="fork_tour_done">Готово</string>
+    <string name="fork_news_show_tour">Показати тур</string>
+    <string name="fork_news_close">Закрити</string>
+    <string name="fork_tour_again">Показати знайомство ще раз</string>
+    <string name="fork_tour_again_summary">Три сторінки про плитки, розкладання й Стрічку</string>
 </resources>
