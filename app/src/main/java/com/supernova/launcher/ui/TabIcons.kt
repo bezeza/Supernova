@@ -74,6 +74,8 @@ object TabIcons {
         SmartCategory.MAPS -> R.drawable.tab_glyph_maps
         SmartCategory.PRODUCTIVITY -> R.drawable.tab_glyph_productivity
         SmartCategory.FINANCE -> R.drawable.tab_glyph_finance
+        SmartCategory.SHOPPING -> R.drawable.tab_glyph_fork_shopping // Fork
+        SmartCategory.GOVERNMENT -> R.drawable.tab_glyph_fork_government // Fork
     }
 
     // A picked icon: the tab bar tints every tab icon, which would turn a
