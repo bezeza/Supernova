@@ -11,7 +11,16 @@ import com.supernova.launcher.ui.AppDrawerAdapter
 
 // How the drawer's own grid is laid out, which the category's screen copies so
 // its apps sit as they do in the drawer: the column count and the grid's padding.
-class ScreenLook(val columns: Int, val left: Int, val top: Int, val right: Int, val bottom: Int)
+class ScreenLook(
+    val columns: Int,
+    val left: Int,
+    val top: Int,
+    val right: Int,
+    val bottom: Int,
+    // The look for another number of apps, asked when the category gains or loses some while it is open (the
+    // columns follow the count); null where the look does not depend on it.
+    val relook: ((Int) -> ScreenLook)? = null
+)
 
 // One category on a screen of its own, over the tiles, like a folder in App
 // Library or a category in HyperOS. The content is a [CategoryPage]; this puts

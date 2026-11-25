@@ -101,8 +101,7 @@ class CategoriesController(
 
         override fun resize(id: String, size: CategorySize) = resizeTile(id, size)
 
-        override fun groupOf(id: String): List<String> =
-            CellGrid.block(rows.placed(), id).map { it.id }.ifEmpty { listOf(id) }
+        override fun groupOf(id: String): List<String> = DragGroup.of(rows.placed(), id, rows.editing)
 
         override fun viewsOf(ids: Set<String>): Map<String, View> =
             (0 until recycler.childCount).map { recycler.getChildAt(it) }
