@@ -2,7 +2,8 @@
     <string name="app_name" translatable="false">Supernova</string>
     <!-- The name the system shows (drawers, the default-home chooser, the
          accessibility and notification-access lists); debug builds rename it. -->
-    <string name="app_label" translatable="false">Supernova</string>
+    <!-- Fork: told apart from the original on the home screen and in system lists. -->
+    <string name="app_label" translatable="false">Supernova Fork</string>
     <string name="settings">Settings</string>
     <string name="set_default_launcher">Set as default launcher</string>
     <string name="add_page">Add page</string>

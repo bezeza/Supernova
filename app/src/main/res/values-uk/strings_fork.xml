@@ -121,4 +121,6 @@
     <string name="fork_backup_in_folder">У теці: %1$s</string>
     <string name="fork_backup_done">Бекап зроблено</string>
     <string name="fork_backup_failed">Не вдалося зберегти бекап у теку</string>
+    <string name="fork_updates">Перевірити оновлення</string>
+    <string name="fork_updates_summary">Відкриває сторінку релізів у браузері</string>
 </resources>

@@ -28,7 +28,12 @@
 - 🌍 **Українська й російська мови** з коробки.
 
 ### 📲 Встановлення
-Готових релізів у цьому репозиторії ще немає. Хочеш збірку, пиши в Telegram **[@Bezeza](https://t.me/Bezeza)**, або збери сам: `./gradlew assembleRelease` (потрібен JDK 17 і Android SDK).
+1. Завантаж APK з **[останнього релізу](https://github.com/bezeza/Supernova/releases/latest)** (Android 9 і новіший).
+2. Або додай у [Obtainium](https://github.com/ImranR98/Obtainium), щоб отримувати оновлення: **[Додати в Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/bezeza/Supernova)**.
+
+⚠️ **Якщо в тебе стоїть оригінальний Supernova** (з F-Droid, Play чи GitHub), поверх нього форк не встановиться: підпис інший, а пакет той самий. Спершу зроби **Налаштування → Резервна копія → Експортувати**, видали оригінал, встанови форк і імпортуй копію.
+
+Зібрати самому: `./gradlew assembleRelease` (потрібен JDK 17 і Android SDK). Питання: Telegram **[@Bezeza](https://t.me/Bezeza)**.
 
 ### 💛 Підтримати
 Форк безкоштовний і без реклами. Якщо він тобі став у пригоді, можна кинути на каву й розвиток у [банку Monobank](https://send.monobank.ua/jar/8Hqt4ZL4oD). Дякую, це справді мотивує!
@@ -52,7 +57,12 @@
 - 🌍 **Украинский и русский языки** из коробки.
 
 ### 📲 Установка
-Готовых релизов в этом репозитории пока нет. Нужна сборка: пишите в Telegram **[@Bezeza](https://t.me/Bezeza)**, или соберите сами: `./gradlew assembleRelease` (нужны JDK 17 и Android SDK).
+1. Скачайте APK из **[последнего релиза](https://github.com/bezeza/Supernova/releases/latest)** (Android 9 и новее).
+2. Или добавьте в [Obtainium](https://github.com/ImranR98/Obtainium), чтобы получать обновления: **[Добавить в Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/bezeza/Supernova)**.
+
+⚠️ **Если стоит оригинальный Supernova** (из F-Droid, Play или GitHub), поверх него форк не установится: подпись другая, а пакет тот же. Сначала сделайте **Настройки → Резервная копия → Экспорт**, удалите оригинал, установите форк и импортируйте копию.
+
+Собрать самому: `./gradlew assembleRelease` (нужны JDK 17 и Android SDK). Вопросы: Telegram **[@Bezeza](https://t.me/Bezeza)**.
 
 ### 💛 Поддержать
 Форк бесплатный и без рекламы. Если он вам пригодился, можно бросить на кофе и развитие в [банку Monobank](https://send.monobank.ua/jar/8Hqt4ZL4oD). Спасибо, это правда мотивирует!
@@ -76,7 +86,12 @@ A fork of the wonderful [Supernova](https://github.com/tanujnotes/Supernova) lau
 - 🌍 **Ukrainian and Russian** out of the box.
 
 ### 📲 Install
-There are no ready releases in this repository yet. Want a build? Message **[@Bezeza](https://t.me/Bezeza)** on Telegram, or build it yourself: `./gradlew assembleRelease` (needs JDK 17 and the Android SDK).
+1. Download the APK from the **[latest release](https://github.com/bezeza/Supernova/releases/latest)** (Android 9 and newer).
+2. Or add it to [Obtainium](https://github.com/ImranR98/Obtainium) to get updates: **[Add to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/bezeza/Supernova)**.
+
+⚠️ **If you have the original Supernova** (from F-Droid, Play or GitHub), the fork will not install over it: another signature, same package. First **Settings → Backup → Export**, uninstall the original, install the fork and import your backup.
+
+Build it yourself: `./gradlew assembleRelease` (needs JDK 17 and the Android SDK). Questions: Telegram **[@Bezeza](https://t.me/Bezeza)**.
 
 ### 💛 Support
 The fork is free and ad-free. If it helped you, you can toss in for coffee and further work via a [Monobank jar](https://send.monobank.ua/jar/8Hqt4ZL4oD). Thank you, it really keeps me going!

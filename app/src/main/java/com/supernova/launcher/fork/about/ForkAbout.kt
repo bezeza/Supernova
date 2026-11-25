@@ -15,6 +15,7 @@ object ForkAbout {
     const val AUTHOR_GITHUB = "https://github.com/bezeza"
     const val AUTHOR_TELEGRAM = "https://t.me/Bezeza"
     const val ORIGINAL = "https://github.com/tanujnotes/Supernova"
+    const val RELEASES = "$REPOSITORY/releases/latest"
 
     // About's rows with the fork's own among them.
     fun addTo(context: Context, items: List<SettingItem>): List<SettingItem> {
@@ -33,6 +34,12 @@ object ForkAbout {
             subtitle = { context.getString(R.string.fork_whats_new_summary) },
             onClick = { showChanges(context) }
         ).describedBy(R.string.fork_whats_new_summary),
+        // The launcher has no internet access of its own: the browser shows what the newest release is.
+        SettingItem.Row(
+            R.string.fork_updates,
+            subtitle = { context.getString(R.string.fork_updates_summary) },
+            onClick = { AboutLinks.open(context, RELEASES) }
+        ).describedBy(R.string.fork_updates_summary),
         SettingItem.Row(
             R.string.fork_tour_again,
             subtitle = { context.getString(R.string.fork_tour_again_summary) },

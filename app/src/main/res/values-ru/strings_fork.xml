@@ -121,4 +121,6 @@
     <string name="fork_backup_in_folder">В папке: %1$s</string>
     <string name="fork_backup_done">Бэкап сделан</string>
     <string name="fork_backup_failed">Не удалось сохранить бэкап в папку</string>
+    <string name="fork_updates">Проверить обновления</string>
+    <string name="fork_updates_summary">Открывает страницу релизов в браузере</string>
 </resources>

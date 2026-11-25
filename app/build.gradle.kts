@@ -28,8 +28,9 @@ android {
         applicationId = "com.supernova.launcher"
         minSdk = 28
         targetSdk = 36
-        versionCode = 29
-        versionName = "v0.2.9"
+        // Fork: upstream's code times 100 plus the fork's own number; the name says both.
+        versionCode = 2901
+        versionName = "v0.2.9-fork.1"
         // For app/src/androidTest (SmokeTest): read its warning before
         // running it on a phone in use.
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
