@@ -86,7 +86,7 @@
     <string name="fork_about_original">Original: tanujnotes/Supernova</string>
     <string name="fork_whats_new">What\'s new in the fork</string>
     <string name="fork_whats_new_summary">Changes against the original</string>
-    <string name="fork_changes">• Categories style of the app menu, with a tile mosaic: 7 sizes, long-press menu, dragging, Compact\n• A categories page on the home screen\n• Recently installed: 4×1, 2×2 and 4×2\n• Columns in a category: Auto, As in the menu, 3–5\n• Choosing large icons, category icons\n• Per-folder columns, tint, name and icon\n• Ukrainian and Russian languages\n• Smart folders know Ukrainian apps, with new Shopping and Government and mobile (turn Smart folders off and on to sort again)</string>
+    <string name="fork_changes">• Categories style of the app menu, with a tile mosaic: 7 sizes, long-press menu, dragging, Compact\n• A categories page on the home screen\n• Recently installed: 4×1, 2×2 and 4×2\n• Columns in a category: Auto, As in the menu, 3–5\n• Choosing large icons, category icons\n• Per-folder columns, tint, name and icon\n• Ukrainian and Russian languages\n• Smart folders know Ukrainian apps, with new Shopping and Government and mobile (turn Smart folders off and on to sort again)\n• A weekly backup, with a copy in a folder you choose</string>
     <string name="fork_hint_tile_menu">Hold a tile: its sizes and menu</string>
     <string name="fork_hint_columns">Number of columns: Settings → App drawer → Columns in a category</string>
     <string name="fork_hint_ok">Got it</string>
@@ -110,4 +110,17 @@
     <string name="fork_tour_dots" translatable="false">● ○ ○</string>
     <string name="fork_category_shopping">Shopping</string>
     <string name="fork_category_government">Government and mobile</string>
+    <string name="fork_backup_folder">Folder for weekly copies</string>
+    <string name="fork_backup_folder_about">A copy there survives reinstalling the app. It holds your list of apps: a folder synced to a cloud takes it there too.</string>
+    <string name="fork_backup_folder_none">Not chosen</string>
+    <string name="fork_backup_folder_lost">The folder is not available. Choose it again.</string>
+    <string name="fork_backup_other_folder">Another folder</string>
+    <string name="fork_backup_turn_off">Turn off</string>
+    <string name="fork_backup_last">Last weekly backup</string>
+    <string name="fork_backup_last_about">Made once a week; tap to make one now</string>
+    <string name="fork_backup_never">not yet</string>
+    <string name="fork_backup_in_app">In the app: %1$s</string>
+    <string name="fork_backup_in_folder">In the folder: %1$s</string>
+    <string name="fork_backup_done">Backup made</string>
+    <string name="fork_backup_failed">The backup to the folder failed</string>
 </resources>

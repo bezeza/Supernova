@@ -6,15 +6,20 @@ import android.graphics.drawable.Drawable
 import android.widget.FrameLayout
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.supernova.launcher.LauncherActivity
 import com.supernova.launcher.data.AppCatalog
 import com.supernova.launcher.data.LaunchableApp
+import com.supernova.launcher.fork.backup.WeeklyBackup
 import com.supernova.launcher.ui.AppDrawerAdapter
+import com.supernova.launcher.ui.LauncherViewModel
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
 import com.supernova.launcher.fork.welcome.ForkLanguageActivity
 import com.supernova.launcher.fork.welcome.Welcome
 import com.supernova.launcher.fork.welcome.WelcomeFlags
+import kotlinx.coroutines.launch
 
 /**
  * The fork's only entry point inside [LauncherActivity].
@@ -63,13 +68,24 @@ object ForkHooks {
         screenAdapter: AppDrawerAdapter
     ): CategoriesController = CategoriesController(container, catalog, decorateIcon, actions, screenAdapter)
 
+    // The weekly copy, when a week has passed.
+    private fun backUpIfDue(activity: LauncherActivity) {
+        val viewModel = ViewModelProvider(activity)[LauncherViewModel::class.java]
+        activity.lifecycleScope.launch {
+            if (viewModel.onboardingDone()) WeeklyBackup.run(activity.applicationContext, viewModel)
+        }
+    }
+
     private val observer = object : DefaultLifecycleObserver {
         /** Fork work that should run each time the launcher becomes visible plugs in here. */
         override fun onStart(owner: LifecycleOwner) = plugIn(owner, Phase.START)
 
         /** Fork work that should run each time the launcher is in front plugs in here. */
         override fun onResume(owner: LifecycleOwner) {
-            if (owner is LauncherActivity) Welcome.onLauncherResumed(owner)
+            if (owner is LauncherActivity) {
+                Welcome.onLauncherResumed(owner)
+                backUpIfDue(owner)
+            }
             plugIn(owner, Phase.RESUME)
         }
 

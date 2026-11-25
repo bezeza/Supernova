@@ -85,7 +85,7 @@
     <string name="fork_about_original">Оригінал: tanujnotes/Supernova</string>
     <string name="fork_whats_new">Що нового у форку</string>
     <string name="fork_whats_new_summary">Зміни проти оригіналу</string>
-    <string name="fork_changes">• Стиль меню «Категорії» з мозаїкою плиток: 7 розмірів, меню довгим натисканням, перетягування, «Ущільнити»\n• Сторінка категорій на робочому столі\n• Нещодавно встановлені: 4×1, 2×2 і 4×2\n• Колонки в категорії: Авто, Як у меню, 3–5\n• Вибір великих іконок, значки категорій\n• Власні колонки, прозорість, назва й іконка для кожної папки\n• Українська й російська мови\n• Розумні папки знають українські застосунки, нові «Покупки» й «Держава і зв\'язок» (щоб розкласти заново, вимкніть і ввімкніть «Розумні папки»)</string>
+    <string name="fork_changes">• Стиль меню «Категорії» з мозаїкою плиток: 7 розмірів, меню довгим натисканням, перетягування, «Ущільнити»\n• Сторінка категорій на робочому столі\n• Нещодавно встановлені: 4×1, 2×2 і 4×2\n• Колонки в категорії: Авто, Як у меню, 3–5\n• Вибір великих іконок, значки категорій\n• Власні колонки, прозорість, назва й іконка для кожної папки\n• Українська й російська мови\n• Розумні папки знають українські застосунки, нові «Покупки» й «Держава і зв\'язок» (щоб розкласти заново, вимкніть і ввімкніть «Розумні папки»)\n• Тижневий бекап і копія у вибрану вами теку</string>
     <string name="fork_hint_tile_menu">Утримуйте плитку: розміри й меню</string>
     <string name="fork_hint_columns">Кількість колонок: Налаштування → Шухляда застосунків → Колонки в категорії</string>
     <string name="fork_hint_ok">Зрозуміло</string>
@@ -108,4 +108,17 @@
     <string name="fork_tour_again_summary">Три сторінки про плитки, розкладання й Стрічку</string>
     <string name="fork_category_shopping">Покупки</string>
     <string name="fork_category_government">Держава і зв\'язок</string>
+    <string name="fork_backup_folder">Тека для тижневих копій</string>
+    <string name="fork_backup_folder_about">Копія там переживає перевстановлення застосунку. У ній є список ваших застосунків: тека, що синхронізується з хмарою, віднесе його й туди.</string>
+    <string name="fork_backup_folder_none">Не вибрано</string>
+    <string name="fork_backup_folder_lost">Тека недоступна. Виберіть її ще раз.</string>
+    <string name="fork_backup_other_folder">Інша тека</string>
+    <string name="fork_backup_turn_off">Вимкнути</string>
+    <string name="fork_backup_last">Останній тижневий бекап</string>
+    <string name="fork_backup_last_about">Робиться раз на тиждень; торкніться, щоб зробити зараз</string>
+    <string name="fork_backup_never">ще не було</string>
+    <string name="fork_backup_in_app">У застосунку: %1$s</string>
+    <string name="fork_backup_in_folder">У теці: %1$s</string>
+    <string name="fork_backup_done">Бекап зроблено</string>
+    <string name="fork_backup_failed">Не вдалося зберегти бекап у теку</string>
 </resources>
