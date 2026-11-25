@@ -5,7 +5,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +38,7 @@ internal class CategoryPage(
     private var shownApps: List<LaunchableApp> = emptyList()
 
     private val bar = PickBar(context) { cancelPicking() }.apply { visibility = View.GONE }
+    private val notes = PageNotes(context)
 
     // The apps chosen so far, by their place in the grid, wear their numbers while choosing.
     private val marks = PickMarks(density).also {
@@ -82,6 +82,9 @@ internal class CategoryPage(
         addView(bar, LinearLayout.LayoutParams(wide, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             setMargins(gap, 0, gap, gap / 2)
         })
+        addView(notes.view, LinearLayout.LayoutParams(wide, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            setMargins(gap, 0, gap, gap / 2)
+        })
         addView(grid, LinearLayout.LayoutParams(wide, 0, 1f))
     }
 
@@ -119,6 +122,7 @@ internal class CategoryPage(
         applyLook(look)
         cells.submit(apps, emptyList(), true, AppDrawerAdapter.Order.UNSORTED, replace = true)
         grid.scrollToPosition(0)
+        notes.showHint(picking = false)
     }
 
     // New apps for the open category: the grid diffs against what it had.
@@ -133,6 +137,7 @@ internal class CategoryPage(
     // The page is let go: a choosing of large icons in it ends.
     fun release() {
         stopPicking()
+        notes.hide()
     }
 
     fun rebind() = cells.notifyItemRangeChanged(0, cells.itemCount)
@@ -141,6 +146,7 @@ internal class CategoryPage(
     fun setLook(textColor: Int, showIcon: Boolean, accent: Int) {
         header.setLook(textColor, showIcon)
         bar.setLook(accent)
+        notes.setLook(accent)
         marks.accent = accent
         if (cells.labelTextColor != textColor) {
             cells.labelTextColor = textColor
@@ -157,7 +163,7 @@ internal class CategoryPage(
             val chosen = current.picked
             stopPicking()
             onPicked(chosen)
-            Toast.makeText(appContext, R.string.fork_pick_large_done, Toast.LENGTH_SHORT).show()
+            notes.announceChosen()
         } else {
             showProgress(current)
         }
@@ -174,6 +180,7 @@ internal class CategoryPage(
     fun cancelPicking(): Boolean {
         if (picker == null) return false
         stopPicking()
+        notes.showHint(picking = false)
         return true
     }
 
@@ -189,6 +196,7 @@ internal class CategoryPage(
         if (slots < 1) return
         val current = LargePicker<LaunchableApp>(slots)
         picker = current
+        notes.showHint(picking = true)
         bar.visibility = View.VISIBLE
         header.setPicking(true, choosable = true)
         showProgress(current)

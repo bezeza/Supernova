@@ -9,7 +9,9 @@ internal object BottomClearance {
     fun over(bottom: Int, tops: List<Int?>): Int =
         tops.filterNotNull().maxOfOrNull { bottom - it }?.coerceAtLeast(0) ?: 0
 
-    // What the navigation bar covers of a list that ends at [bottomInWindow] in a window [windowHeight] high.
+    // What the navigation bar covers of a list that ends at [bottomInWindow] in a window [windowHeight] high. Never
+    // more than the bar itself: a list measured while its sheet is still below the screen is not covered by all of
+    // that distance, and a margin taken from it would put the plates over the list's bottom off the screen.
     fun underNavigation(bottomInWindow: Int, windowHeight: Int, barHeight: Int): Int =
-        (bottomInWindow - (windowHeight - barHeight)).coerceAtLeast(0)
+        (bottomInWindow - (windowHeight - barHeight)).coerceIn(0, barHeight.coerceAtLeast(0))
 }

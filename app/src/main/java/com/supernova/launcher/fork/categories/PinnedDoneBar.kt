@@ -60,7 +60,7 @@ internal class PinnedDoneBar(context: Context, private val onDone: () -> Unit) :
     private fun dp(value: Float): Int = (value * density).toInt()
 
     private companion object {
-        const val HINT_SP = 11f
+        const val HINT_SP = 15f
         const val HINT_LINES = 3
         const val DONE_SP = 14f
         const val PADDING_DP = 12f
