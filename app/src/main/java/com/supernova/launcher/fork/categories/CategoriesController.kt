@@ -10,10 +10,12 @@ import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.supernova.launcher.R
 import com.supernova.launcher.data.AppCatalog
 import com.supernova.launcher.data.DrawerGroup
 import com.supernova.launcher.data.LaunchableApp
+import com.supernova.launcher.fork.frequent.FrequentTile
 import com.supernova.launcher.ui.AppDrawerAdapter
 
 // The Categories drawer: a list of its own that sits over the drawer's usual
@@ -178,16 +180,25 @@ class CategoriesController(
         val context = recycler.context
         closeMenu()
         menuOwner = null
+        val frequent = FrequentTile.isFrequent(id)
         val rowsOfMenu = buildList {
             add(MenuRow(context.getString(R.string.fork_menu_open), R.drawable.ic_menu_open) {
                 actions.onCategory(view, tile.entry.group, tile.entry.apps)
             })
-            add(MenuRow(context.getString(R.string.fork_menu_options), R.drawable.ic_menu_edit) {
-                showOptions(view, tile.entry.group, tile.entry.apps)
-            })
-            add(MenuRow(context.getString(R.string.fork_folder_menu), R.drawable.ic_menu_move_to_folder) {
-                actions.onCategoryLongPress(view, tile.entry.group, tile.entry.apps)
-            })
+            if (frequent) {
+                // No folder behind this tile: no settings of a category, no folder menu, but a way back for the
+                // apps the user took off it.
+                add(MenuRow(context.getString(R.string.fork_frequent_reset), R.drawable.ic_menu_show) {
+                    confirmFrequentReset(view.context)
+                })
+            } else {
+                add(MenuRow(context.getString(R.string.fork_menu_options), R.drawable.ic_menu_edit) {
+                    showOptions(view, tile.entry.group, tile.entry.apps)
+                })
+                add(MenuRow(context.getString(R.string.fork_folder_menu), R.drawable.ic_menu_move_to_folder) {
+                    actions.onCategoryLongPress(view, tile.entry.group, tile.entry.apps)
+                })
+            }
             add(MenuRow(context.getString(R.string.fork_menu_compact), R.drawable.ic_menu_sort) {
                 commitCells(CellGrid.compact(rows.placed()), null)
             })
@@ -206,6 +217,16 @@ class CategoriesController(
         menu.show(view, x, y, tile.options.size, sizes, layouts, rowsOfMenu, drag.handleOnScreen()) { size ->
             resizeTile(id, size)
         }
+    }
+
+    // The apps taken off the Frequent tile come back, once the user has said yes.
+    private fun confirmFrequentReset(context: Context) {
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.fork_frequent_reset)
+            .setMessage(R.string.fork_frequent_reset_message)
+            .setPositiveButton(R.string.fork_frequent_reset_ok) { _, _ -> actions.edits.onFrequentReset() }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun sizeChoices(context: Context): List<SizeChoice> = listOf(
@@ -271,6 +292,9 @@ class CategoriesController(
     // Told when a screen opens or closes, so the drawer can hide or show its own list.
     var onScreenChanged: (() -> Unit)? = null
     val isScreenOpen: Boolean get() = state.isOpen
+
+    // The id of the category whose screen is open, null when none is.
+    val openId: String? get() = state.openId.takeIf { state.isOpen }
     private var openGroup: DrawerGroup? = null
 
     init {

@@ -118,6 +118,7 @@ internal class CategoryPage(
     fun bind(group: DrawerGroup, apps: List<LaunchableApp>, look: ScreenLook) {
         stopPicking()
         shownApps = apps
+        header.virtual = com.supernova.launcher.fork.frequent.FrequentTile.isFrequent(group.id)
         header.show(group.name, choosable = apps.size > 1)
         applyLook(look)
         cells.submit(apps, emptyList(), true, AppDrawerAdapter.Order.UNSORTED, replace = true)

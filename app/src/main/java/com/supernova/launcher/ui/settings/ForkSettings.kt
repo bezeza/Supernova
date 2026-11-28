@@ -27,7 +27,7 @@ object ForkSettings {
             } else if (section.title == R.string.settings_section_drawer) {
                 val extra = autoSortRows(context, viewModel, actions)
                 val extraRows = categoriesRows(viewModel) + columnsRow(context, viewModel, actions) +
-                    folderScreenRow(viewModel)
+                    folderScreenRow(viewModel) + frequentRow(viewModel)
                 val withStyleRows = afterDrawerStyle(section.items, extraRows)
                 SettingsSection(section.title, afterSmartFolders(withStyleRows, extra))
             } else if (section.title == R.string.settings_section_backup) {
@@ -50,6 +50,15 @@ object ForkSettings {
         get = { it.categoriesHomePage },
         set = { viewModel.set(Pref.categoriesHomePage, it) },
         subtitle = R.string.fork_home_page_summary
+    )
+
+    // The Frequent category: a tile of the categories (the drawer's and the home page's) with the apps opened most
+    // from the launcher. Off by default; off, nothing is collected, and what was collected stays.
+    private fun frequentRow(viewModel: LauncherViewModel): SettingItem = SettingItem.Toggle(
+        R.string.fork_frequent_title,
+        get = { it.frequentEnabled },
+        set = { viewModel.setFrequentEnabled(it) },
+        subtitle = R.string.fork_frequent_summary
     )
 
     private fun afterDrawerStyle(items: List<SettingItem>, extra: List<SettingItem>): List<SettingItem> {

@@ -6,7 +6,8 @@ import com.supernova.launcher.data.LaunchableApp
 
 // One category on the Categories drawer: a folder (smart or the user's) and
 // its apps in the order the drawer sorts them.
-class CategoryEntry(val group: DrawerGroup, val apps: List<LaunchableApp>)
+// [note] is what its tile says while it holds no app (the Frequent category's status), else null.
+class CategoryEntry(val group: DrawerGroup, val apps: List<LaunchableApp>, val note: String? = null)
 
 // How the tiles look and respond, from the drawer's colours and the settings.
 data class TileLook(
@@ -66,7 +67,9 @@ class CategoryEdits(
     // The tiles dragged to a new order: the ids of the shown folders, in that order.
     val onOrder: (List<String>) -> Unit,
     // Tiles put in cells, some given another size too, all in one change (a tile moved moves others).
-    val onTiles: (Map<String, TileChange>) -> Unit = {}
+    val onTiles: (Map<String, TileChange>) -> Unit = {},
+    // The Frequent tile's "Reset hidden": the apps taken off it come back.
+    val onFrequentReset: () -> Unit = {}
 )
 
 internal fun appKey(app: LaunchableApp): String = "${app.userSerial}/${app.packageName}/${app.className}"

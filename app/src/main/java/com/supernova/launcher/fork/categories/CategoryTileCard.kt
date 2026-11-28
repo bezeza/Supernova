@@ -74,6 +74,11 @@ internal class CategoryTileCard(context: Context) : EditableCard(context) {
         name.text = text
     }
 
+    // What the card says while it holds no app: [text], or the usual words for an empty category.
+    fun setEmptyText(text: String?) {
+        empty.text = text ?: context.getString(R.string.fork_empty_category)
+    }
+
     fun setColors(card: Int, text: Int) {
         shape.setColor(card)
         empty.setTextColor(text)

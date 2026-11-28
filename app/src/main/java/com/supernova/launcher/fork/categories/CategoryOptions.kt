@@ -96,7 +96,8 @@ object CategoryOptionsStore {
 
     // The strip of the newest installs is no folder, but it has a size and a cell of its own.
     const val RECENT_KEY = "fork:recent"
-    private val KEPT_KEYS = setOf(RECENT_KEY)
+    // The Frequent tile is no folder either: it keeps its size and cell the same way.
+    private val KEPT_KEYS = setOf(RECENT_KEY, com.supernova.launcher.fork.frequent.FrequentTile.ID)
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -117,8 +118,9 @@ object CategoryOptionsStore {
 
     // Defaults are not written, so a category set back to them leaves no trace.
     fun encode(options: Map<String, CategoryOptions>): String {
-        // The row of the newest installs keeps its entry whatever it holds: its default size is not a category's.
-        val stored = options.filter { (id, v) -> !v.isDefault || id == RECENT_KEY }
+        // The row of the newest installs and the Frequent tile keep their entries whatever they hold: their default
+        // sizes are not a category's.
+        val stored = options.filter { (id, v) -> !v.isDefault || id in KEPT_KEYS }
             .mapValues { (_, v) ->
                 StoredOptions(v.sort.name, v.hidden, v.size.name, v.large, v.col ?: NO_CELL, v.row ?: NO_CELL)
             }

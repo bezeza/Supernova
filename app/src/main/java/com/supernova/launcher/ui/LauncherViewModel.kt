@@ -1263,6 +1263,12 @@ class LauncherViewModel(
 
     // Fork: the launch also goes to the Frequent category's own statistics, when it is on (fork/frequent). An app of
     // the private space is not counted there.
+    // Fork: the Frequent category on or off. Turning it on starts its warm-up over; nothing collected is dropped.
+    fun setFrequentEnabled(on: Boolean) {
+        set(com.supernova.launcher.data.Pref.frequentEnabled, on)
+        persist { com.supernova.launcher.fork.frequent.FrequentStore.setEnabled(getApplication(), on) }
+    }
+
     private fun noteFrequentLaunch(app: LaunchableApp) {
         val enabled = state.value.prefs.frequentEnabled && !app.privateSpace
         if (!enabled) return

@@ -23,17 +23,9 @@ internal sealed class CategoryRow(val key: String, val content: String) {
     class Tile(val entry: CategoryEntry, val options: CategoryOptions = CategoryOptions()) : CategoryRow(
         "tile/${entry.group.id}",
         entry.group.name + "|" + options.size + options.large + "@" + options.col + "," + options.row + "|" +
-            entry.apps.joinToString(",") { appKey(it) }
+            entry.note + "|" + entry.apps.joinToString(",") { appKey(it) }
     ) {
-        val slots = when (options.size) {
-            CategorySize.SMALL -> TileSlots.small()
-            CategorySize.NORMAL -> TileSlots.normal(minOf(options.large, CategoryLayout.LARGE_SLOTS))
-            CategorySize.WIDE -> TileSlots.double()
-            CategorySize.STRIP -> TileSlots.strip(CategoryOptions.stripCount(options.large))
-            CategorySize.LARGE -> TileSlots.big()
-            CategorySize.TALL -> TileSlots.tall()
-            CategorySize.HALF -> TileSlots.half()
-        }
+        val slots = TileSlots.of(options)
         val layout = CategoryLayout.tile(entry.apps, slots)
     }
 
@@ -328,6 +320,7 @@ internal class CategoriesAdapter(
             val small = row.options.size == CategorySize.SMALL
             title.visibility = if (small) View.GONE else View.VISIBLE
             card.setName(entry.group.name)
+            card.setEmptyText(entry.note)
             card.bind(row.layout, icons, actions, open = open, openLongPress = openLongPress)
             // The name under the tile opens it too.
             view.setOnClickListener(open)
