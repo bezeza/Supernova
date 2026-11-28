@@ -2,6 +2,7 @@ package com.supernova.launcher.fork.frequent
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import androidx.core.content.edit
 
 // The one place the Frequent category asks what time it is, so a debug build can move it forward.
 internal object FrequentClock {
@@ -29,7 +30,7 @@ internal object FrequentDebugShift {
     fun shift(context: Context, deltaMs: Long?): Long {
         if (!isDebuggable(context)) return 0L
         val next = if (deltaMs == null) 0L else offsetMs(context) + deltaMs
-        prefs(context).edit().putLong(KEY, next).apply()
+        prefs(context).edit { putLong(KEY, next) }
         return next
     }
 
