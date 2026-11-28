@@ -14,11 +14,16 @@ internal object FrequentCodec {
 
     fun decodeStat(entry: String): Pair<String, AppStat>? {
         val parts = entry.split(SEP)
-        if (parts.size != FIELDS || parts[0].isEmpty()) return null
-        val score = parts[1].toDoubleOrNull()?.takeIf { it.isFinite() && it >= 0.0 }
-        val last = parts[2].toLongOrNull()
-        val count = parts[3].toIntOrNull()?.takeIf { it >= 0 }
-        return if (score != null && last != null && count != null) parts[0] to AppStat(score, last, count) else null
+        if (parts.size != FIELDS) return null
+        val (key, rawScore, rawLast, rawCount) = parts
+        val score = rawScore.toDoubleOrNull()?.takeIf { it.isFinite() && it >= 0.0 }
+        val last = rawLast.toLongOrNull()
+        val count = rawCount.toIntOrNull()?.takeIf { it >= 0 }
+        return if (key.isNotEmpty() && score != null && last != null && count != null) {
+            key to AppStat(score, last, count)
+        } else {
+            null
+        }
     }
 
     fun encodeStats(stats: Map<String, AppStat>): Set<String> =
