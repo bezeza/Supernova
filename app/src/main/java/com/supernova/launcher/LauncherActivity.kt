@@ -3415,6 +3415,9 @@ class LauncherActivity :
         val menu = newItemPopup(forItem = true)
         addNotificationRows(menu, app.packageName, app.userSerial)
         itemMenuHook?.invoke(menu)
+        // Fork: "Hide from Frequent" while that category's screen is open (fork/frequent).
+        com.supernova.launcher.fork.frequent.FrequentMenu
+            .addRows(this, menu, viewModel, app, drawer.isFrequentScreenOpen())
         val extras = PopupRows.decode(
             viewModel.state.value.prefs.popupItemsDrawer, PopupRows.drawerDefaults
         )

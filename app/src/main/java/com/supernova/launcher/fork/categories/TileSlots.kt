@@ -25,6 +25,17 @@ internal object TileSlots {
     private const val EIGHTH = 0.125f
     private const val TALL_CORNER_X = 0.25f
 
+    // The layout a tile of these options has.
+    fun of(options: CategoryOptions): List<Slot> = when (options.size) {
+        CategorySize.SMALL -> small()
+        CategorySize.NORMAL -> normal(minOf(options.large, CategoryLayout.LARGE_SLOTS))
+        CategorySize.WIDE -> double()
+        CategorySize.STRIP -> strip(CategoryOptions.stripCount(options.large))
+        CategorySize.LARGE -> big()
+        CategorySize.TALL -> tall()
+        CategorySize.HALF -> half()
+    }
+
     // [large] 3 / 2 / 1 / 0 large icons, the rest of the card small icons.
     fun normal(large: Int): List<Slot> = when (large) {
         0 -> grid(THIRD, GRID_THREE, large = false)

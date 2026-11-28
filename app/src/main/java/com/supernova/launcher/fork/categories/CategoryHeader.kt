@@ -58,18 +58,22 @@ internal class CategoryHeader(context: Context) : LinearLayout(context) {
     // [choosable]: there is something to choose between.
     fun show(name: String, choosable: Boolean) {
         this.name = name
-        pickButton.visibility = if (choosable) VISIBLE else GONE
+        pickButton.visibility = if (choosable && !virtual) VISIBLE else GONE
+        addButton.visibility = if (virtual) GONE else VISIBLE
         render()
     }
 
+    // A category that is no folder (the Frequent one): no "+", no choosing of large icons.
+    var virtual = false
+
     fun setChoosable(choosable: Boolean) {
-        if (pickButton.visibility != INVISIBLE) pickButton.visibility = if (choosable) VISIBLE else GONE
+        if (pickButton.visibility != INVISIBLE) pickButton.visibility = if (choosable && !virtual) VISIBLE else GONE
     }
 
     // While choosing the name stays and the two buttons are away: what to do is said by the bar under the header.
     fun setPicking(picking: Boolean, choosable: Boolean) {
-        pickButton.visibility = if (picking) INVISIBLE else if (choosable) VISIBLE else GONE
-        addButton.visibility = if (picking) INVISIBLE else VISIBLE
+        pickButton.visibility = if (picking) INVISIBLE else if (choosable && !virtual) VISIBLE else GONE
+        addButton.visibility = if (picking) INVISIBLE else if (virtual) GONE else VISIBLE
     }
 
     fun setLook(color: Int, showIcon: Boolean) {

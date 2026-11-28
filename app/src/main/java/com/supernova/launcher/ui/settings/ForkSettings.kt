@@ -7,6 +7,7 @@ import com.supernova.launcher.data.Pref
 import com.supernova.launcher.fork.about.ForkAbout
 import com.supernova.launcher.fork.backup.ForkBackupRows
 import com.supernova.launcher.fork.categories.CategoryColumns
+import com.supernova.launcher.fork.frequent.FrequentSettings
 import com.supernova.launcher.ui.DrawerStyle
 import com.supernova.launcher.ui.LauncherViewModel
 
@@ -27,7 +28,7 @@ object ForkSettings {
             } else if (section.title == R.string.settings_section_drawer) {
                 val extra = autoSortRows(context, viewModel, actions)
                 val extraRows = categoriesRows(viewModel) + columnsRow(context, viewModel, actions) +
-                    folderScreenRow(viewModel)
+                    folderScreenRow(viewModel) + FrequentSettings.row(viewModel)
                 val withStyleRows = afterDrawerStyle(section.items, extraRows)
                 SettingsSection(section.title, afterSmartFolders(withStyleRows, extra))
             } else if (section.title == R.string.settings_section_backup) {

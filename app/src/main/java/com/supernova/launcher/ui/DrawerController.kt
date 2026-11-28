@@ -27,6 +27,7 @@ import com.supernova.launcher.data.LauncherPrefs
 import com.supernova.launcher.runLogged
 import com.supernova.launcher.search.AppSearchProvider
 import com.supernova.launcher.databinding.ActivityLauncherBinding
+import androidx.lifecycle.viewModelScope
 import com.supernova.launcher.fork.ForkHooks
 import com.supernova.launcher.fork.categories.CategoriesActions
 import com.supernova.launcher.fork.categories.CategoriesController
@@ -37,6 +38,8 @@ import com.supernova.launcher.fork.categories.CategorySettings
 import com.supernova.launcher.fork.categories.CategoryOptionsStore
 import com.supernova.launcher.fork.categories.CategoryOrder
 import com.supernova.launcher.fork.categories.CategoryColumns
+import com.supernova.launcher.fork.frequent.FrequentTile
+import com.supernova.launcher.fork.frequent.FrequentTop
 import com.supernova.launcher.fork.categories.CategoryColumnsLayout
 import com.supernova.launcher.fork.categories.CategoryReorder
 import com.supernova.launcher.fork.categories.CategorySort
@@ -109,7 +112,7 @@ class DrawerController(
             onAppClick, onAppLongPress, ::openCategoryScreen, onFolderLongPress,
             CategoryEdits(
                 ::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder,
-                ::changeCategoryTiles
+                ::changeCategoryTiles, ::resetFrequentExcluded
             )
         ),
         categoryAdapter
@@ -989,6 +992,7 @@ class DrawerController(
     // scroll parked. Shared by open() and the finger pull.
     private fun prepareContent(prefs: LauncherPrefs) {
         dateButton?.text = SearchBarButtons.dateText(context)
+        openFrequent(prefs) // Fork
         // Neighbour and spare pages for the paged style (stockSparePages).
         if (spareTiles > 0) stockSparePages(spareTiles)
         // Usage orders shift with every launch; those changes no longer
@@ -1988,10 +1992,9 @@ class DrawerController(
         apps: List<LaunchableApp>
     ) {
         if (!categoriesStyle || tab != null) return
-        categories.submit(
-            categoriesData(prefs, folders.map { it.group to it.members }, apps, SurfaceId.DRAWER),
-            showRecent = prefs.categoriesShowRecent
-        )
+        val data = categoriesData(prefs, folders.map { it.group to it.members }, apps, SurfaceId.DRAWER)
+        categories.submit(data, showRecent = prefs.categoriesShowRecent)
+        placeFrequentFirst(prefs, data)
     }
 
     // Fork: the categories and the tiles' look, from the folders (with the apps they hold) and the apps outside them.
@@ -2002,18 +2005,26 @@ class DrawerController(
         apps: List<LaunchableApp>,
         surface: SurfaceId
     ): CategoriesData {
-        val options = CategoryOptionsStore.decode(prefs.categoriesOptions)
+        val stored = CategoryOptionsStore.decode(prefs.categoriesOptions)
+        val frequentTile = frequentTile(prefs, stored) // Fork
+        val options = if (frequentTile == null) {
+            stored
+        } else {
+            stored + (FrequentTile.ID to FrequentTile.optionsOf(stored[FrequentTile.ID]))
+        }
         val usage = AppUsage(viewModel.launchCounts(), emptyList(), viewModel::hiddenKey)
         val orderings = Orderings<LaunchableApp>(
             alphabetical = { DrawerOrder.sorted(it, DrawerSort.ALPHA, usage) },
             byUse = { DrawerOrder.sorted(it, DrawerSort.MOST_USED, usage) },
             keyOf = viewModel::hiddenKey
         )
-        val (hiddenFolders, shownFolders) = folders.partition { options[it.first.id]?.hidden == true }
+        val withFrequent = listOfNotNull(frequentTile?.let { it.group to it.apps }) + folders
+        val (hiddenFolders, shownFolders) = withFrequent.partition { options[it.first.id]?.hidden == true }
         return CategoriesData(
             categories = shownFolders.map { (group, folderApps) ->
                 val sort = options[group.id]?.sort ?: CategorySort.DRAWER
-                CategoryEntry(group, CategoryOrder.apply(folderApps, sort, group.members.toList(), orderings))
+                val note = frequentTile?.note?.takeIf { FrequentTile.isFrequent(group.id) }
+                CategoryEntry(group, CategoryOrder.apply(folderApps, sort, group.members.toList(), orderings), note)
             },
             settings = CategorySettings(
                 options,
@@ -2034,6 +2045,70 @@ class DrawerController(
             )
         )
     }
+
+    // Fork: the Frequent category as a tile: a group of its own with the apps of the top, and what the tile says
+    // while it has none. Null while the category is off.
+    private class FrequentEntry(val group: DrawerGroup, val apps: List<LaunchableApp>, val note: String?)
+
+    private val frequent = FrequentTop(context, viewModel.viewModelScope) {
+        if (populated) submit() else needsRefresh = true
+    }
+    private var frequentPlacing = false
+
+    private fun frequentTile(prefs: LauncherPrefs, stored: Map<String, CategoryOptions>): FrequentEntry? {
+        if (!prefs.frequentEnabled) return null
+        frequent.load()
+        val byKey = viewModel.visibleApps().associateBy(viewModel::hiddenKey)
+        val keys = frequent.shown(
+            FrequentTile.capacity(FrequentTile.optionsOf(stored[FrequentTile.ID])), byKey.keys, prefs.frequentExcluded
+        )
+        val apps = keys.mapNotNull(byKey::get)
+        val group = DrawerGroup(
+            name = context.getString(R.string.fork_frequent_name),
+            members = apps.mapTo(mutableSetOf()) { viewModel.hiddenKey(it) },
+            id = FrequentTile.ID
+        )
+        val status = if (frequent.collecting) R.string.fork_frequent_collecting else R.string.fork_frequent_empty
+        return FrequentEntry(group, apps, context.getString(status).takeIf { apps.isEmpty() })
+    }
+
+    // Fork: the drawer is opening: what the last opening worked out is shown, and a new top is worked out.
+    private fun openFrequent(prefs: LauncherPrefs) {
+        if (!prefs.frequentEnabled) return
+        frequent.load()
+        val stored = CategoryOptionsStore.decode(prefs.categoriesOptions)
+        val places = FrequentTile.capacity(FrequentTile.optionsOf(stored[FrequentTile.ID]))
+        val eligible = viewModel.visibleApps().mapTo(HashSet(), viewModel::hiddenKey)
+        val installed = viewModel.state.value.apps.mapTo(HashSet(), viewModel::hiddenKey)
+        frequent.opened(places, installed, eligible, prefs.frequentExcluded)
+    }
+
+    // Fork: the first time the category is on, its tile goes to the top as the largest size, and the others make
+    // way. Once its options are stored this is over for good; turning the category off and on again leaves the
+    // tile where the user put it.
+    private fun placeFrequentFirst(prefs: LauncherPrefs, data: CategoriesData) {
+        val stored = CategoryOptionsStore.decode(prefs.categoriesOptions)
+        if (!prefs.frequentEnabled || FrequentTile.ID in stored) {
+            frequentPlacing = false
+            return
+        }
+        if (frequentPlacing) return
+        frequentPlacing = true
+        val others = data.categories.filterNot { FrequentTile.isFrequent(it.group.id) }.map {
+            val own = stored[it.group.id] ?: CategoryOptions()
+            com.supernova.launcher.fork.categories.Entry(it.group.id, own.size, own.col, own.row)
+        }
+        val changes = FrequentTile.firstPlacement(others)
+        changeCategoryTiles(changes)
+        changeCategoryOrder(FrequentTile.orderAfter(changes))
+    }
+
+    // Fork: the apps taken off the Frequent tile come back.
+    private fun resetFrequentExcluded() = viewModel.set(com.supernova.launcher.data.Pref.frequentExcluded, emptySet())
+
+    // Fork: the screen of the Frequent category is open (the app menu then offers to take an app off it).
+    fun isFrequentScreenOpen(): Boolean =
+        categories.openId == FrequentTile.ID || homeCategories.any { it.openId == FrequentTile.ID }
 
     // Fork: the categories page of the home screen. The pager has a copy of the page in up to three places, so each
     // copy has a controller of its own, fed while its view is on a window with the folders and apps of the All
@@ -2056,7 +2131,7 @@ class DrawerController(
                 { view, group, apps -> if (group.id != OTHER_APPS_ID) onFolderLongPress(view, group, apps) },
                 CategoryEdits(
                     ::placeCategoryLarge, ::changeCategoryOptions, ::addAppsToCategory, ::changeCategoryOrder,
-                    ::changeCategoryTiles
+                    ::changeCategoryTiles, ::resetFrequentExcluded
                 )
             ),
             cells
@@ -2097,6 +2172,7 @@ class DrawerController(
         val tiles = entries + listOfNotNull((other to apps).takeIf { apps.isNotEmpty() })
         val data = categoriesData(prefs, tiles, emptyList(), SurfaceId.HOME)
         homeCategories.forEach { it.submit(data, prefs.categoriesShowRecent) }
+        placeFrequentFirst(prefs, data)
     }
 
     // Fork: Back on the home screen's categories page: a category's screen closes, or the arranging stops.
@@ -2112,7 +2188,7 @@ class DrawerController(
 
     // Fork: the apps chosen as large icons become the folder's first apps, in the order chosen.
     private fun placeCategoryLarge(group: DrawerGroup, picked: List<LaunchableApp>) {
-        if (group.id == OTHER_APPS_ID) return
+        if (group.id == OTHER_APPS_ID || FrequentTile.isFrequent(group.id)) return
         picked.asReversed().forEach { viewModel.moveAppInFolder(group.id, it, LauncherViewModel.InFolderMove.START) }
         // The choice is a manual order: a sort of its own would undo it.
         changeCategoryOptions(group.id) { it.copy(sort = CategorySort.MANUAL) }
@@ -2165,7 +2241,7 @@ class DrawerController(
 
     // Fork: the "+" on the screen: the folder's apps to pick, as in the folder's menu.
     private fun addAppsToCategory(group: DrawerGroup) {
-        if (group.id == OTHER_APPS_ID) return
+        if (group.id == OTHER_APPS_ID || FrequentTile.isFrequent(group.id)) return
         val icons = ItemIcons(binding.root.context, viewModel)
         GroupChecklist(binding.root.context, viewModel, icons).show(group, viewModel.visibleApps())
     }

@@ -125,4 +125,13 @@
     <string name="fork_backup_failed">The backup to the folder failed</string>
     <string name="fork_updates">Check for updates</string>
     <string name="fork_updates_summary">Opens the releases page in the browser</string>
+    <string name="fork_frequent_name">Frequent</string>
+    <string name="fork_frequent_title">Frequent apps</string>
+    <string name="fork_frequent_summary">A tile of the apps you open most from the launcher. Counted: launches from the drawer, dock, home screen, folders and search. Not counted: launches from notifications, widgets and links. Everything stays on this phone.</string>
+    <string name="fork_frequent_collecting">Collecting stats…</string>
+    <string name="fork_frequent_empty">No data yet</string>
+    <string name="fork_frequent_exclude">Hide from Frequent</string>
+    <string name="fork_frequent_reset">Reset hidden</string>
+    <string name="fork_frequent_reset_message">The apps you hid from Frequent can show up there again.</string>
+    <string name="fork_frequent_reset_ok">Reset</string>
 </resources>

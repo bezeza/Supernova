@@ -123,4 +123,13 @@
     <string name="fork_backup_failed">Не вдалося зберегти бекап у теку</string>
     <string name="fork_updates">Перевірити оновлення</string>
     <string name="fork_updates_summary">Відкриває сторінку релізів у браузері</string>
+    <string name="fork_frequent_name">Часті</string>
+    <string name="fork_frequent_title">Часті застосунки</string>
+    <string name="fork_frequent_summary">Плитка застосунків, які ви відкриваєте найчастіше. Враховуються запуски з лаунчера: із шухляди, дока, робочого столу, папок і пошуку. Запуски зі сповіщень, віджетів і посилань не враховуються. Усе лишається на цьому телефоні.</string>
+    <string name="fork_frequent_collecting">Збираю статистику…</string>
+    <string name="fork_frequent_empty">Поки що немає даних</string>
+    <string name="fork_frequent_exclude">Не показувати в Частих</string>
+    <string name="fork_frequent_reset">Скинути приховані</string>
+    <string name="fork_frequent_reset_message">Застосунки, які ви прибрали з Частих, знову зможуть там показуватися.</string>
+    <string name="fork_frequent_reset_ok">Скинути</string>
 </resources>
