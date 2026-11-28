@@ -129,6 +129,16 @@ git push origin main
 | `LauncherActivity.kt` | `categoriesPageFactory` у `onCreate`, `newCategoriesPage`, `categoriesPageInView` (на сторінці категорій дотики належать списку плиток, жести головного екрана не діють), `backOnCategoriesPage`, гілки в `onPageSelected`, `workspaceCanScroll` і `emptyPagesRemovable`. Позначено `Fork` |
 | `ui/settings/ForkSettings.kt` | перемикач «Сторінка категорій» у розділі «Головний екран», після «Нескінченної прокрутки» |
 
+## «Часті» (ядро, PR 1 з двох)
+
+Пакет `fork/frequent`. Тут лише ядро без інтерфейсу: плитки, перемикача й пункту меню ще немає (PR 2). Запуск рахується в `LauncherViewModel.noteLaunch` (рядок `Fork`), лише коли `frequentEnabled` увімкнено (типово вимкнено) і застосунок не з приватного простору. Рахуються тільки запуски через `launchApp`, тобто з шухляди, дока, столу, папок і пошуку; сповіщення, віджети й посилання не враховуються.
+
+- Формула: `score = score * 2^(-dt/H) + 1` при запуску, `score * 2^(-dt/H)` при перерахунку, `H` = 6 діб. Гістерезис `gamma` = 1,25, поріг кандидата 2, прогрів 12 запусків у 3 застосунках або 24 години й 6 запусків. Усі числа лише в `FrequentConfig`.
+- Склад топу рахується при відкритті шухляди (не частіше ніж раз на 24 години), а показується при наступному відкритті. Порядок місць не перераховується: новачок стає на місце того, хто вибув. Виключення користувача й видалені застосунки прибираються з показаного одразу.
+- Статистика лежить в окремому файлі DataStore `fork_frequent` (`FrequentStore`), поза бекапом і поза скиданням налаштувань. У бекап ідуть лише `frequentEnabled` і `frequentExcluded` (в `LauncherPrefs`).
+- Усе рахується в чистих функціях (`FrequentScore`, `FrequentWarmup`, `FrequentSelection`, `FrequentEngine`, `FrequentCodec`) з юніт-тестами в `test/.../fork/frequent`; час береться лише з `FrequentClock`.
+- Перевірка на телефоні: у debug-збірці годинник «Частих» (не системний) зсувається на +24 години командою `adb shell am broadcast -n com.supernova.launcher.debug/com.supernova.launcher.fork.frequent.FrequentShiftReceiver` (`--ei hours N` іншого кроку, `--ez reset true` повертає реальний час). Приймач лежить у `src/debug`, у release його немає.
+
 ## Правила форка
 
 Код фіч форка живе в пакеті `com.supernova.launcher.fork`. Пакет уже є (`fork/ForkHooks.kt`).

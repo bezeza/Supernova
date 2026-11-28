@@ -1256,7 +1256,19 @@ class LauncherViewModel(
     // in.
     fun recentApps(limit: Int): List<LaunchableApp> = DrawerOrder.recentRow(visibleApps(), usage(), limit)
 
-    fun noteLaunch(app: LaunchableApp) = persist { preferences.recordLaunch(hiddenKey(app)) }
+    fun noteLaunch(app: LaunchableApp) {
+        persist { preferences.recordLaunch(hiddenKey(app)) }
+        noteFrequentLaunch(app) // Fork
+    }
+
+    // Fork: the launch also goes to the Frequent category's own statistics, when it is on (fork/frequent). An app of
+    // the private space is not counted there.
+    private fun noteFrequentLaunch(app: LaunchableApp) {
+        val enabled = state.value.prefs.frequentEnabled && !app.privateSpace
+        if (!enabled) return
+        val key = hiddenKey(app)
+        persist { com.supernova.launcher.fork.frequent.FrequentStore.noteLaunch(getApplication(), key, enabled) }
+    }
 
     fun personalApps(): List<LaunchableApp> = visibleApps().filterNot { it.work }
 

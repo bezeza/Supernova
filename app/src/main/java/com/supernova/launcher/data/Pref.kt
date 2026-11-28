@@ -226,6 +226,8 @@ object Pref {
     val categoriesColumns = choice("categories_columns", CategoryColumns.entries)
     val folderScreen = bool("folder_screen")
     val categoriesHomePage = bool("categories_home_page")
+    val frequentEnabled = bool("frequent_enabled")
+    val frequentExcluded = textSet("frequent_excluded")
     val folderOptions = text("folder_options")
     val categoriesSearchBottom = bool("categories_search_bottom")
     val smartFoldersDismissed = textSet("smart_folders_dismissed")

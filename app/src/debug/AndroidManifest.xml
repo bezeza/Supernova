@@ -8,6 +8,12 @@
             android:name=".LeakWatchSetup"
             android:authorities="${applicationId}.leak-watch-setup"
             android:exported="false" />
+        <!-- Fork: moves the Frequent category's clock ahead (adb shell am broadcast, see the receiver).
+             Debug builds only; the DUMP permission leaves it to the shell. -->
+        <receiver
+            android:name=".fork.frequent.FrequentShiftReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
     </application>
 
 </manifest>
