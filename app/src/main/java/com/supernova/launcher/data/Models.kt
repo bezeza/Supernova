@@ -281,6 +281,9 @@ data class LauncherPrefs(
     val folderScreen: Boolean = false,
     // Fork: the last page of the home screen shows the category tiles.
     val categoriesHomePage: Boolean = false,
+    // Fork: the Frequent category (fork/frequent) is on, and the apps the user took off it, by app key.
+    val frequentEnabled: Boolean = false,
+    val frequentExcluded: Set<String> = emptySet(),
     // Each folder's own options as JSON by id (fork/folders/FolderOptions).
     val folderOptions: String = "",
     val categoriesSearchBottom: Boolean = false,
